@@ -108,6 +108,13 @@ export default function HomeScreen() {
             >
               <Text style={styles.buttonText}>Join Game</Text>
             </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.button, styles.rulesButton]}
+              onPress={() => router.push('/rules')}
+            >
+              <Text style={styles.rulesButtonText}>How to Play</Text>
+            </TouchableOpacity>
           </View>
         )}
 
@@ -242,5 +249,15 @@ const styles = StyleSheet.create({
     color: '#888',
     fontSize: 16,
     marginTop: 8,
+  },
+  rulesButton: {
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: '#444',
+  },
+  rulesButtonText: {
+    color: '#aaa',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
