@@ -37,8 +37,8 @@ export function Game() {
 
   const [guessTitle, setGuessTitle] = useState('');
   const [guessArtist, setGuessArtist] = useState('');
-  const [songNameResult, setSongNameResult] = useState<boolean | null>(null);
   const [selectedPosition, setSelectedPosition] = useState<number | null>(null);
+  const songNameResult = useGameStore((s) => s.songNameResult);
 
   const socket = getSocket();
   const isMyTurn = currentTurnPlayerId === myId;
@@ -58,7 +58,7 @@ export function Game() {
     socket.emit('skip-song');
     setGuessTitle('');
     setGuessArtist('');
-    setSongNameResult(null);
+    useGameStore.setState({ songNameResult: null });
   };
 
   const handleChallenge = () => {
@@ -68,7 +68,6 @@ export function Game() {
   const handleNameSong = () => {
     if (!guessTitle.trim() || !guessArtist.trim()) return;
     socket.emit('name-song', { title: guessTitle.trim(), artist: guessArtist.trim() });
-    // We'll get the result via the song-named event
   };
 
   const handleBuyCard = () => {
@@ -79,8 +78,8 @@ export function Game() {
     socket.emit('confirm-reveal');
     setGuessTitle('');
     setGuessArtist('');
-    setSongNameResult(null);
     setSelectedPosition(null);
+    useGameStore.setState({ songNameResult: null });
   };
 
   const revealedSong = lastReveal?.song;
@@ -238,14 +237,22 @@ export function Game() {
               onChange={(e) => setGuessArtist(e.target.value)}
               className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#1DB954]"
             />
-            {guessTitle && guessArtist && (
+            {songNameResult && songNameResult.playerId === myId ? (
+              <div className={`text-center py-2 px-4 rounded-xl text-sm font-bold ${
+                songNameResult.correct
+                  ? 'bg-green-500/20 text-green-400 border border-green-500/30'
+                  : 'bg-red-500/20 text-red-400 border border-red-500/30'
+              }`}>
+                {songNameResult.correct ? 'Correct! +1 Token' : 'Wrong guess'}
+              </div>
+            ) : guessTitle && guessArtist ? (
               <button
                 onClick={handleNameSong}
                 className="w-full bg-purple-600 hover:bg-purple-500 text-white font-bold py-2 rounded-xl text-sm transition-all"
               >
                 Submit Song Guess
               </button>
-            )}
+            ) : null}
           </motion.div>
         )}
 

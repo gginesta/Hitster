@@ -81,6 +81,10 @@ export function useSocket() {
       store.updatePlayerTimeline(playerId, timeline);
     });
 
+    socket.on('song-named', ({ playerId, correct }) => {
+      store.setSongNameResult(playerId, correct);
+    });
+
     socket.on('game-over', ({ winnerId, players }) => {
       store.setWinner(winnerId, players);
       store.setPhase('game_over');

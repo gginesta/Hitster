@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Music, Headphones, BookOpen } from 'lucide-react';
+import { Music, Headphones, BookOpen, Wifi, WifiOff } from 'lucide-react';
 import { motion } from 'motion/react';
 import { getSocket } from '../services/socket';
 import { useGameStore } from '../store';
@@ -9,6 +9,7 @@ export function Home() {
   const [mode, setMode] = useState<'idle' | 'host' | 'join'>('idle');
   const [code, setCode] = useState(['', '', '', '']);
   const error = useGameStore((s) => s.error);
+  const connected = useGameStore((s) => s.connected);
   const setScreen = useGameStore((s) => s.setScreen);
   const setError = useGameStore((s) => s.setError);
 
@@ -45,6 +46,21 @@ export function Home() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-6 text-white bg-[#1a1a2e]">
+      {/* Connection indicator */}
+      <div className="absolute top-4 right-4">
+        {connected ? (
+          <div className="flex items-center gap-1.5 text-xs text-green-400">
+            <Wifi className="w-3.5 h-3.5" />
+            Connected
+          </div>
+        ) : (
+          <div className="flex items-center gap-1.5 text-xs text-red-400 animate-pulse">
+            <WifiOff className="w-3.5 h-3.5" />
+            Connecting...
+          </div>
+        )}
+      </div>
+
       <motion.div
         initial={{ y: -50, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -94,15 +110,18 @@ export function Home() {
                 if (!name.trim()) return;
                 setMode('host');
               }}
-              disabled={!name.trim()}
+              disabled={!name.trim() || !connected}
               className="w-full bg-[#1DB954] hover:bg-[#1ed760] disabled:opacity-50 disabled:hover:bg-[#1DB954] text-black font-bold text-lg py-4 px-6 rounded-2xl flex items-center justify-center gap-3 transition-all transform active:scale-95 shadow-[0_0_20px_rgba(29,185,84,0.3)]"
             >
               <Headphones className="w-6 h-6" />
               Host Game
             </button>
             <button
-              onClick={() => setMode('join')}
-              disabled={!name.trim()}
+              onClick={() => {
+                if (!name.trim()) return;
+                setMode('join');
+              }}
+              disabled={!name.trim() || !connected}
               className="w-full bg-white/10 hover:bg-white/15 disabled:opacity-50 text-white font-bold text-lg py-4 px-6 rounded-2xl transition-all transform active:scale-95"
             >
               Join Game
@@ -121,8 +140,8 @@ export function Home() {
             animate={{ opacity: 1, height: 'auto' }}
             className="space-y-6 pt-4 text-center"
           >
-            <p className="text-gray-300">
-              You'll create a room for others to join.
+            <p className="text-gray-300 mb-4">
+              Hosts need Spotify Premium to play music for the room.
             </p>
             <button
               onClick={handleHost}

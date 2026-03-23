@@ -39,6 +39,7 @@ interface GameStore {
 
   // Reveal
   lastReveal: RevealData | null;
+  songNameResult: { playerId: string; correct: boolean } | null;
 
   // Winner
   winnerId: string | null;
@@ -60,6 +61,7 @@ interface GameStore {
   addChallenger: (id: string) => void;
   setDeckSize: (size: number) => void;
   setLastReveal: (reveal: RevealData | null) => void;
+  setSongNameResult: (playerId: string, correct: boolean) => void;
   setWinner: (winnerId: string, players: Record<string, Player>) => void;
   updatePlayerTokens: (playerId: string, tokens: number) => void;
   updatePlayerTimeline: (playerId: string, timeline: SongCard[]) => void;
@@ -85,6 +87,7 @@ const initialState = {
   challengers: [],
   deckSize: 0,
   lastReveal: null,
+  songNameResult: null,
   winnerId: null,
   finalPlayers: {} as Record<string, Player>,
 };
@@ -107,6 +110,7 @@ export const useGameStore = create<GameStore>((set) => ({
   addChallenger: (id) => set((s) => ({ challengers: [...s.challengers, id] })),
   setDeckSize: (deckSize) => set({ deckSize }),
   setLastReveal: (lastReveal) => set({ lastReveal }),
+  setSongNameResult: (playerId, correct) => set({ songNameResult: { playerId, correct } }),
   setWinner: (winnerId, players) => set({ winnerId, finalPlayers: players }),
   updatePlayerTokens: (playerId, tokens) =>
     set((s) => ({
