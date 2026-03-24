@@ -11,6 +11,9 @@ export function getSocket(): GameSocket {
     socket = io(url, {
       transports: ['websocket', 'polling'],
       autoConnect: false,
+      reconnection: true,
+      reconnectionAttempts: 10,
+      reconnectionDelay: 1000,
     });
   }
   return socket;
