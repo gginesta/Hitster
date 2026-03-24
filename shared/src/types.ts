@@ -7,6 +7,7 @@ export interface SongData {
 export interface SongCard extends SongData {
   id: string;
   spotifyTrackId?: string;
+  previewUrl?: string;
 }
 
 export type GameMode = 'original' | 'pro' | 'expert' | 'coop';
@@ -35,6 +36,7 @@ export interface GameState {
   turnOrder: string[];
   turnIndex: number;
   deckSize: number;
+  sharedTimeline: SongCard[];
 }
 
 export interface Room {
@@ -53,4 +55,5 @@ export interface PublicGameView {
 export interface SongGuess {
   title: string;
   artist: string;
+  year?: number;
 }

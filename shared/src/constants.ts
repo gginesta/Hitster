@@ -11,3 +11,4 @@ export const BUY_CARD_COST = 3;
 export const ROOM_CODE_LENGTH = 4;
 export const DECK_SIZE = 50;
 export const CHALLENGE_WINDOW_MS = 15000;
+export const COOP_WRONG_PENALTY = 1;

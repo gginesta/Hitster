@@ -1,23 +1,114 @@
-import { useState } from 'react';
-import { Music, Headphones, BookOpen, Wifi, WifiOff } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { Music, Headphones, BookOpen, Wifi, WifiOff, Loader2, LogIn, LogOut, UserPlus } from 'lucide-react';
 import { motion } from 'motion/react';
 import { getSocket } from '../services/socket';
+import { openSpotifyLogin, refreshAccessToken } from '../services/spotify';
 import { useGameStore } from '../store';
 
 export function Home() {
-  const [name, setName] = useState('');
+  const [name, setName] = useState(() => localStorage.getItem('hitster_display_name') || '');
   const [mode, setMode] = useState<'idle' | 'host' | 'join'>('idle');
   const [code, setCode] = useState(['', '', '', '']);
+  const [connecting, setConnecting] = useState(false);
+  const [authMode, setAuthMode] = useState<'none' | 'login' | 'register'>('none');
+  const [authUsername, setAuthUsername] = useState('');
+  const [authPassword, setAuthPassword] = useState('');
+  const [authLoading, setAuthLoading] = useState(false);
+  const [signedInAs, setSignedInAs] = useState<string | null>(() => localStorage.getItem('hitster_username'));
   const error = useGameStore((s) => s.error);
   const connected = useGameStore((s) => s.connected);
   const setScreen = useGameStore((s) => s.setScreen);
   const setError = useGameStore((s) => s.setError);
 
-  const handleHost = () => {
-    if (!name.trim()) return;
+  const handleAuthResult = useCallback((data: { success: boolean; error?: string; displayName?: string }) => {
+    setAuthLoading(false);
+    if (data.success) {
+      localStorage.setItem('hitster_username', authUsername);
+      setSignedInAs(authUsername);
+      if (data.displayName) {
+        setName(data.displayName);
+        localStorage.setItem('hitster_display_name', data.displayName);
+      }
+      setAuthMode('none');
+      setAuthPassword('');
+      setError(null);
+    } else {
+      setError(data.error || 'Authentication failed');
+    }
+  }, [authUsername, setError]);
+
+  useEffect(() => {
+    const socket = getSocket();
+    socket.on('auth-result', handleAuthResult);
+    return () => {
+      socket.off('auth-result', handleAuthResult);
+    };
+  }, [handleAuthResult]);
+
+  const handleAuth = () => {
+    if (!authUsername.trim() || !authPassword.trim()) return;
+    setAuthLoading(true);
     setError(null);
     const socket = getSocket();
-    socket.emit('create-room', { playerName: name.trim() });
+    if (authMode === 'register') {
+      socket.emit('register', {
+        username: authUsername.trim(),
+        password: authPassword,
+        displayName: name.trim() || authUsername.trim(),
+      });
+    } else {
+      socket.emit('login', { username: authUsername.trim(), password: authPassword });
+    }
+  };
+
+  const handleSignOut = () => {
+    localStorage.removeItem('hitster_username');
+    localStorage.removeItem('hitster_display_name');
+    setSignedInAs(null);
+    setName('');
+    setError(null);
+  };
+
+  const createRoomWithToken = (accessToken: string, refreshToken: string) => {
+    useGameStore.setState({
+      spotifyToken: accessToken,
+      spotifyRefreshToken: refreshToken,
+    });
+    localStorage.setItem('spotify_refresh_token', refreshToken);
+
+    const socket = getSocket();
+    socket.emit('create-room', {
+      playerName: name.trim(),
+      spotifyAccessToken: accessToken,
+    });
+  };
+
+  const handleSpotifyLogin = async () => {
+    if (!name.trim()) return;
+    setConnecting(true);
+    setError(null);
+
+    try {
+      // Try to reuse a saved refresh token first
+      const savedRefresh = localStorage.getItem('spotify_refresh_token');
+      if (savedRefresh) {
+        try {
+          const refreshed = await refreshAccessToken(savedRefresh);
+          createRoomWithToken(refreshed.accessToken, refreshed.refreshToken);
+          return;
+        } catch {
+          // Refresh failed — fall through to full login
+          localStorage.removeItem('spotify_refresh_token');
+        }
+      }
+
+      const { accessToken, refreshToken } = await openSpotifyLogin();
+      createRoomWithToken(accessToken, refreshToken);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Spotify login failed');
+    } finally {
+      setConnecting(false);
+    }
   };
 
   const handleJoin = () => {
@@ -93,6 +184,93 @@ export function Home() {
           />
         </div>
 
+        {/* Account section */}
+        {signedInAs ? (
+          <div className="flex items-center justify-between bg-white/5 rounded-xl px-4 py-2.5">
+            <span className="text-sm text-gray-300">
+              Signed in as <span className="text-white font-medium">{signedInAs}</span>
+            </span>
+            <button
+              onClick={handleSignOut}
+              className="text-xs text-gray-400 hover:text-white flex items-center gap-1 transition-colors"
+            >
+              <LogOut className="w-3 h-3" />
+              Sign out
+            </button>
+          </div>
+        ) : authMode !== 'none' ? (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            className="space-y-3 bg-white/5 rounded-xl p-4"
+          >
+            <div className="flex gap-2 mb-2">
+              <button
+                onClick={() => { setAuthMode('login'); setError(null); }}
+                className={`flex-1 text-xs font-bold py-1.5 rounded-lg transition-all ${authMode === 'login' ? 'bg-white/15 text-white' : 'text-gray-400 hover:text-white'}`}
+              >
+                Sign In
+              </button>
+              <button
+                onClick={() => { setAuthMode('register'); setError(null); }}
+                className={`flex-1 text-xs font-bold py-1.5 rounded-lg transition-all ${authMode === 'register' ? 'bg-white/15 text-white' : 'text-gray-400 hover:text-white'}`}
+              >
+                Create Account
+              </button>
+            </div>
+            <input
+              type="text"
+              value={authUsername}
+              onChange={(e) => setAuthUsername(e.target.value)}
+              placeholder="Username"
+              maxLength={20}
+              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-[#1DB954] transition-all"
+            />
+            <input
+              type="password"
+              value={authPassword}
+              onChange={(e) => setAuthPassword(e.target.value)}
+              placeholder="Password"
+              onKeyDown={(e) => e.key === 'Enter' && handleAuth()}
+              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-[#1DB954] transition-all"
+            />
+            <div className="flex gap-2">
+              <button
+                onClick={() => { setAuthMode('none'); setError(null); }}
+                className="flex-1 text-xs text-gray-400 hover:text-white py-2 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleAuth}
+                disabled={!authUsername.trim() || !authPassword.trim() || authLoading}
+                className="flex-[2] bg-[#1DB954] hover:bg-[#1ed760] disabled:opacity-50 text-black text-xs font-bold py-2 rounded-xl transition-all flex items-center justify-center gap-1"
+              >
+                {authLoading ? (
+                  <Loader2 className="w-3 h-3 animate-spin" />
+                ) : authMode === 'register' ? (
+                  <>
+                    <UserPlus className="w-3 h-3" />
+                    Create Account
+                  </>
+                ) : (
+                  <>
+                    <LogIn className="w-3 h-3" />
+                    Sign In
+                  </>
+                )}
+              </button>
+            </div>
+          </motion.div>
+        ) : (
+          <button
+            onClick={() => setAuthMode('login')}
+            className="text-xs text-gray-500 hover:text-gray-300 transition-colors self-center"
+          >
+            Have an account? Sign in
+          </button>
+        )}
+
         {error && (
           <motion.p
             initial={{ opacity: 0 }}
@@ -138,20 +316,32 @@ export function Home() {
           <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
-            className="space-y-6 pt-4 text-center"
+            className="space-y-4 pt-4 text-center"
           >
-            <p className="text-gray-300 mb-4">
-              Hosts need Spotify Premium to play music for the room.
+            <p className="text-gray-300 text-sm">
+              Connect your Spotify Premium account to play music for the room.
             </p>
             <button
-              onClick={handleHost}
-              className="w-full bg-[#1DB954] hover:bg-[#1ed760] text-black font-bold text-lg py-4 px-6 rounded-2xl flex items-center justify-center gap-3 transition-all transform active:scale-95 shadow-[0_0_20px_rgba(29,185,84,0.3)]"
+              onClick={handleSpotifyLogin}
+              disabled={connecting}
+              className="w-full bg-[#1DB954] hover:bg-[#1ed760] disabled:opacity-70 text-black font-bold text-lg py-4 px-6 rounded-2xl flex items-center justify-center gap-3 transition-all transform active:scale-95 shadow-[0_0_20px_rgba(29,185,84,0.3)]"
             >
-              <Headphones className="w-6 h-6" />
-              Create Room
+              {connecting ? (
+                <>
+                  <Loader2 className="w-6 h-6 animate-spin" />
+                  Connecting to Spotify...
+                </>
+              ) : (
+                <>
+                  <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z" />
+                  </svg>
+                  Connect Spotify & Create Room
+                </>
+              )}
             </button>
             <button
-              onClick={() => setMode('idle')}
+              onClick={() => { setMode('idle'); setError(null); }}
               className="w-full bg-transparent text-gray-400 hover:text-white font-bold py-2 transition-all"
             >
               Cancel

@@ -35,11 +35,11 @@ export function Lobby() {
     socket.emit('update-settings', { cardsToWin });
   };
 
-  const modes: { value: GameMode; label: string }[] = [
-    { value: 'original', label: 'Original' },
-    { value: 'pro', label: 'Pro' },
-    { value: 'expert', label: 'Expert' },
-    { value: 'coop', label: 'Co-op' },
+  const modes: { value: GameMode; label: string; desc: string }[] = [
+    { value: 'original', label: 'Original', desc: 'Place correctly to keep the card' },
+    { value: 'pro', label: 'Pro', desc: 'Must also name the song' },
+    { value: 'expert', label: 'Expert', desc: 'Name song + guess exact year' },
+    { value: 'coop', label: 'Co-op', desc: 'Shared timeline, work together' },
   ];
 
   return (
@@ -129,17 +129,20 @@ export function Lobby() {
                   Game Mode
                 </label>
                 <div className="grid grid-cols-2 gap-2">
-                  {modes.map(({ value, label }) => (
+                  {modes.map(({ value, label, desc }) => (
                     <button
                       key={value}
                       onClick={() => handleUpdateMode(value)}
-                      className={`py-2 px-3 rounded-xl text-sm font-medium transition-all ${
+                      className={`py-3 px-3 rounded-xl text-left transition-all ${
                         settings.mode === value
                           ? 'bg-[#1DB954] text-black'
                           : 'bg-black/30 text-gray-300 hover:bg-black/50'
                       }`}
                     >
-                      {label}
+                      <span className="text-sm font-bold block">{label}</span>
+                      <span className={`text-[10px] block mt-0.5 ${
+                        settings.mode === value ? 'text-black/60' : 'text-gray-500'
+                      }`}>{desc}</span>
                     </button>
                   ))}
                 </div>
@@ -169,9 +172,12 @@ export function Lobby() {
           <div className="bg-white/5 rounded-3xl p-6 border border-white/10">
             <div className="text-center space-y-2 text-gray-400 mb-4">
               <p className="text-sm">
-                Mode: <span className="text-white font-medium capitalize">{settings.mode}</span>
+                Mode: <span className="text-white font-medium">{modes.find(m => m.value === settings.mode)?.label ?? settings.mode}</span>
                 {' · '}
                 Cards to win: <span className="text-white font-medium">{settings.cardsToWin}</span>
+              </p>
+              <p className="text-xs text-gray-500">
+                {modes.find(m => m.value === settings.mode)?.desc}
               </p>
             </div>
             <div className="flex flex-col items-center justify-center py-6 text-gray-400">
