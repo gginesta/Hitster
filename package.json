@@ -14,5 +14,8 @@
     "build:shared": "npm run build --workspace=shared",
     "build:server": "npm run build --workspace=server",
     "build:app": "npm run build --workspace=app"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
   }
 }
