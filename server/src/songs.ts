@@ -6,6 +6,13 @@ import { DECK_SIZE } from '@hitster/shared';
 
 let allSongs: SongData[] = [];
 
+// In-memory cache: "title::artist" → spotifyTrackId
+const trackIdCache = new Map<string, string>();
+
+function cacheKey(song: SongData): string {
+  return `${song.title.toLowerCase()}::${song.artist.toLowerCase()}`;
+}
+
 export function loadSongs() {
   const songsPath = path.join(__dirname, '../../..', 'data', 'songs.json');
   try {
@@ -73,4 +80,61 @@ export async function resolveSpotifyTrackId(
   } catch {
     return null;
   }
+}
+
+/**
+ * Batch-resolve Spotify track IDs for a deck.
+ * Uses cache to avoid redundant API calls.
+ * Filters out songs that couldn't be resolved.
+ * Returns only playable songs.
+ */
+export async function resolveTrackIds(
+  deck: SongCard[],
+  accessToken: string,
+): Promise<SongCard[]> {
+  const CONCURRENCY = 5;
+  let resolved = 0;
+  let cached = 0;
+
+  // First pass: fill from cache
+  for (const card of deck) {
+    const key = cacheKey(card);
+    const cachedId = trackIdCache.get(key);
+    if (cachedId) {
+      card.spotifyTrackId = cachedId;
+      cached++;
+      resolved++;
+    }
+  }
+
+  // Collect uncached cards
+  const uncached = deck.filter((c) => !c.spotifyTrackId);
+
+  // Resolve in batches with concurrency limit
+  for (let i = 0; i < uncached.length; i += CONCURRENCY) {
+    const batch = uncached.slice(i, i + CONCURRENCY);
+    const results = await Promise.all(
+      batch.map(async (card) => {
+        const trackId = await resolveSpotifyTrackId(card, accessToken);
+        if (trackId) {
+          card.spotifyTrackId = trackId;
+          trackIdCache.set(cacheKey(card), trackId);
+          resolved++;
+        }
+        return trackId;
+      }),
+    );
+
+    // Brief pause between batches to be nice to rate limits
+    if (i + CONCURRENCY < uncached.length) {
+      await new Promise((r) => setTimeout(r, 100));
+    }
+  }
+
+  const playable = deck.filter((c) => c.spotifyTrackId);
+  console.log(
+    `Track resolution: ${resolved}/${deck.length} resolved (${cached} cached), ${playable.length} playable`,
+  );
+
+  return playable;
 }

@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { Disc, Coins, Check, X, SkipForward, AlertTriangle, ShoppingCart, Star, Calendar } from 'lucide-react';
+import { Disc, Coins, Check, X, SkipForward, AlertTriangle, ShoppingCart, Star, Play, Pause } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { getSocket } from '../services/socket';
 import { useGameStore } from '../store';
+import { useSpotifyPlayer } from '../hooks/useSpotifyPlayer';
 import { SKIP_COST, CHALLENGE_COST, BUY_CARD_COST } from '@hitster/shared';
 import type { SongCard, GameMode } from '@hitster/shared';
 
@@ -38,23 +39,48 @@ const MODE_COLORS: Record<GameMode, string> = {
   coop: 'bg-green-500/20 text-green-400 border-green-500/30',
 };
 
+function Equalizer({ animate }: { animate: boolean }) {
+  return (
+    <div className="flex items-end gap-[3px] h-6">
+      {[0, 1, 2, 3, 4].map((i) => (
+        <motion.div
+          key={i}
+          className="w-[3px] bg-[#1DB954] rounded-full"
+          animate={animate ? {
+            height: [6, 18, 10, 22, 8],
+          } : { height: 6 }}
+          transition={animate ? {
+            duration: 0.8,
+            repeat: Infinity,
+            repeatType: 'reverse',
+            delay: i * 0.1,
+          } : {}}
+        />
+      ))}
+    </div>
+  );
+}
+
 export function Game() {
   const myId = useGameStore((s) => s.myId);
   const players = useGameStore((s) => s.players);
   const currentTurnPlayerId = useGameStore((s) => s.currentTurnPlayerId);
-  const currentSong = useGameStore((s) => s.currentSong);
   const phase = useGameStore((s) => s.phase);
   const lastReveal = useGameStore((s) => s.lastReveal);
   const deckSize = useGameStore((s) => s.deckSize);
   const challengers = useGameStore((s) => s.challengers);
   const settings = useGameStore((s) => s.settings);
   const sharedTimeline = useGameStore((s) => s.sharedTimeline);
+  const isPlayingMusic = useGameStore((s) => s.isPlaying);
+  const spotifyError = useGameStore((s) => s.spotifyError);
 
   const [guessTitle, setGuessTitle] = useState('');
   const [guessArtist, setGuessArtist] = useState('');
   const [guessYear, setGuessYear] = useState('');
   const [selectedPosition, setSelectedPosition] = useState<number | null>(null);
   const songNameResult = useGameStore((s) => s.songNameResult);
+
+  const { isHost: isSpotifyHost, spotifyReady, togglePlayback } = useSpotifyPlayer();
 
   const socket = getSocket();
   const isMyTurn = currentTurnPlayerId === myId;
@@ -189,6 +215,13 @@ export function Game() {
         </div>
       </div>
 
+      {/* Spotify error banner */}
+      {spotifyError && (
+        <div className="bg-red-500/10 border-b border-red-500/20 px-4 py-2 text-center text-sm text-red-400">
+          {spotifyError}
+        </div>
+      )}
+
       {/* Center Area */}
       <div className="flex-1 flex flex-col items-center justify-center p-6 relative overflow-y-auto">
         <AnimatePresence mode="wait">
@@ -241,7 +274,7 @@ export function Game() {
                   <div>
                     {lastReveal!.correct ? (
                       <div className="flex items-center justify-center gap-2 text-white bg-black/20 px-4 py-2 rounded-full">
-                        <Check className="w-5 h-5" /> {isCoop ? 'Correct!' : 'Correct!'}
+                        <Check className="w-5 h-5" /> Correct!
                       </div>
                     ) : isCoop && modeResult?.coopPenalty ? (
                       <div className="flex items-center justify-center gap-2 text-white bg-black/20 px-4 py-2 rounded-full">
@@ -272,30 +305,42 @@ export function Game() {
               <div className="absolute -right-12 -bottom-12 opacity-20">
                 <Disc className="w-48 h-48" />
               </div>
+
+              {/* Top status */}
               <div className="absolute top-4 left-4 right-4 flex justify-between items-center">
-                <div className="flex gap-1">
-                  <span className="w-1 h-3 bg-[#1DB954] rounded-full animate-pulse" />
-                  <span className="w-1 h-4 bg-[#1DB954] rounded-full animate-pulse" style={{ animationDelay: '150ms' }} />
-                  <span className="w-1 h-2 bg-[#1DB954] rounded-full animate-pulse" style={{ animationDelay: '300ms' }} />
-                </div>
+                <Equalizer animate={isPlayingMusic && phase === 'playing'} />
                 <span className="text-xs font-bold text-white/70 uppercase tracking-widest">
-                  {phase === 'challenge' ? (isCoop ? 'Revealing...' : 'Challenge!') : 'Now Playing'}
+                  {phase === 'challenge' ? (isCoop ? 'Revealing...' : 'Challenge!') : isPlayingMusic ? 'Now Playing' : 'Paused'}
                 </span>
               </div>
-              <h2 className="text-6xl font-black text-white/90 mt-4">?</h2>
-              <p className="text-white/50 font-medium mt-2">
+
+              {/* Center: Play/Pause for host, "?" for non-host */}
+              {isSpotifyHost && spotifyReady && phase === 'playing' ? (
+                <button
+                  onClick={togglePlayback}
+                  className="w-20 h-20 rounded-full bg-[#1DB954] hover:bg-[#1ed760] flex items-center justify-center transition-all transform active:scale-90 shadow-[0_0_30px_rgba(29,185,84,0.4)]"
+                >
+                  {isPlayingMusic ? (
+                    <Pause className="w-10 h-10 text-black" fill="black" />
+                  ) : (
+                    <Play className="w-10 h-10 text-black ml-1" fill="black" />
+                  )}
+                </button>
+              ) : (
+                <h2 className="text-6xl font-black text-white/90 mt-4">?</h2>
+              )}
+
+              <p className="text-white/50 font-medium mt-3 text-sm">
                 {phase === 'challenge'
                   ? (isCoop ? 'Checking placement...' : 'Waiting for challenges...')
-                  : 'Guess the year'}
+                  : isPlayingMusic ? 'Listen and guess the year...' : 'Guess the year'}
               </p>
 
               {/* Mode requirement hint */}
               {isMyTurn && phase === 'playing' && (mode === 'pro' || mode === 'expert') && (
-                <div className="mt-3 flex flex-col items-center gap-1">
-                  <div className="flex items-center gap-1 text-xs text-yellow-400">
-                    <Star className="w-3 h-3" />
-                    {mode === 'pro' ? 'Must name the song to keep card' : 'Must name song + exact year'}
-                  </div>
+                <div className="mt-2 flex items-center gap-1 text-xs text-yellow-400">
+                  <Star className="w-3 h-3" />
+                  {mode === 'pro' ? 'Must name the song' : 'Must name song + exact year'}
                 </div>
               )}
             </motion.div>

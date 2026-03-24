@@ -16,7 +16,7 @@ import {
   DEFAULT_CARDS_TO_WIN,
 } from '@hitster/shared';
 import { GameEngine } from './game';
-import { selectGameDeck } from './songs';
+import { selectGameDeck, resolveTrackIds } from './songs';
 
 type HitsterSocket = Socket<ClientToServerEvents, ServerToClientEvents>;
 type HitsterServer = Server<ClientToServerEvents, ServerToClientEvents>;
@@ -24,6 +24,7 @@ type HitsterServer = Server<ClientToServerEvents, ServerToClientEvents>;
 const rooms = new Map<string, Room>();
 const games = new Map<string, GameEngine>();
 const socketToRoom = new Map<string, { code: string; playerId: string }>();
+const roomSpotifyTokens = new Map<string, string>();
 
 const ALLOWED_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
 
@@ -82,6 +83,7 @@ export function registerRoomHandlers(io: HitsterServer, socket: HitsterSocket) {
       const engine = new GameEngine(room, io);
       engine.setSpotifyToken(spotifyAccessToken);
       games.set(code, engine);
+      roomSpotifyTokens.set(code, spotifyAccessToken);
     }
 
     socket.emit('room-created', { code, playerId });
@@ -138,7 +140,7 @@ export function registerRoomHandlers(io: HitsterServer, socket: HitsterSocket) {
     io.to(mapping.code).emit('settings-updated', room.settings);
   });
 
-  socket.on('start-game', () => {
+  socket.on('start-game', async () => {
     const mapping = socketToRoom.get(socket.id);
     if (!mapping) return;
     const room = rooms.get(mapping.code);
@@ -150,12 +152,25 @@ export function registerRoomHandlers(io: HitsterServer, socket: HitsterSocket) {
       return;
     }
 
-    const deck = selectGameDeck();
+    let deck = selectGameDeck();
     let engine = games.get(mapping.code);
     if (!engine) {
       engine = new GameEngine(room, io);
       games.set(mapping.code, engine);
     }
+
+    // Resolve Spotify track IDs if token available
+    const spotifyToken = roomSpotifyTokens.get(mapping.code);
+    if (spotifyToken) {
+      io.to(mapping.code).emit('resolving-tracks');
+      const playable = await resolveTrackIds(deck, spotifyToken);
+      if (playable.length === 0) {
+        socket.emit('error', { message: 'Could not find any songs on Spotify. Please try again.' });
+        return;
+      }
+      deck = playable;
+    }
+
     engine.startGame(deck);
   });
 

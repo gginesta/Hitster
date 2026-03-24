@@ -52,6 +52,15 @@ interface GameStore {
   lastReveal: RevealData | null;
   songNameResult: { playerId: string; correct: boolean } | null;
 
+  // Spotify
+  spotifyToken: string | null;
+  spotifyRefreshToken: string | null;
+  spotifyDeviceId: string | null;
+  spotifyReady: boolean;
+  spotifyError: string | null;
+  isPlaying: boolean;
+  currentTrackId: string | null;
+
   // Winner
   winnerId: string | null;
   finalPlayers: Record<string, Player>;
@@ -79,6 +88,13 @@ interface GameStore {
   updatePlayerTimeline: (playerId: string, timeline: SongCard[]) => void;
   addPlayer: (player: Player) => void;
   removePlayer: (playerId: string) => void;
+  setSpotifyToken: (token: string | null) => void;
+  setSpotifyRefreshToken: (token: string | null) => void;
+  setSpotifyDeviceId: (id: string | null) => void;
+  setSpotifyReady: (ready: boolean) => void;
+  setSpotifyError: (error: string | null) => void;
+  setIsPlaying: (playing: boolean) => void;
+  setCurrentTrackId: (trackId: string | null) => void;
   syncRoom: (room: Room) => void;
   reset: () => void;
 }
@@ -99,6 +115,13 @@ const initialState = {
   challengers: [],
   deckSize: 0,
   sharedTimeline: [] as SongCard[],
+  spotifyToken: null as string | null,
+  spotifyRefreshToken: null as string | null,
+  spotifyDeviceId: null as string | null,
+  spotifyReady: false,
+  spotifyError: null as string | null,
+  isPlaying: false,
+  currentTrackId: null as string | null,
   lastReveal: null,
   songNameResult: null,
   winnerId: null,
@@ -149,6 +172,13 @@ export const useGameStore = create<GameStore>((set) => ({
       const { [playerId]: _, ...rest } = s.players;
       return { players: rest };
     }),
+  setSpotifyToken: (spotifyToken) => set({ spotifyToken }),
+  setSpotifyRefreshToken: (spotifyRefreshToken) => set({ spotifyRefreshToken }),
+  setSpotifyDeviceId: (spotifyDeviceId) => set({ spotifyDeviceId }),
+  setSpotifyReady: (spotifyReady) => set({ spotifyReady }),
+  setSpotifyError: (spotifyError) => set({ spotifyError }),
+  setIsPlaying: (isPlaying) => set({ isPlaying }),
+  setCurrentTrackId: (currentTrackId) => set({ currentTrackId }),
   syncRoom: (room) =>
     set({
       players: room.players,

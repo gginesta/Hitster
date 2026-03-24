@@ -56,6 +56,16 @@ export function useSocket() {
       store.setPhase('playing');
       store.setPendingPlacement(null);
       store.setLastReveal(null);
+      useGameStore.setState({ songNameResult: null });
+    });
+
+    socket.on('play-song', ({ spotifyTrackId }) => {
+      store.setCurrentTrackId(spotifyTrackId);
+    });
+
+    socket.on('resolving-tracks', () => {
+      // Could show a loading state — for now just log
+      console.log('Resolving Spotify track IDs...');
     });
 
     socket.on('card-placed', ({ position }) => {

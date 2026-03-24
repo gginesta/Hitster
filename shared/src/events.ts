@@ -48,6 +48,7 @@ export interface ServerToClientEvents {
   'timeline-updated': (data: { playerId: string; timeline: SongCard[] }) => void;
   'song-named': (data: { playerId: string; correct: boolean }) => void;
   'game-over': (data: { winnerId: string; players: Record<string, Player> }) => void;
+  'resolving-tracks': () => void;
   'error': (data: { message: string }) => void;
   'state-sync': (room: Room) => void;
 }
