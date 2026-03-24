@@ -65,6 +65,7 @@ interface GameStore {
   spotifyReady: boolean;
   spotifyError: string | null;
   isPlaying: boolean;
+  autoplayBlocked: boolean;
   currentTrackId: string | null;
   currentPreviewUrl: string | null;
 
@@ -130,6 +131,7 @@ const initialState = {
   spotifyReady: false,
   spotifyError: null as string | null,
   isPlaying: false,
+  autoplayBlocked: false,
   currentTrackId: null as string | null,
   currentPreviewUrl: null as string | null,
   lastReveal: null,

@@ -4,7 +4,6 @@ import { motion, AnimatePresence } from 'motion/react';
 import { getSocket } from '../services/socket';
 import { useGameStore } from '../store';
 import { useSpotifyPlayer } from '../hooks/useSpotifyPlayer';
-import { requestActivation } from '../services/spotifyPlayer';
 import { SKIP_COST, CHALLENGE_COST, BUY_CARD_COST, TURN_TIME_MS } from '@hitster/shared';
 import {
   playCorrectSound,
@@ -184,17 +183,27 @@ export function Game() {
     prevCountdownRef.current = countdown;
   }, [countdown]);
 
+  const autoplayBlocked = useGameStore((s) => s.autoplayBlocked);
   const { isHost: isSpotifyHost, spotifyReady, togglePlayback } = useSpotifyPlayer();
 
-  // Pre-activate Spotify audio on first user interaction anywhere on the game screen.
-  // This ensures the browser's autoplay policy is satisfied.
-  const activatedRef = useRef(false);
-  const handleFirstInteraction = useCallback(() => {
-    if (!activatedRef.current) {
-      activatedRef.current = true;
-      requestActivation();
-    }
-  }, []);
+  // Global click handler to unlock audio on first interaction
+  useEffect(() => {
+    if (!autoplayBlocked) return;
+
+    const unlockAudio = async () => {
+      await togglePlayback();
+      document.removeEventListener('click', unlockAudio);
+      document.removeEventListener('touchstart', unlockAudio);
+    };
+
+    document.addEventListener('click', unlockAudio, { once: true });
+    document.addEventListener('touchstart', unlockAudio, { once: true });
+
+    return () => {
+      document.removeEventListener('click', unlockAudio);
+      document.removeEventListener('touchstart', unlockAudio);
+    };
+  }, [autoplayBlocked, togglePlayback]);
 
   const socket = getSocket();
   const isMyTurn = currentTurnPlayerId === myId;
@@ -271,8 +280,6 @@ export function Game() {
   return (
     <div
       className="flex flex-col h-screen text-white bg-[#1a1a2e] overflow-hidden"
-      onClick={handleFirstInteraction}
-      onTouchStart={handleFirstInteraction}
     >
       {/* Top Bar */}
       <div className="flex justify-between items-center px-4 py-3 bg-black/40 backdrop-blur-xl border-b border-white/5 z-10">
@@ -332,8 +339,23 @@ export function Game() {
         </div>
       </div>
 
+      {/* Autoplay blocked banner */}
+      {autoplayBlocked && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-[#1DB954]/20 border-b border-[#1DB954]/30 px-4 py-3 text-center cursor-pointer"
+          onClick={togglePlayback}
+        >
+          <div className="flex items-center justify-center gap-2 text-[#1DB954] font-bold">
+            <Play className="w-5 h-5" fill="currentColor" />
+            <span>Tap anywhere to start the music</span>
+          </div>
+        </motion.div>
+      )}
+
       {/* Spotify error banner */}
-      {spotifyError && (
+      {spotifyError && !autoplayBlocked && (
         <div className="bg-red-500/10 border-b border-red-500/20 px-4 py-2 text-center text-xs text-red-400 font-medium">
           {spotifyError}
         </div>
@@ -499,7 +521,7 @@ export function Game() {
                   className="absolute inset-0 flex items-center justify-center z-20"
                 >
                   <div className="relative">
-                    <svg className="w-28 h-28 -rotate-90" viewBox="0 0 100 100">
+                    <svg className="w-40 h-40 -rotate-90" viewBox="0 0 100 100">
                       <circle
                         cx="50" cy="50" r="42"
                         fill="none"
@@ -513,12 +535,12 @@ export function Game() {
                         strokeWidth="6"
                         strokeLinecap="round"
                         strokeDasharray={`${2 * Math.PI * 42}`}
-                        strokeDashoffset={`${2 * Math.PI * 42 * (1 - countdown / 15)}`}
+                        strokeDashoffset={`${2 * Math.PI * 42 * (1 - countdown / 8)}`}
                         className="transition-all duration-100"
                       />
                     </svg>
-                    <span className={`absolute inset-0 flex items-center justify-center text-4xl font-black ${
-                      countdown <= 5 ? 'text-red-400' : 'text-amber-400'
+                    <span className={`absolute inset-0 flex items-center justify-center text-6xl font-black drop-shadow-lg ${
+                      countdown <= 3 ? 'text-red-400' : 'text-amber-400'
                     }`}>
                       {countdown}
                     </span>

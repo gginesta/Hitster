@@ -38,6 +38,8 @@ app.use((req, res, next) => {
 const httpServer = createServer(app);
 const io = new Server<ClientToServerEvents, ServerToClientEvents>(httpServer, {
   cors: { origin: '*', methods: ['GET', 'POST'] },
+  pingInterval: 10000,
+  pingTimeout: 5000,
 });
 
 initDatabase();
