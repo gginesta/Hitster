@@ -13,9 +13,12 @@ export function useSocket() {
     socket.on('connect', () => store.setConnected(true));
     socket.on('disconnect', () => store.setConnected(false));
 
-    socket.on('room-created', ({ code, playerId }) => {
+    socket.on('room-created', ({ code, playerId, room }) => {
       store.setMyId(playerId);
       store.setRoomCode(code);
+      store.setPlayers(room.players);
+      store.setHostId(room.hostId);
+      store.setSettings(room.settings);
       store.setScreen('lobby');
       store.setError(null);
     });
@@ -56,10 +59,21 @@ export function useSocket() {
       store.setPhase('playing');
       store.setPendingPlacement(null);
       store.setLastReveal(null);
+      useGameStore.setState({ songNameResult: null });
     });
 
-    socket.on('card-placed', ({ position }) => {
+    socket.on('play-song', ({ spotifyTrackId, previewUrl }) => {
+      store.setCurrentTrackId(spotifyTrackId, previewUrl);
+    });
+
+    socket.on('resolving-tracks', () => {
+      // Could show a loading state — for now just log
+      console.log('Resolving Spotify track IDs...');
+    });
+
+    socket.on('card-placed', ({ position, challengeDeadline }) => {
       store.setPendingPlacement(position);
+      useGameStore.setState({ challengeDeadline: challengeDeadline ?? null });
       store.setPhase('challenge');
     });
 
@@ -71,6 +85,7 @@ export function useSocket() {
       store.setLastReveal(data);
       store.setPhase('reveal');
       store.setCurrentSong(data.song);
+      useGameStore.setState({ challengeDeadline: null });
     });
 
     socket.on('tokens-updated', ({ playerId, tokens }) => {
@@ -81,6 +96,10 @@ export function useSocket() {
       store.updatePlayerTimeline(playerId, timeline);
     });
 
+    socket.on('shared-timeline-updated', ({ timeline }) => {
+      store.setSharedTimeline(timeline);
+    });
+
     socket.on('song-named', ({ playerId, correct }) => {
       store.setSongNameResult(playerId, correct);
     });
@@ -89,6 +108,20 @@ export function useSocket() {
       store.setWinner(winnerId, players);
       store.setPhase('game_over');
       store.setScreen('results');
+    });
+
+    socket.on('game-restarted', ({ room }) => {
+      store.syncRoom(room);
+      store.setScreen('lobby');
+      store.setCurrentTrackId(null);
+      store.setIsPlaying(false);
+      store.setLastReveal(null);
+      useGameStore.setState({
+        winnerId: null,
+        finalPlayers: {},
+        songNameResult: null,
+        challengeDeadline: null,
+      });
     });
 
     socket.on('error', ({ message }) => {

@@ -16,7 +16,7 @@ import {
   DEFAULT_CARDS_TO_WIN,
 } from '@hitster/shared';
 import { GameEngine } from './game';
-import { selectGameDeck } from './songs';
+import { selectGameDeck, resolveTrackIds } from './songs';
 
 type HitsterSocket = Socket<ClientToServerEvents, ServerToClientEvents>;
 type HitsterServer = Server<ClientToServerEvents, ServerToClientEvents>;
@@ -24,6 +24,7 @@ type HitsterServer = Server<ClientToServerEvents, ServerToClientEvents>;
 const rooms = new Map<string, Room>();
 const games = new Map<string, GameEngine>();
 const socketToRoom = new Map<string, { code: string; playerId: string }>();
+const roomSpotifyTokens = new Map<string, string>();
 
 const ALLOWED_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
 
@@ -48,6 +49,7 @@ function createDefaultGameState(): GameState {
     turnOrder: [],
     turnIndex: 0,
     deckSize: 0,
+    sharedTimeline: [],
   };
 }
 
@@ -81,9 +83,13 @@ export function registerRoomHandlers(io: HitsterServer, socket: HitsterSocket) {
       const engine = new GameEngine(room, io);
       engine.setSpotifyToken(spotifyAccessToken);
       games.set(code, engine);
+      roomSpotifyTokens.set(code, spotifyAccessToken);
     }
 
-    socket.emit('room-created', { code, playerId });
+    console.log(`[create-room] Room ${code} created. Players:`, Object.keys(room.players), 'Host:', room.hostId);
+    socket.emit('room-created', { code, playerId, room });
+    // Also send state-sync so the host's player data is fully populated
+    socket.emit('state-sync', room);
   });
 
   socket.on('join-room', ({ code, playerName }) => {
@@ -137,7 +143,7 @@ export function registerRoomHandlers(io: HitsterServer, socket: HitsterSocket) {
     io.to(mapping.code).emit('settings-updated', room.settings);
   });
 
-  socket.on('start-game', () => {
+  socket.on('start-game', async () => {
     const mapping = socketToRoom.get(socket.id);
     if (!mapping) return;
     const room = rooms.get(mapping.code);
@@ -149,12 +155,25 @@ export function registerRoomHandlers(io: HitsterServer, socket: HitsterSocket) {
       return;
     }
 
-    const deck = selectGameDeck();
+    let deck = selectGameDeck();
     let engine = games.get(mapping.code);
     if (!engine) {
       engine = new GameEngine(room, io);
       games.set(mapping.code, engine);
     }
+
+    // Resolve Spotify track IDs if token available
+    const spotifyToken = roomSpotifyTokens.get(mapping.code);
+    if (spotifyToken) {
+      io.to(mapping.code).emit('resolving-tracks');
+      const playable = await resolveTrackIds(deck, spotifyToken);
+      if (playable.length === 0) {
+        socket.emit('error', { message: 'Could not find any songs on Spotify. Please try again.' });
+        return;
+      }
+      deck = playable;
+    }
+
     engine.startGame(deck);
   });
 
@@ -197,6 +216,41 @@ export function registerRoomHandlers(io: HitsterServer, socket: HitsterSocket) {
     const engine = getEngine(socket);
     if (!engine) return;
     engine.confirmReveal();
+  });
+
+  socket.on('restart-game', () => {
+    const mapping = socketToRoom.get(socket.id);
+    if (!mapping) return;
+    const room = rooms.get(mapping.code);
+    if (!room) return;
+
+    // Only the host can restart
+    if (room.hostId !== mapping.playerId) {
+      socket.emit('error', { message: 'Only the host can restart the game' });
+      return;
+    }
+
+    // Reset engine state
+    const engine = games.get(mapping.code);
+    if (engine) {
+      engine.resetGame();
+    } else {
+      // No engine — reset room state manually
+      room.gameState = createDefaultGameState();
+      for (const player of Object.values(room.players)) {
+        player.timeline = [];
+        player.tokens = STARTING_TOKENS;
+      }
+    }
+
+    // Remove disconnected players
+    for (const [id, player] of Object.entries(room.players)) {
+      if (!player.connected) {
+        delete room.players[id];
+      }
+    }
+
+    io.to(mapping.code).emit('game-restarted', { room });
   });
 
   socket.on('disconnect', () => {

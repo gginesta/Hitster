@@ -13,6 +13,7 @@ import {
   CHALLENGE_COST,
   BUY_CARD_COST,
   CHALLENGE_WINDOW_MS,
+  COOP_WRONG_PENALTY,
 } from '@hitster/shared';
 
 type HitsterServer = Server<ClientToServerEvents, ServerToClientEvents>;
@@ -24,32 +25,89 @@ export class GameEngine {
   private spotifyAccessToken: string | null = null;
   private challengeTimer: ReturnType<typeof setTimeout> | null = null;
   private songNamed = new Set<string>();
+  /** Tracks whether each player's song name guess was correct this round */
+  private songNameCorrect = new Map<string, boolean>();
+  /** Tracks the active player's year guess for Expert mode */
+  private yearGuess: number | null = null;
 
   constructor(room: Room, io: HitsterServer) {
     this.room = room;
     this.io = io;
   }
 
+  private get mode() {
+    return this.room.settings.mode;
+  }
+
+  private get isCoop() {
+    return this.mode === 'coop';
+  }
+
   setSpotifyToken(token: string) {
     this.spotifyAccessToken = token;
+  }
+
+  resetGame() {
+    // Clear timers
+    if (this.challengeTimer) {
+      clearTimeout(this.challengeTimer);
+      this.challengeTimer = null;
+    }
+
+    // Clear engine state
+    this.deck = [];
+    this.songNamed.clear();
+    this.songNameCorrect.clear();
+    this.yearGuess = null;
+
+    // Reset all players: clear timelines, restore starting tokens
+    for (const player of Object.values(this.room.players)) {
+      player.timeline = [];
+      player.tokens = STARTING_TOKENS;
+    }
+
+    // Reset game state to lobby defaults
+    this.room.gameState = {
+      phase: 'lobby',
+      currentTurnPlayerId: null,
+      currentSong: null,
+      pendingPlacement: null,
+      challengers: [],
+      turnOrder: [],
+      turnIndex: 0,
+      deckSize: 0,
+      sharedTimeline: [],
+    };
   }
 
   startGame(deck: SongCard[]) {
     this.deck = [...deck];
     const playerIds = Object.keys(this.room.players);
 
-    // Give each player a starting card
-    for (const id of playerIds) {
+    // Give each player a starting card (or shared timeline for co-op)
+    if (this.isCoop) {
       const card = this.deck.pop();
-      if (card) {
-        this.room.players[id].timeline = [card];
+      for (const id of playerIds) {
+        this.room.players[id].timeline = [];
         this.room.players[id].tokens = STARTING_TOKENS;
+      }
+      // Shared timeline starts with one card
+      const sharedTimeline = card ? [card] : [];
+      this.room.gameState.sharedTimeline = sharedTimeline;
+    } else {
+      for (const id of playerIds) {
+        const card = this.deck.pop();
+        if (card) {
+          this.room.players[id].timeline = [card];
+          this.room.players[id].tokens = STARTING_TOKENS;
+        }
       }
     }
 
     // Shuffle turn order
     const turnOrder = [...playerIds].sort(() => Math.random() - 0.5);
     this.room.gameState = {
+      ...this.room.gameState,
       phase: 'playing',
       currentTurnPlayerId: turnOrder[0],
       currentSong: null,
@@ -58,16 +116,23 @@ export class GameEngine {
       turnOrder,
       turnIndex: 0,
       deckSize: this.deck.length,
+      sharedTimeline: this.room.gameState.sharedTimeline || [],
     };
 
     this.io.to(this.room.code).emit('game-started', { gameState: this.room.gameState });
 
     // Sync each player's starting timeline
-    for (const id of playerIds) {
-      this.io.to(this.room.code).emit('timeline-updated', {
-        playerId: id,
-        timeline: this.room.players[id].timeline,
+    if (this.isCoop) {
+      this.io.to(this.room.code).emit('shared-timeline-updated', {
+        timeline: this.room.gameState.sharedTimeline,
       });
+    } else {
+      for (const id of playerIds) {
+        this.io.to(this.room.code).emit('timeline-updated', {
+          playerId: id,
+          timeline: this.room.players[id].timeline,
+        });
+      }
     }
 
     this.startTurn();
@@ -86,6 +151,8 @@ export class GameEngine {
     this.room.gameState.challengers = [];
     this.room.gameState.deckSize = this.deck.length;
     this.songNamed.clear();
+    this.songNameCorrect.clear();
+    this.yearGuess = null;
 
     const turnPlayerId = this.room.gameState.currentTurnPlayerId!;
 
@@ -99,6 +166,7 @@ export class GameEngine {
     if (song.spotifyTrackId) {
       this.io.to(this.room.code).emit('play-song', {
         spotifyTrackId: song.spotifyTrackId,
+        previewUrl: song.previewUrl,
       });
     }
   }
@@ -110,18 +178,28 @@ export class GameEngine {
     gs.pendingPlacement = position;
     gs.phase = 'challenge';
 
-    this.io.to(this.room.code).emit('card-placed', { playerId, position });
+    const challengeDeadline = this.isCoop ? undefined : Date.now() + CHALLENGE_WINDOW_MS;
+    this.io.to(this.room.code).emit('card-placed', { playerId, position, challengeDeadline });
 
-    // Start challenge window
-    this.challengeTimer = setTimeout(() => {
-      this.resolveRound();
-    }, CHALLENGE_WINDOW_MS);
+    if (this.isCoop) {
+      // Co-op: no challenge window, resolve immediately after a short delay
+      this.challengeTimer = setTimeout(() => {
+        this.resolveRound();
+      }, 2000);
+    } else {
+      // Start challenge window
+      this.challengeTimer = setTimeout(() => {
+        this.resolveRound();
+      }, CHALLENGE_WINDOW_MS);
+    }
   }
 
   challenge(challengerId: string) {
     const gs = this.room.gameState;
     if (gs.phase !== 'challenge') return;
     if (challengerId === gs.currentTurnPlayerId) return;
+    // No challenges in co-op mode
+    if (this.isCoop) return;
 
     const player = this.room.players[challengerId];
     if (!player || player.tokens < CHALLENGE_COST) return;
@@ -148,6 +226,13 @@ export class GameEngine {
     const titleMatch = normalize(guess.title) === normalize(gs.currentSong.title);
     const artistMatch = normalize(guess.artist) === normalize(gs.currentSong.artist);
     const correct = titleMatch && artistMatch;
+
+    this.songNameCorrect.set(playerId, correct);
+
+    // Track year guess for Expert mode (only for active player)
+    if (this.mode === 'expert' && playerId === gs.currentTurnPlayerId && guess.year != null) {
+      this.yearGuess = guess.year;
+    }
 
     if (correct) {
       const player = this.room.players[playerId];
@@ -188,14 +273,27 @@ export class GameEngine {
 
     player.tokens -= BUY_CARD_COST;
 
-    // Insert card in correct chronological position
-    this.insertCardInTimeline(player.timeline, card);
+    if (this.isCoop) {
+      // In co-op, bought cards go to shared timeline
+      this.insertCardInTimeline(this.room.gameState.sharedTimeline, card);
+      this.io.to(this.room.code).emit('tokens-updated', { playerId, tokens: player.tokens });
+      this.io.to(this.room.code).emit('shared-timeline-updated', {
+        timeline: this.room.gameState.sharedTimeline,
+      });
 
-    this.io.to(this.room.code).emit('tokens-updated', { playerId, tokens: player.tokens });
-    this.io.to(this.room.code).emit('timeline-updated', { playerId, timeline: player.timeline });
+      if (this.room.gameState.sharedTimeline.length >= this.room.settings.cardsToWin) {
+        this.endGame();
+      }
+    } else {
+      // Insert card in correct chronological position
+      this.insertCardInTimeline(player.timeline, card);
 
-    if (player.timeline.length >= this.room.settings.cardsToWin) {
-      this.endGame();
+      this.io.to(this.room.code).emit('tokens-updated', { playerId, tokens: player.tokens });
+      this.io.to(this.room.code).emit('timeline-updated', { playerId, timeline: player.timeline });
+
+      if (player.timeline.length >= this.room.settings.cardsToWin) {
+        this.endGame();
+      }
     }
   }
 
@@ -217,7 +315,26 @@ export class GameEngine {
     const activePlayer = this.room.players[activePlayerId];
     const position = gs.pendingPlacement!;
 
-    const correct = this.isPlacementCorrect(activePlayer.timeline, song, position);
+    if (this.isCoop) {
+      this.resolveCoopRound(song, activePlayerId, activePlayer, position);
+      return;
+    }
+
+    const timeline = activePlayer.timeline;
+    const placementCorrect = this.isPlacementCorrect(timeline, song, position);
+
+    // Mode-specific checks
+    const activePlayerNamedSong = this.songNameCorrect.get(activePlayerId) === true;
+    const yearCorrect = this.mode === 'expert' ? this.yearGuess === song.year : undefined;
+
+    let correct = placementCorrect;
+    if (this.mode === 'pro') {
+      // Pro: must place correctly AND name the song
+      correct = placementCorrect && activePlayerNamedSong;
+    } else if (this.mode === 'expert') {
+      // Expert: must place correctly AND name the song AND guess the exact year
+      correct = placementCorrect && activePlayerNamedSong && (yearCorrect === true);
+    }
 
     let stolenBy: string | null = null;
     let winnerId: string | null = null;
@@ -248,6 +365,11 @@ export class GameEngine {
       correct,
       winnerId,
       stolenBy,
+      modeResult: {
+        placementCorrect,
+        songNamed: activePlayerNamedSong,
+        yearCorrect,
+      },
     });
 
     if (winnerId) {
@@ -259,6 +381,55 @@ export class GameEngine {
 
     // Check win condition
     if (winnerId && this.room.players[winnerId].timeline.length >= this.room.settings.cardsToWin) {
+      this.endGame();
+      return;
+    }
+  }
+
+  private resolveCoopRound(
+    song: SongCard,
+    activePlayerId: string,
+    activePlayer: { tokens: number; timeline: SongCard[] },
+    position: number,
+  ) {
+    const gs = this.room.gameState;
+    const sharedTimeline = gs.sharedTimeline;
+    const placementCorrect = this.isPlacementCorrect(sharedTimeline, song, position);
+
+    if (placementCorrect) {
+      // Card goes into shared timeline
+      sharedTimeline.splice(position, 0, song);
+    } else {
+      // Penalty: active player loses a token
+      if (activePlayer.tokens > 0) {
+        activePlayer.tokens -= COOP_WRONG_PENALTY;
+        this.io.to(this.room.code).emit('tokens-updated', {
+          playerId: activePlayerId,
+          tokens: activePlayer.tokens,
+        });
+      }
+    }
+
+    gs.phase = 'reveal';
+
+    this.io.to(this.room.code).emit('reveal', {
+      song,
+      correct: placementCorrect,
+      winnerId: placementCorrect ? activePlayerId : null,
+      stolenBy: null,
+      modeResult: {
+        placementCorrect,
+        songNamed: false,
+        coopPenalty: !placementCorrect,
+      },
+    });
+
+    this.io.to(this.room.code).emit('shared-timeline-updated', {
+      timeline: sharedTimeline,
+    });
+
+    // Check co-op win condition
+    if (sharedTimeline.length >= this.room.settings.cardsToWin) {
       this.endGame();
       return;
     }
@@ -304,13 +475,19 @@ export class GameEngine {
   private endGame() {
     this.room.gameState.phase = 'game_over';
 
-    // Find winner (most cards, or first to reach target)
     let winnerId = '';
-    let maxCards = 0;
-    for (const [id, player] of Object.entries(this.room.players)) {
-      if (player.timeline.length > maxCards) {
-        maxCards = player.timeline.length;
-        winnerId = id;
+
+    if (this.isCoop) {
+      // Co-op: everyone wins (or first player as representative)
+      winnerId = this.room.gameState.turnOrder[0];
+    } else {
+      // Find winner (most cards, or first to reach target)
+      let maxCards = 0;
+      for (const [id, player] of Object.entries(this.room.players)) {
+        if (player.timeline.length > maxCards) {
+          maxCards = player.timeline.length;
+          winnerId = id;
+        }
       }
     }
 

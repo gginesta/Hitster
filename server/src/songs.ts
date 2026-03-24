@@ -6,8 +6,32 @@ import { DECK_SIZE } from '@hitster/shared';
 
 let allSongs: SongData[] = [];
 
+// In-memory cache: "title::artist" → { trackId, previewUrl }
+const trackCache = new Map<string, { trackId: string; previewUrl?: string }>();
+
+function cacheKey(song: SongData): string {
+  return `${song.title.toLowerCase()}::${song.artist.toLowerCase()}`;
+}
+
 export function loadSongs() {
-  const songsPath = path.join(__dirname, '../../..', 'data', 'songs.json');
+  console.log('[songs] __dirname:', __dirname);
+  console.log('[songs] process.cwd():', process.cwd());
+
+  // Try multiple possible locations for songs.json
+  const candidates = [
+    path.join(__dirname, '..', '..', 'data', 'songs.json'),   // from server/src or server/dist
+    path.join(__dirname, '..', 'data', 'songs.json'),          // from server/
+    path.join(process.cwd(), 'data', 'songs.json'),            // from project root (npm workspaces)
+  ];
+
+  console.log('[songs] Candidates:');
+  for (const c of candidates) {
+    console.log(`  ${c} → exists: ${fs.existsSync(c)}`);
+  }
+
+  const songsPath = candidates.find(p => fs.existsSync(p)) || candidates[0];
+  console.log('[songs] Using:', songsPath);
+
   try {
     const raw = fs.readFileSync(songsPath, 'utf-8');
     allSongs = JSON.parse(raw);
@@ -56,10 +80,10 @@ export function selectGameDeck(count: number = DECK_SIZE): SongCard[] {
   return deck;
 }
 
-export async function resolveSpotifyTrackId(
+export async function resolveSpotifyTrack(
   song: SongData,
   accessToken: string
-): Promise<string | null> {
+): Promise<{ trackId: string; previewUrl?: string } | null> {
   try {
     const query = encodeURIComponent(`track:${song.title} artist:${song.artist}`);
     const res = await fetch(
@@ -69,8 +93,67 @@ export async function resolveSpotifyTrackId(
     if (!res.ok) return null;
     const data = await res.json();
     const track = data.tracks?.items?.[0];
-    return track?.id || null;
+    if (!track?.id) return null;
+    return { trackId: track.id, previewUrl: track.preview_url || undefined };
   } catch {
     return null;
   }
+}
+
+/**
+ * Batch-resolve Spotify track IDs for a deck.
+ * Uses cache to avoid redundant API calls.
+ * Filters out songs that couldn't be resolved.
+ * Returns only playable songs.
+ */
+export async function resolveTrackIds(
+  deck: SongCard[],
+  accessToken: string,
+): Promise<SongCard[]> {
+  const CONCURRENCY = 5;
+  let resolved = 0;
+  let cached = 0;
+
+  // First pass: fill from cache
+  for (const card of deck) {
+    const key = cacheKey(card);
+    const cachedEntry = trackCache.get(key);
+    if (cachedEntry) {
+      card.spotifyTrackId = cachedEntry.trackId;
+      card.previewUrl = cachedEntry.previewUrl;
+      cached++;
+      resolved++;
+    }
+  }
+
+  // Collect uncached cards
+  const uncached = deck.filter((c) => !c.spotifyTrackId);
+
+  // Resolve in batches with concurrency limit
+  for (let i = 0; i < uncached.length; i += CONCURRENCY) {
+    const batch = uncached.slice(i, i + CONCURRENCY);
+    await Promise.all(
+      batch.map(async (card) => {
+        const result = await resolveSpotifyTrack(card, accessToken);
+        if (result) {
+          card.spotifyTrackId = result.trackId;
+          card.previewUrl = result.previewUrl;
+          trackCache.set(cacheKey(card), result);
+          resolved++;
+        }
+      }),
+    );
+
+    // Brief pause between batches to be nice to rate limits
+    if (i + CONCURRENCY < uncached.length) {
+      await new Promise((r) => setTimeout(r, 100));
+    }
+  }
+
+  const playable = deck.filter((c) => c.spotifyTrackId);
+  console.log(
+    `Track resolution: ${resolved}/${deck.length} resolved (${cached} cached), ${playable.length} playable`,
+  );
+
+  return playable;
 }

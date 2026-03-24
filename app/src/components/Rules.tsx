@@ -38,10 +38,10 @@ export function Rules() {
       icon: <Zap className="w-6 h-6 text-purple-400" />,
       title: 'Game Modes',
       items: [
-        'Original: Place the card in the right spot. Optionally name the song for a bonus token.',
-        'Pro: Must place correctly AND name the song.',
-        'Expert: Must place, name, AND guess the exact year.',
-        'Co-op: Shared timeline, work together! Lose a token on wrong placement.',
+        'Original: Place the card in the correct chronological spot to keep it. Optionally name the song for a bonus token.',
+        'Pro: You must place the card correctly AND name the song (title + artist). If you don\'t name it, the card is lost even if placed correctly.',
+        'Expert: The ultimate challenge — place correctly, name the song, AND guess the exact release year. All three must be right to keep the card.',
+        'Co-op: All players share one timeline and work together. No challenges. Wrong placement costs the active player 1 token. Reach the target together to win!',
       ],
     },
   ];

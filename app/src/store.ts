@@ -9,11 +9,19 @@ import type {
 
 export type Screen = 'home' | 'lobby' | 'game' | 'results' | 'rules';
 
+interface ModeResult {
+  placementCorrect: boolean;
+  songNamed: boolean;
+  yearCorrect?: boolean;
+  coopPenalty?: boolean;
+}
+
 interface RevealData {
   song: SongCard;
   correct: boolean;
   winnerId: string | null;
   stolenBy: string | null;
+  modeResult?: ModeResult;
 }
 
 interface GameStore {
@@ -37,9 +45,25 @@ interface GameStore {
   challengers: string[];
   deckSize: number;
 
+  // Shared timeline (co-op)
+  sharedTimeline: SongCard[];
+
   // Reveal
   lastReveal: RevealData | null;
   songNameResult: { playerId: string; correct: boolean } | null;
+
+  // Challenge
+  challengeDeadline: number | null;
+
+  // Spotify
+  spotifyToken: string | null;
+  spotifyRefreshToken: string | null;
+  spotifyDeviceId: string | null;
+  spotifyReady: boolean;
+  spotifyError: string | null;
+  isPlaying: boolean;
+  currentTrackId: string | null;
+  currentPreviewUrl: string | null;
 
   // Winner
   winnerId: string | null;
@@ -60,6 +84,7 @@ interface GameStore {
   setPendingPlacement: (pos: number | null) => void;
   addChallenger: (id: string) => void;
   setDeckSize: (size: number) => void;
+  setSharedTimeline: (timeline: SongCard[]) => void;
   setLastReveal: (reveal: RevealData | null) => void;
   setSongNameResult: (playerId: string, correct: boolean) => void;
   setWinner: (winnerId: string, players: Record<string, Player>) => void;
@@ -67,6 +92,13 @@ interface GameStore {
   updatePlayerTimeline: (playerId: string, timeline: SongCard[]) => void;
   addPlayer: (player: Player) => void;
   removePlayer: (playerId: string) => void;
+  setSpotifyToken: (token: string | null) => void;
+  setSpotifyRefreshToken: (token: string | null) => void;
+  setSpotifyDeviceId: (id: string | null) => void;
+  setSpotifyReady: (ready: boolean) => void;
+  setSpotifyError: (error: string | null) => void;
+  setIsPlaying: (playing: boolean) => void;
+  setCurrentTrackId: (trackId: string | null, previewUrl?: string | null) => void;
   syncRoom: (room: Room) => void;
   reset: () => void;
 }
@@ -86,6 +118,16 @@ const initialState = {
   pendingPlacement: null,
   challengers: [],
   deckSize: 0,
+  sharedTimeline: [] as SongCard[],
+  challengeDeadline: null as number | null,
+  spotifyToken: null as string | null,
+  spotifyRefreshToken: null as string | null,
+  spotifyDeviceId: null as string | null,
+  spotifyReady: false,
+  spotifyError: null as string | null,
+  isPlaying: false,
+  currentTrackId: null as string | null,
+  currentPreviewUrl: null as string | null,
   lastReveal: null,
   songNameResult: null,
   winnerId: null,
@@ -109,6 +151,7 @@ export const useGameStore = create<GameStore>((set) => ({
   setPendingPlacement: (pendingPlacement) => set({ pendingPlacement }),
   addChallenger: (id) => set((s) => ({ challengers: [...s.challengers, id] })),
   setDeckSize: (deckSize) => set({ deckSize }),
+  setSharedTimeline: (sharedTimeline) => set({ sharedTimeline }),
   setLastReveal: (lastReveal) => set({ lastReveal }),
   setSongNameResult: (playerId, correct) => set({ songNameResult: { playerId, correct } }),
   setWinner: (winnerId, players) => set({ winnerId, finalPlayers: players }),
@@ -135,6 +178,13 @@ export const useGameStore = create<GameStore>((set) => ({
       const { [playerId]: _, ...rest } = s.players;
       return { players: rest };
     }),
+  setSpotifyToken: (spotifyToken) => set({ spotifyToken }),
+  setSpotifyRefreshToken: (spotifyRefreshToken) => set({ spotifyRefreshToken }),
+  setSpotifyDeviceId: (spotifyDeviceId) => set({ spotifyDeviceId }),
+  setSpotifyReady: (spotifyReady) => set({ spotifyReady }),
+  setSpotifyError: (spotifyError) => set({ spotifyError }),
+  setIsPlaying: (isPlaying) => set({ isPlaying }),
+  setCurrentTrackId: (currentTrackId, previewUrl) => set({ currentTrackId, currentPreviewUrl: previewUrl ?? null }),
   syncRoom: (room) =>
     set({
       players: room.players,
@@ -146,6 +196,7 @@ export const useGameStore = create<GameStore>((set) => ({
       pendingPlacement: room.gameState.pendingPlacement,
       challengers: room.gameState.challengers,
       deckSize: room.gameState.deckSize,
+      sharedTimeline: room.gameState.sharedTimeline || [],
     }),
   reset: () => set(initialState),
 }));
