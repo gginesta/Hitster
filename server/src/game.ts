@@ -16,6 +16,7 @@ import {
   TURN_TIME_MS,
   COOP_WRONG_PENALTY,
 } from '@hitster/shared';
+import { logger } from './logger';
 
 type HitsterServer = Server<ClientToServerEvents, ServerToClientEvents>;
 
@@ -125,6 +126,13 @@ export class GameEngine {
       sharedTimeline: this.room.gameState.sharedTimeline || [],
     };
 
+    logger.info('Game started', {
+      roomCode: this.room.code,
+      playerCount: playerIds.length,
+      mode: this.mode,
+      deckSize: this.deck.length,
+    });
+
     this.io.to(this.room.code).emit('game-started', { gameState: this.room.gameState });
 
     // Sync each player's starting timeline
@@ -161,6 +169,15 @@ export class GameEngine {
     this.yearGuess = null;
 
     const turnPlayerId = this.room.gameState.currentTurnPlayerId!;
+    const turnPlayer = this.room.players[turnPlayerId];
+
+    logger.info('Turn started', {
+      roomCode: this.room.code,
+      playerName: turnPlayer?.name,
+      songTitle: song.title,
+      songArtist: song.artist,
+      cardsRemaining: this.deck.length,
+    });
 
     // Send song info to all players (year hidden for active player)
     this.io.to(this.room.code).emit('new-turn', {
@@ -234,6 +251,12 @@ export class GameEngine {
     if (!gs.challengers.includes(challengerId)) {
       gs.challengers.push(challengerId);
       player.tokens -= CHALLENGE_COST;
+
+      logger.info('Challenge made', {
+        roomCode: this.room.code,
+        challengerName: player.name,
+        activePlayerId: gs.currentTurnPlayerId,
+      });
 
       this.io.to(this.room.code).emit('challenge-made', { challengerId });
       this.io.to(this.room.code).emit('tokens-updated', {
@@ -391,6 +414,16 @@ export class GameEngine {
     }
     // If incorrect and no challengers, card is discarded
 
+    logger.info('Card placed', {
+      roomCode: this.room.code,
+      playerName: activePlayer.name,
+      correct,
+      placementCorrect,
+      stolenBy: stolenBy ? this.room.players[stolenBy]?.name : null,
+      songTitle: song.title,
+      songYear: song.year,
+    });
+
     gs.phase = 'reveal';
 
     this.io.to(this.room.code).emit('reveal', {
@@ -523,6 +556,21 @@ export class GameEngine {
         }
       }
     }
+
+    const finalScores: Record<string, number> = {};
+    for (const [id, player] of Object.entries(this.room.players)) {
+      finalScores[player.name] = this.isCoop
+        ? this.room.gameState.sharedTimeline.length
+        : player.timeline.length;
+    }
+    const winnerName = winnerId ? this.room.players[winnerId]?.name : 'unknown';
+
+    logger.info('Game over', {
+      roomCode: this.room.code,
+      winner: winnerName,
+      mode: this.mode,
+      finalScores,
+    });
 
     this.io.to(this.room.code).emit('game-over', {
       winnerId,
