@@ -87,8 +87,8 @@ export function useSpotifyPlayer() {
         useGameStore.setState({ spotifyError: message });
       },
       onAutoplayFailed: () => {
-        useGameStore.setState({ isPlaying: false });
-        console.log('[Hitster] Autoplay blocked — user must click play');
+        useGameStore.setState({ isPlaying: false, autoplayBlocked: true });
+        console.log('[Hitster] Autoplay blocked — user must tap to unlock audio');
       },
       onStateChange: (paused) => {
         if (!usingFallbackRef.current) {
@@ -180,6 +180,7 @@ export function useSpotifyPlayer() {
   // Play button handler — called on user gesture (click)
   const togglePlayback = useCallback(async () => {
     activateElement();
+    useGameStore.setState({ autoplayBlocked: false });
 
     const {
       isPlaying: playing,

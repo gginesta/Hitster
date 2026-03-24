@@ -165,7 +165,27 @@ export function Game() {
     prevCountdownRef.current = countdown;
   }, [countdown]);
 
+  const autoplayBlocked = useGameStore((s) => s.autoplayBlocked);
   const { isHost: isSpotifyHost, spotifyReady, togglePlayback } = useSpotifyPlayer();
+
+  // Global click handler to unlock audio on first interaction
+  useEffect(() => {
+    if (!autoplayBlocked) return;
+
+    const unlockAudio = async () => {
+      await togglePlayback();
+      document.removeEventListener('click', unlockAudio);
+      document.removeEventListener('touchstart', unlockAudio);
+    };
+
+    document.addEventListener('click', unlockAudio, { once: true });
+    document.addEventListener('touchstart', unlockAudio, { once: true });
+
+    return () => {
+      document.removeEventListener('click', unlockAudio);
+      document.removeEventListener('touchstart', unlockAudio);
+    };
+  }, [autoplayBlocked, togglePlayback]);
 
   const socket = getSocket();
   const isMyTurn = currentTurnPlayerId === myId;
@@ -311,8 +331,23 @@ export function Game() {
         </div>
       </div>
 
+      {/* Autoplay blocked banner */}
+      {autoplayBlocked && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-[#1DB954]/20 border-b border-[#1DB954]/30 px-4 py-3 text-center cursor-pointer"
+          onClick={togglePlayback}
+        >
+          <div className="flex items-center justify-center gap-2 text-[#1DB954] font-bold">
+            <Play className="w-5 h-5" fill="currentColor" />
+            <span>Tap anywhere to start the music</span>
+          </div>
+        </motion.div>
+      )}
+
       {/* Spotify error banner */}
-      {spotifyError && (
+      {spotifyError && !autoplayBlocked && (
         <div className="bg-red-500/10 border-b border-red-500/20 px-4 py-2 text-center text-sm text-red-400">
           {spotifyError}
         </div>
