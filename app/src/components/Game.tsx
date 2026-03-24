@@ -1,10 +1,20 @@
-import { useState, useEffect, useCallback } from 'react';
-import { Disc, Coins, Check, X, SkipForward, AlertTriangle, ShoppingCart, Star, Play, Pause } from 'lucide-react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { Disc, Coins, Check, X, SkipForward, AlertTriangle, ShoppingCart, Star, Play, Pause, Volume2, VolumeX } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { getSocket } from '../services/socket';
 import { useGameStore } from '../store';
 import { useSpotifyPlayer } from '../hooks/useSpotifyPlayer';
 import { SKIP_COST, CHALLENGE_COST, BUY_CARD_COST } from '@hitster/shared';
+import {
+  playCorrectSound,
+  playWrongSound,
+  playChallengeSound,
+  playStolenSound,
+  playTickSound,
+  playStartSound,
+  isMuted,
+  toggleMute,
+} from '../services/sounds';
 import type { SongCard, GameMode } from '@hitster/shared';
 
 const DECADE_COLORS: Record<number, string> = {
@@ -104,6 +114,57 @@ export function Game() {
     return () => clearInterval(interval);
   }, [phase, challengeDeadline]);
 
+  // --- Sound effects ---
+  const [soundMuted, setSoundMuted] = useState(isMuted);
+  const handleToggleMute = useCallback(() => {
+    const nowMuted = toggleMute();
+    setSoundMuted(nowMuted);
+  }, []);
+
+  // Track first turn to play start sound
+  const hasPlayedStartRef = useRef(false);
+  const prevPhaseRef = useRef(phase);
+  const prevChallengersLenRef = useRef(challengers.length);
+  const prevCountdownRef = useRef<number | null>(null);
+
+  // Play start sound when phase changes to 'playing' for the first turn
+  useEffect(() => {
+    if (phase === 'playing' && prevPhaseRef.current !== 'playing' && !hasPlayedStartRef.current) {
+      playStartSound();
+      hasPlayedStartRef.current = true;
+    }
+    prevPhaseRef.current = phase;
+  }, [phase]);
+
+  // Play correct/wrong/stolen sound on reveal
+  useEffect(() => {
+    if (phase === 'reveal' && lastReveal) {
+      if (lastReveal.stolenBy) {
+        playStolenSound();
+      } else if (lastReveal.correct) {
+        playCorrectSound();
+      } else {
+        playWrongSound();
+      }
+    }
+  }, [phase, lastReveal]);
+
+  // Play challenge sound when a new challenger is added
+  useEffect(() => {
+    if (challengers.length > prevChallengersLenRef.current) {
+      playChallengeSound();
+    }
+    prevChallengersLenRef.current = challengers.length;
+  }, [challengers.length]);
+
+  // Play tick sound when countdown hits 5, 4, 3, 2, 1
+  useEffect(() => {
+    if (countdown !== null && countdown >= 1 && countdown <= 5 && countdown !== prevCountdownRef.current) {
+      playTickSound();
+    }
+    prevCountdownRef.current = countdown;
+  }, [countdown]);
+
   const { isHost: isSpotifyHost, spotifyReady, togglePlayback } = useSpotifyPlayer();
 
   const socket = getSocket();
@@ -190,6 +251,17 @@ export function Game() {
               {isMyTurn ? 'Your Turn' : `${activePlayer.name}'s Turn`}
             </p>
           </div>
+        </div>
+
+        {/* Mute button + Player score chips */}
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handleToggleMute}
+            className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
+            title={soundMuted ? 'Unmute sounds' : 'Mute sounds'}
+          >
+            {soundMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+          </button>
         </div>
 
         {/* Player score chips */}
