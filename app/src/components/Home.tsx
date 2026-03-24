@@ -180,6 +180,10 @@ export function Home() {
             onChange={(e) => setName(e.target.value)}
             placeholder="Enter your nickname..."
             maxLength={20}
+            autoComplete="off"
+            autoCorrect="off"
+            autoCapitalize="words"
+            spellCheck={false}
             className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#1DB954] focus:border-transparent transition-all"
           />
         </div>
@@ -224,14 +228,22 @@ export function Home() {
               onChange={(e) => setAuthUsername(e.target.value)}
               placeholder="Username"
               maxLength={20}
+              autoComplete="off"
+              autoCorrect="off"
+              autoCapitalize="off"
+              spellCheck={false}
               className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-[#1DB954] transition-all"
             />
             <input
-              type="password"
+              type="text"
               value={authPassword}
               onChange={(e) => setAuthPassword(e.target.value)}
               placeholder="Password"
               onKeyDown={(e) => e.key === 'Enter' && handleAuth()}
+              autoComplete="off"
+              autoCorrect="off"
+              autoCapitalize="off"
+              spellCheck={false}
               className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-[#1DB954] transition-all"
             />
             <div className="flex gap-2">
@@ -367,6 +379,10 @@ export function Home() {
                     value={code[i]}
                     onChange={(e) => handleCodeChange(i, e.target.value)}
                     onKeyDown={(e) => handleCodeKeyDown(i, e)}
+                    autoComplete="off"
+                    autoCorrect="off"
+                    autoCapitalize="characters"
+                    spellCheck={false}
                     className="w-16 h-20 bg-white/5 border-2 border-white/10 rounded-2xl text-center text-3xl font-black text-white focus:outline-none focus:border-[#1DB954] focus:bg-[#1DB954]/10 transition-all uppercase"
                   />
                 ))}
