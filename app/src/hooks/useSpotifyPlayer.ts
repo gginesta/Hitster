@@ -30,8 +30,6 @@ export function useSpotifyPlayer() {
   const lastTrackRef = useRef<string | null>(null);
   const tokenRef = useRef<string | null>(spotifyToken);
   const usingFallbackRef = useRef(false);
-  // Track whether autoplay was blocked — user needs to click play
-  const autoplayBlockedRef = useRef(false);
 
   // Keep token ref current
   useEffect(() => {
@@ -42,10 +40,8 @@ export function useSpotifyPlayer() {
   const getToken = useCallback(async (): Promise<string> => {
     if (tokenRef.current) return tokenRef.current;
 
-    // Check both storage locations (Home.tsx saves to localStorage)
     const refreshToken = spotifyRefreshToken
-      || localStorage.getItem('spotify_refresh_token')
-      || sessionStorage.getItem('spotify_refresh_token');
+      || localStorage.getItem('spotify_refresh_token');
     if (!refreshToken) throw new Error('No token available');
 
     const result = await refreshAccessToken(refreshToken);
@@ -53,7 +49,6 @@ export function useSpotifyPlayer() {
       spotifyToken: result.accessToken,
       spotifyRefreshToken: result.refreshToken,
     });
-    // Save to both storage locations for consistency
     localStorage.setItem('spotify_refresh_token', result.refreshToken);
     tokenRef.current = result.accessToken;
     return result.accessToken;
@@ -63,7 +58,6 @@ export function useSpotifyPlayer() {
   useEffect(() => {
     if (!isHost || isInitialized()) return;
 
-    // Init fallback audio in parallel
     initFallbackAudio({
       onStateChange: (paused) => {
         if (usingFallbackRef.current) {
@@ -76,24 +70,26 @@ export function useSpotifyPlayer() {
       onReady: (_deviceId) => {
         useGameStore.setState({
           spotifyDeviceId: _deviceId,
-          spotifyReady: true,
           spotifyError: null,
         });
+        // Don't set spotifyReady yet — wait for device to be confirmed
+        console.log('[Hitster] SDK ready, waiting for device confirmation...');
+      },
+      onDeviceConfirmed: () => {
+        // Device is now confirmed in Spotify's device list — safe to play
+        console.log('[Hitster] Device confirmed — ready to play!');
+        useGameStore.setState({ spotifyReady: true, spotifyError: null });
       },
       onNotReady: () => {
-        // Don't set spotifyReady=false — the SDK will reconnect with a new device
-        // and fire 'ready' again. Setting false would cancel pending playback.
         useGameStore.setState({ spotifyDeviceId: null });
         console.log('[Hitster] Device went offline, waiting for reconnection...');
       },
       onError: (message) => {
-        useGameStore.setState({ spotifyError: message, spotifyReady: false });
+        useGameStore.setState({ spotifyError: message });
       },
       onAutoplayFailed: () => {
-        // Browser blocked autoplay — the user must click the play button
-        autoplayBlockedRef.current = true;
         useGameStore.setState({ isPlaying: false });
-        console.log('[Hitster] Autoplay blocked — waiting for user to click play');
+        console.log('[Hitster] Autoplay blocked — user must click play');
       },
       onStateChange: (paused) => {
         if (!usingFallbackRef.current) {
@@ -102,7 +98,7 @@ export function useSpotifyPlayer() {
       },
       onActive: (active) => {
         if (!active) {
-          console.log('[Hitster] Player state is null — device not yet active');
+          console.log('[Hitster] Player state null — device not yet active');
         }
       },
     });
@@ -120,12 +116,10 @@ export function useSpotifyPlayer() {
 
   /**
    * Attempt to play a track. Tries SDK first, falls back to preview URL.
-   * Returns true if playback started.
    */
   const attemptPlayTrack = useCallback(async (trackId: string): Promise<boolean> => {
     usingFallbackRef.current = false;
 
-    // Get a fresh token
     let token: string;
     try {
       token = await getToken();
@@ -136,15 +130,12 @@ export function useSpotifyPlayer() {
 
     // Try SDK playback
     const success = await playTrack(trackId, token);
-    if (success) {
-      // If token was 401, refresh and retry once
-      return true;
-    }
+    if (success) return true;
 
     // Token might be expired — refresh and retry
-    console.log('[Hitster] Refreshing token and retrying playTrack...');
+    console.log('[Hitster] Refreshing token and retrying...');
     try {
-      tokenRef.current = null; // Force refresh
+      tokenRef.current = null;
       token = await getToken();
       const retrySuccess = await playTrack(trackId, token);
       if (retrySuccess) return true;
@@ -152,14 +143,13 @@ export function useSpotifyPlayer() {
       console.warn('[Hitster] Token refresh failed');
     }
 
-    // SDK failed — try preview URL fallback
     return tryFallback();
   }, [getToken]);
 
   const tryFallback = useCallback(async (): Promise<boolean> => {
     const previewUrl = useGameStore.getState().currentPreviewUrl;
     if (previewUrl) {
-      console.log('[Hitster] Using preview URL fallback');
+      console.log('[Hitster] Trying preview URL fallback');
       usingFallbackRef.current = true;
       const ok = await playPreviewUrl(previewUrl);
       if (ok) {
@@ -174,31 +164,15 @@ export function useSpotifyPlayer() {
     return false;
   }, []);
 
-  // Auto-play on new turn OR when device becomes ready
+  // Auto-play when track changes and device is confirmed ready
   useEffect(() => {
     if (!isHost || !spotifyReady || !currentTrackId) return;
     if (phase !== 'playing') return;
     if (currentTrackId === lastTrackRef.current) return;
 
     lastTrackRef.current = currentTrackId;
-    autoplayBlockedRef.current = false;
-
     attemptPlayTrack(currentTrackId);
   }, [isHost, spotifyReady, currentTrackId, phase, attemptPlayTrack]);
-
-  // When spotifyReady flips to true (device reconnected), retry if we have a track
-  const prevReadyRef = useRef(spotifyReady);
-  useEffect(() => {
-    const wasReady = prevReadyRef.current;
-    prevReadyRef.current = spotifyReady;
-
-    // Device just became ready and we have an unplayed track
-    if (!wasReady && spotifyReady && isHost && currentTrackId && phase === 'playing') {
-      console.log('[Hitster] Device reconnected, retrying track:', currentTrackId);
-      lastTrackRef.current = currentTrackId;
-      attemptPlayTrack(currentTrackId);
-    }
-  }, [spotifyReady, isHost, currentTrackId, phase, attemptPlayTrack]);
 
   // Auto-pause on challenge/reveal/game_over
   useEffect(() => {
@@ -211,7 +185,6 @@ export function useSpotifyPlayer() {
 
   // Play button handler — called on user gesture (click)
   const togglePlayback = useCallback(async () => {
-    // This is a user gesture — activate the audio element
     activateElement();
 
     const {
@@ -220,7 +193,6 @@ export function useSpotifyPlayer() {
     } = useGameStore.getState();
 
     if (playing) {
-      // Pause
       if (usingFallbackRef.current) {
         pauseFallback();
         useGameStore.setState({ isPlaying: false });
@@ -228,13 +200,8 @@ export function useSpotifyPlayer() {
         await togglePlay();
       }
     } else {
-      // Play — if autoplay was blocked or SDK failed, start from scratch
       if (trackId) {
-        const success = await attemptPlayTrack(trackId);
-        if (!success) {
-          // Last resort: try togglePlay in case SDK has a track queued
-          await togglePlay();
-        }
+        await attemptPlayTrack(trackId);
       } else {
         await togglePlay();
       }

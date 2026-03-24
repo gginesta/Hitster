@@ -99,6 +99,8 @@ export async function refreshAccessToken(
   });
 
   if (!res.ok) {
+    // Clear the invalid refresh token so we don't keep trying it
+    localStorage.removeItem('spotify_refresh_token');
     throw new Error('Token refresh failed');
   }
 
