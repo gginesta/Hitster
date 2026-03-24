@@ -21,7 +21,7 @@ export interface ClientToServerEvents {
 }
 
 export interface ServerToClientEvents {
-  'room-created': (data: { code: string; playerId: string }) => void;
+  'room-created': (data: { code: string; playerId: string; room: Room }) => void;
   'room-joined': (data: { room: Room; playerId: string }) => void;
   'player-joined': (player: Player) => void;
   'player-left': (playerId: string) => void;

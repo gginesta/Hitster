@@ -13,9 +13,12 @@ export function useSocket() {
     socket.on('connect', () => store.setConnected(true));
     socket.on('disconnect', () => store.setConnected(false));
 
-    socket.on('room-created', ({ code, playerId }) => {
+    socket.on('room-created', ({ code, playerId, room }) => {
       store.setMyId(playerId);
       store.setRoomCode(code);
+      store.setPlayers(room.players);
+      store.setHostId(room.hostId);
+      store.setSettings(room.settings);
       store.setScreen('lobby');
       store.setError(null);
     });

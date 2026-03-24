@@ -86,7 +86,7 @@ export function registerRoomHandlers(io: HitsterServer, socket: HitsterSocket) {
       roomSpotifyTokens.set(code, spotifyAccessToken);
     }
 
-    socket.emit('room-created', { code, playerId });
+    socket.emit('room-created', { code, playerId, room });
   });
 
   socket.on('join-room', ({ code, playerName }) => {
