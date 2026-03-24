@@ -16,7 +16,7 @@ import {
   DEFAULT_CARDS_TO_WIN,
 } from '@hitster/shared';
 import { GameEngine } from './game';
-import { selectGameDeck, resolveTrackIds } from './songs';
+import { selectGameDeck, resolveTrackIds, fetchPlaylistDeck } from './songs';
 import { saveRoom, loadAllRooms, deleteRoom } from './database';
 import { logger } from './logger';
 
@@ -118,7 +118,7 @@ export function registerRoomHandlers(io: HitsterServer, socket: HitsterSocket) {
       code,
       players: { [playerId]: player },
       hostId: playerId,
-      settings: { mode: 'original', cardsToWin: DEFAULT_CARDS_TO_WIN },
+      settings: { mode: 'original', cardsToWin: DEFAULT_CARDS_TO_WIN, songPack: 'standard' },
       gameState: createDefaultGameState(),
     };
 
@@ -244,23 +244,42 @@ export function registerRoomHandlers(io: HitsterServer, socket: HitsterSocket) {
       return;
     }
 
-    let deck = selectGameDeck();
+    const spotifyToken = roomSpotifyTokens.get(mapping.code);
+    const { songPack, decades, playlistUrl } = room.settings;
+    let deck: import('@hitster/shared').SongCard[];
+
+    if (songPack === 'playlist' && playlistUrl && spotifyToken) {
+      // Fetch songs directly from a Spotify playlist
+      io.to(mapping.code).emit('resolving-tracks');
+      deck = await fetchPlaylistDeck(playlistUrl, spotifyToken);
+      if (deck.length === 0) {
+        socket.emit('error', { message: 'Could not load songs from that playlist. Check the link and try again.' });
+        return;
+      }
+    } else {
+      // Use built-in song database (standard or decade-filtered)
+      deck = selectGameDeck(undefined, songPack === 'decades' ? decades : undefined);
+      if (deck.length === 0) {
+        socket.emit('error', { message: 'Not enough songs for the selected decades. Try adding more.' });
+        return;
+      }
+
+      // Resolve Spotify track IDs if token available
+      if (spotifyToken) {
+        io.to(mapping.code).emit('resolving-tracks');
+        const playable = await resolveTrackIds(deck, spotifyToken);
+        if (playable.length === 0) {
+          socket.emit('error', { message: 'Could not find any songs on Spotify. Please try again.' });
+          return;
+        }
+        deck = playable;
+      }
+    }
+
     let engine = games.get(mapping.code);
     if (!engine) {
       engine = new GameEngine(room, io);
       games.set(mapping.code, engine);
-    }
-
-    // Resolve Spotify track IDs if token available
-    const spotifyToken = roomSpotifyTokens.get(mapping.code);
-    if (spotifyToken) {
-      io.to(mapping.code).emit('resolving-tracks');
-      const playable = await resolveTrackIds(deck, spotifyToken);
-      if (playable.length === 0) {
-        socket.emit('error', { message: 'Could not find any songs on Spotify. Please try again.' });
-        return;
-      }
-      deck = playable;
     }
 
     engine.startGame(deck);

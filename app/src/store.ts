@@ -114,7 +114,7 @@ const initialState = {
   error: null,
   players: {} as Record<string, Player>,
   hostId: '',
-  settings: { mode: 'original' as const, cardsToWin: 10 },
+  settings: { mode: 'original' as const, cardsToWin: 10, songPack: 'standard' as const },
   phase: 'lobby' as GamePhase,
   currentTurnPlayerId: null,
   currentSong: null,
