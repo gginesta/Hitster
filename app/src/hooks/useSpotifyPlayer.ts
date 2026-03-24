@@ -7,7 +7,6 @@ import {
   playTrack,
   pause,
   togglePlay,
-  disconnect,
   isInitialized,
 } from '../services/spotifyPlayer';
 import {
@@ -103,15 +102,10 @@ export function useSpotifyPlayer() {
       },
     });
 
-    return () => {
-      disconnect();
-      destroyFallback();
-      useGameStore.setState({
-        spotifyReady: false,
-        spotifyDeviceId: null,
-        isPlaying: false,
-      });
-    };
+    // No cleanup — the SDK connection must stay alive for the entire session.
+    // Disconnecting and reconnecting confuses Spotify's servers (device
+    // deregistration + re-registration race). The connection is cleaned up
+    // naturally when the browser tab closes.
   }, [isHost, getToken]);
 
   /**
