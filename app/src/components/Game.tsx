@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { getSocket } from '../services/socket';
 import { useGameStore } from '../store';
 import { useSpotifyPlayer } from '../hooks/useSpotifyPlayer';
-import { SKIP_COST, CHALLENGE_COST, BUY_CARD_COST } from '@hitster/shared';
+import { SKIP_COST, CHALLENGE_COST, BUY_CARD_COST, TURN_TIME_MS } from '@hitster/shared';
 import {
   playCorrectSound,
   playWrongSound,
@@ -85,6 +85,7 @@ export function Game() {
   const spotifyError = useGameStore((s) => s.spotifyError);
 
   const challengeDeadline = useGameStore((s) => s.challengeDeadline);
+  const turnDeadline = useGameStore((s) => s.turnDeadline);
   const [noChallengeClicked, setNoChallengeClicked] = useState(false);
 
   const [guessTitle, setGuessTitle] = useState('');
@@ -113,6 +114,23 @@ export function Game() {
     const interval = setInterval(tick, 100);
     return () => clearInterval(interval);
   }, [phase, challengeDeadline]);
+
+  // Countdown timer for turn (playing phase)
+  const TURN_TIME_SECONDS = TURN_TIME_MS / 1000;
+  const [turnCountdown, setTurnCountdown] = useState<number | null>(null);
+  useEffect(() => {
+    if (phase !== 'playing' || !turnDeadline) {
+      setTurnCountdown(null);
+      return;
+    }
+    const tick = () => {
+      const remaining = Math.max(0, Math.ceil((turnDeadline - Date.now()) / 1000));
+      setTurnCountdown(remaining);
+    };
+    tick();
+    const interval = setInterval(tick, 100);
+    return () => clearInterval(interval);
+  }, [phase, turnDeadline]);
 
   // --- Sound effects ---
   const [soundMuted, setSoundMuted] = useState(isMuted);
@@ -424,6 +442,42 @@ export function Game() {
                 </button>
               ) : (
                 <h2 className="text-6xl font-black text-white/90 mt-4">?</h2>
+              )}
+
+              {/* Countdown timer during playing phase (turn timer) */}
+              {phase === 'playing' && turnCountdown !== null && turnCountdown > 0 && (
+                <motion.div
+                  key="turn-countdown"
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  className="absolute top-3 right-3 z-20"
+                >
+                  <div className="relative">
+                    <svg className="w-14 h-14 -rotate-90" viewBox="0 0 100 100">
+                      <circle
+                        cx="50" cy="50" r="42"
+                        fill="none"
+                        stroke="rgba(255,255,255,0.1)"
+                        strokeWidth="6"
+                      />
+                      <circle
+                        cx="50" cy="50" r="42"
+                        fill="none"
+                        stroke={turnCountdown <= 5 ? '#ef4444' : turnCountdown <= 10 ? '#f97316' : '#3b82f6'}
+                        strokeWidth="6"
+                        strokeLinecap="round"
+                        strokeDasharray={`${2 * Math.PI * 42}`}
+                        strokeDashoffset={`${2 * Math.PI * 42 * (1 - turnCountdown / TURN_TIME_SECONDS)}`}
+                        className="transition-all duration-100"
+                      />
+                    </svg>
+                    <span className={`absolute inset-0 flex items-center justify-center text-lg font-black ${
+                      turnCountdown <= 5 ? 'text-red-400' : turnCountdown <= 10 ? 'text-orange-400' : 'text-white'
+                    }`}>
+                      {turnCountdown}
+                    </span>
+                  </div>
+                </motion.div>
               )}
 
               {/* Countdown timer during challenge phase */}

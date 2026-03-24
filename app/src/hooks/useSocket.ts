@@ -59,7 +59,11 @@ export function useSocket() {
       store.setPhase('playing');
       store.setPendingPlacement(null);
       store.setLastReveal(null);
-      useGameStore.setState({ songNameResult: null });
+      useGameStore.setState({ songNameResult: null, turnDeadline: null });
+    });
+
+    socket.on('turn-started', ({ turnDeadline }) => {
+      useGameStore.setState({ turnDeadline });
     });
 
     socket.on('play-song', ({ spotifyTrackId, previewUrl }) => {
@@ -73,7 +77,7 @@ export function useSocket() {
 
     socket.on('card-placed', ({ position, challengeDeadline }) => {
       store.setPendingPlacement(position);
-      useGameStore.setState({ challengeDeadline: challengeDeadline ?? null });
+      useGameStore.setState({ challengeDeadline: challengeDeadline ?? null, turnDeadline: null });
       store.setPhase('challenge');
     });
 
@@ -85,7 +89,7 @@ export function useSocket() {
       store.setLastReveal(data);
       store.setPhase('reveal');
       store.setCurrentSong(data.song);
-      useGameStore.setState({ challengeDeadline: null });
+      useGameStore.setState({ challengeDeadline: null, turnDeadline: null });
     });
 
     socket.on('tokens-updated', ({ playerId, tokens }) => {
@@ -108,6 +112,7 @@ export function useSocket() {
       store.setWinner(winnerId, players);
       store.setPhase('game_over');
       store.setScreen('results');
+      useGameStore.setState({ turnDeadline: null });
     });
 
     socket.on('game-restarted', ({ room }) => {
