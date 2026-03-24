@@ -435,7 +435,7 @@ export function Game() {
                   className="absolute inset-0 flex items-center justify-center z-20"
                 >
                   <div className="relative">
-                    <svg className="w-28 h-28 -rotate-90" viewBox="0 0 100 100">
+                    <svg className="w-40 h-40 -rotate-90" viewBox="0 0 100 100">
                       <circle
                         cx="50" cy="50" r="42"
                         fill="none"
@@ -449,12 +449,12 @@ export function Game() {
                         strokeWidth="6"
                         strokeLinecap="round"
                         strokeDasharray={`${2 * Math.PI * 42}`}
-                        strokeDashoffset={`${2 * Math.PI * 42 * (1 - countdown / 15)}`}
+                        strokeDashoffset={`${2 * Math.PI * 42 * (1 - countdown / 8)}`}
                         className="transition-all duration-100"
                       />
                     </svg>
-                    <span className={`absolute inset-0 flex items-center justify-center text-4xl font-black ${
-                      countdown <= 5 ? 'text-red-400' : 'text-amber-400'
+                    <span className={`absolute inset-0 flex items-center justify-center text-6xl font-black drop-shadow-lg ${
+                      countdown <= 3 ? 'text-red-400' : 'text-amber-400'
                     }`}>
                       {countdown}
                     </span>
