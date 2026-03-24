@@ -55,6 +55,9 @@ interface GameStore {
   // Challenge
   challengeDeadline: number | null;
 
+  // Turn timer
+  turnDeadline: number | null;
+
   // Spotify
   spotifyToken: string | null;
   spotifyRefreshToken: string | null;
@@ -120,6 +123,7 @@ const initialState = {
   deckSize: 0,
   sharedTimeline: [] as SongCard[],
   challengeDeadline: null as number | null,
+  turnDeadline: null as number | null,
   spotifyToken: null as string | null,
   spotifyRefreshToken: null as string | null,
   spotifyDeviceId: null as string | null,

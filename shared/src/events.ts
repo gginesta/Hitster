@@ -31,6 +31,7 @@ export interface ServerToClientEvents {
   'settings-updated': (settings: GameSettings) => void;
   'game-started': (data: { gameState: Room['gameState'] }) => void;
   'new-turn': (data: { turnPlayerId: string; songCard: Partial<SongCard> }) => void;
+  'turn-started': (data: { turnPlayerId: string; turnDeadline: number }) => void;
   'play-song': (data: { spotifyTrackId: string; previewUrl?: string }) => void;
   'card-placed': (data: { playerId: string; position: number; challengeDeadline?: number }) => void;
   'challenge-made': (data: { challengerId: string }) => void;

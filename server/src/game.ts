@@ -13,6 +13,7 @@ import {
   CHALLENGE_COST,
   BUY_CARD_COST,
   CHALLENGE_WINDOW_MS,
+  TURN_TIME_MS,
   COOP_WRONG_PENALTY,
 } from '@hitster/shared';
 
@@ -24,6 +25,7 @@ export class GameEngine {
   private deck: SongCard[] = [];
   private spotifyAccessToken: string | null = null;
   private challengeTimer: ReturnType<typeof setTimeout> | null = null;
+  private turnTimer: ReturnType<typeof setTimeout> | null = null;
   private songNamed = new Set<string>();
   /** Tracks whether each player's song name guess was correct this round */
   private songNameCorrect = new Map<string, boolean>();
@@ -52,6 +54,10 @@ export class GameEngine {
     if (this.challengeTimer) {
       clearTimeout(this.challengeTimer);
       this.challengeTimer = null;
+    }
+    if (this.turnTimer) {
+      clearTimeout(this.turnTimer);
+      this.turnTimer = null;
     }
 
     // Clear engine state
@@ -162,6 +168,21 @@ export class GameEngine {
       songCard: { id: song.id },
     });
 
+    // Emit turn-started with deadline for countdown
+    const turnDeadline = Date.now() + TURN_TIME_MS;
+    this.io.to(this.room.code).emit('turn-started', {
+      turnPlayerId,
+      turnDeadline,
+    });
+
+    // Start turn timer — auto-skip on timeout (no token cost)
+    this.turnTimer = setTimeout(() => {
+      this.turnTimer = null;
+      if (this.room.gameState.phase === 'playing' && this.room.gameState.currentTurnPlayerId === turnPlayerId) {
+        this.advanceTurn();
+      }
+    }, TURN_TIME_MS);
+
     // Tell host to play the song
     if (song.spotifyTrackId) {
       this.io.to(this.room.code).emit('play-song', {
@@ -174,6 +195,12 @@ export class GameEngine {
   placeCard(playerId: string, position: number) {
     const gs = this.room.gameState;
     if (gs.phase !== 'playing' || gs.currentTurnPlayerId !== playerId) return;
+
+    // Clear turn timer since player acted
+    if (this.turnTimer) {
+      clearTimeout(this.turnTimer);
+      this.turnTimer = null;
+    }
 
     gs.pendingPlacement = position;
     gs.phase = 'challenge';
@@ -251,6 +278,12 @@ export class GameEngine {
   skipSong(playerId: string) {
     const gs = this.room.gameState;
     if (gs.phase !== 'playing' || gs.currentTurnPlayerId !== playerId) return;
+
+    // Clear turn timer since player acted
+    if (this.turnTimer) {
+      clearTimeout(this.turnTimer);
+      this.turnTimer = null;
+    }
 
     const player = this.room.players[playerId];
     if (!player || player.tokens < SKIP_COST) return;
