@@ -86,6 +86,7 @@ export function registerRoomHandlers(io: HitsterServer, socket: HitsterSocket) {
       roomSpotifyTokens.set(code, spotifyAccessToken);
     }
 
+    console.log(`[create-room] Room ${code} created. Players:`, Object.keys(room.players), 'Host:', room.hostId);
     socket.emit('room-created', { code, playerId, room });
     // Also send state-sync so the host's player data is fully populated
     socket.emit('state-sync', room);

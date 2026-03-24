@@ -14,13 +14,24 @@ function cacheKey(song: SongData): string {
 }
 
 export function loadSongs() {
+  console.log('[songs] __dirname:', __dirname);
+  console.log('[songs] process.cwd():', process.cwd());
+
   // Try multiple possible locations for songs.json
   const candidates = [
     path.join(__dirname, '..', '..', 'data', 'songs.json'),   // from server/src or server/dist
     path.join(__dirname, '..', 'data', 'songs.json'),          // from server/
     path.join(process.cwd(), 'data', 'songs.json'),            // from project root (npm workspaces)
   ];
+
+  console.log('[songs] Candidates:');
+  for (const c of candidates) {
+    console.log(`  ${c} → exists: ${fs.existsSync(c)}`);
+  }
+
   const songsPath = candidates.find(p => fs.existsSync(p)) || candidates[0];
+  console.log('[songs] Using:', songsPath);
+
   try {
     const raw = fs.readFileSync(songsPath, 'utf-8');
     allSongs = JSON.parse(raw);
