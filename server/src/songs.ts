@@ -3,6 +3,7 @@ import * as path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import type { SongCard, SongData } from '@hitster/shared';
 import { DECK_SIZE } from '@hitster/shared';
+import { logger } from './logger';
 
 let allSongs: SongData[] = [];
 
@@ -14,8 +15,7 @@ function cacheKey(song: SongData): string {
 }
 
 export function loadSongs() {
-  console.log('[songs] __dirname:', __dirname);
-  console.log('[songs] process.cwd():', process.cwd());
+  logger.debug('Song loader paths', { __dirname, cwd: process.cwd() });
 
   // Try multiple possible locations for songs.json
   const candidates = [
@@ -24,27 +24,26 @@ export function loadSongs() {
     path.join(process.cwd(), 'data', 'songs.json'),            // from project root (npm workspaces)
   ];
 
-  console.log('[songs] Candidates:');
-  for (const c of candidates) {
-    console.log(`  ${c} → exists: ${fs.existsSync(c)}`);
-  }
+  logger.debug('Song file candidates', {
+    candidates: candidates.map(c => ({ path: c, exists: fs.existsSync(c) })),
+  });
 
   const songsPath = candidates.find(p => fs.existsSync(p)) || candidates[0];
-  console.log('[songs] Using:', songsPath);
+  logger.info('Loading songs', { path: songsPath });
 
   try {
     const raw = fs.readFileSync(songsPath, 'utf-8');
     allSongs = JSON.parse(raw);
-    console.log(`Loaded ${allSongs.length} songs from database`);
+    logger.info('Songs loaded successfully', { count: allSongs.length });
   } catch (err) {
-    console.error('Failed to load songs:', err);
+    logger.error('Failed to load songs', { error: String(err) });
     allSongs = [];
   }
 }
 
 export function selectGameDeck(count: number = DECK_SIZE): SongCard[] {
   if (allSongs.length === 0) {
-    console.warn('No songs loaded, returning empty deck');
+    logger.warn('No songs loaded, returning empty deck');
     return [];
   }
 
@@ -151,9 +150,12 @@ export async function resolveTrackIds(
   }
 
   const playable = deck.filter((c) => c.spotifyTrackId);
-  console.log(
-    `Track resolution: ${resolved}/${deck.length} resolved (${cached} cached), ${playable.length} playable`,
-  );
+  logger.info('Track resolution complete', {
+    resolved,
+    total: deck.length,
+    cached,
+    playable: playable.length,
+  });
 
   return playable;
 }
