@@ -37,6 +37,11 @@ The game is fully playable as a real-time multiplayer experience with Spotify in
 - [x] Account migration from JSON files to SQLite (automatic on first startup)
 - [x] Structured JSON logging with configurable LOG_LEVEL
 - [x] Health check endpoint (GET /health)
+- [x] Auto-reconnect with session resumption (rejoin room after disconnect)
+- [x] Host crash recovery (game continues, turn skips immediately)
+- [x] Challenge placement visibility (challengers see where card was placed)
+- [x] Spotify autoplay fix (pre-activate on user gesture, tap-to-play indicator)
+- [x] iOS keyboard fix (no sensitive text field behavior on inputs)
 
 ---
 
@@ -62,7 +67,7 @@ The game is fully playable as a real-time multiplayer experience with Spotify in
 
 ## Future: Deployment and Infrastructure
 
-- [ ] **Production deployment** -- Docker, cloud hosting (Railway, Fly.io, or similar)
+- [x] **Production deployment** -- Live on Railway
 - [x] **Database** -- SQLite for room/game state persistence (Redis for horizontal scaling is a future option)
 - [ ] **CDN** -- Serve the frontend via CDN for fast global access
 - [x] **Monitoring** -- Structured logging with game event tracking; health check endpoint
