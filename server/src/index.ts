@@ -21,6 +21,7 @@ loadSongs();
 io.on('connection', (socket) => {
   console.log(`Client connected: ${socket.id}`);
   registerRoomHandlers(io, socket);
+  registerAuthHandlers(socket);
 
   socket.on('disconnect', () => {
     console.log(`Client disconnected: ${socket.id}`);

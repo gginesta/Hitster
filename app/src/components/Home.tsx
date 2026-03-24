@@ -1,19 +1,73 @@
-import { useState } from 'react';
-import { Music, Headphones, BookOpen, Wifi, WifiOff, Loader2 } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { Music, Headphones, BookOpen, Wifi, WifiOff, Loader2, LogIn, LogOut, UserPlus } from 'lucide-react';
 import { motion } from 'motion/react';
 import { getSocket } from '../services/socket';
 import { openSpotifyLogin, refreshAccessToken } from '../services/spotify';
 import { useGameStore } from '../store';
 
 export function Home() {
-  const [name, setName] = useState('');
+  const [name, setName] = useState(() => localStorage.getItem('hitster_display_name') || '');
   const [mode, setMode] = useState<'idle' | 'host' | 'join'>('idle');
   const [code, setCode] = useState(['', '', '', '']);
   const [connecting, setConnecting] = useState(false);
+  const [authMode, setAuthMode] = useState<'none' | 'login' | 'register'>('none');
+  const [authUsername, setAuthUsername] = useState('');
+  const [authPassword, setAuthPassword] = useState('');
+  const [authLoading, setAuthLoading] = useState(false);
+  const [signedInAs, setSignedInAs] = useState<string | null>(() => localStorage.getItem('hitster_username'));
   const error = useGameStore((s) => s.error);
   const connected = useGameStore((s) => s.connected);
   const setScreen = useGameStore((s) => s.setScreen);
   const setError = useGameStore((s) => s.setError);
+
+  const handleAuthResult = useCallback((data: { success: boolean; error?: string; displayName?: string }) => {
+    setAuthLoading(false);
+    if (data.success) {
+      localStorage.setItem('hitster_username', authUsername);
+      setSignedInAs(authUsername);
+      if (data.displayName) {
+        setName(data.displayName);
+        localStorage.setItem('hitster_display_name', data.displayName);
+      }
+      setAuthMode('none');
+      setAuthPassword('');
+      setError(null);
+    } else {
+      setError(data.error || 'Authentication failed');
+    }
+  }, [authUsername, setError]);
+
+  useEffect(() => {
+    const socket = getSocket();
+    socket.on('auth-result', handleAuthResult);
+    return () => {
+      socket.off('auth-result', handleAuthResult);
+    };
+  }, [handleAuthResult]);
+
+  const handleAuth = () => {
+    if (!authUsername.trim() || !authPassword.trim()) return;
+    setAuthLoading(true);
+    setError(null);
+    const socket = getSocket();
+    if (authMode === 'register') {
+      socket.emit('register', {
+        username: authUsername.trim(),
+        password: authPassword,
+        displayName: name.trim() || authUsername.trim(),
+      });
+    } else {
+      socket.emit('login', { username: authUsername.trim(), password: authPassword });
+    }
+  };
+
+  const handleSignOut = () => {
+    localStorage.removeItem('hitster_username');
+    localStorage.removeItem('hitster_display_name');
+    setSignedInAs(null);
+    setName('');
+    setError(null);
+  };
 
   const createRoomWithToken = (accessToken: string, refreshToken: string) => {
     useGameStore.setState({
@@ -129,6 +183,93 @@ export function Home() {
             className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#1DB954] focus:border-transparent transition-all"
           />
         </div>
+
+        {/* Account section */}
+        {signedInAs ? (
+          <div className="flex items-center justify-between bg-white/5 rounded-xl px-4 py-2.5">
+            <span className="text-sm text-gray-300">
+              Signed in as <span className="text-white font-medium">{signedInAs}</span>
+            </span>
+            <button
+              onClick={handleSignOut}
+              className="text-xs text-gray-400 hover:text-white flex items-center gap-1 transition-colors"
+            >
+              <LogOut className="w-3 h-3" />
+              Sign out
+            </button>
+          </div>
+        ) : authMode !== 'none' ? (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            className="space-y-3 bg-white/5 rounded-xl p-4"
+          >
+            <div className="flex gap-2 mb-2">
+              <button
+                onClick={() => { setAuthMode('login'); setError(null); }}
+                className={`flex-1 text-xs font-bold py-1.5 rounded-lg transition-all ${authMode === 'login' ? 'bg-white/15 text-white' : 'text-gray-400 hover:text-white'}`}
+              >
+                Sign In
+              </button>
+              <button
+                onClick={() => { setAuthMode('register'); setError(null); }}
+                className={`flex-1 text-xs font-bold py-1.5 rounded-lg transition-all ${authMode === 'register' ? 'bg-white/15 text-white' : 'text-gray-400 hover:text-white'}`}
+              >
+                Create Account
+              </button>
+            </div>
+            <input
+              type="text"
+              value={authUsername}
+              onChange={(e) => setAuthUsername(e.target.value)}
+              placeholder="Username"
+              maxLength={20}
+              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-[#1DB954] transition-all"
+            />
+            <input
+              type="password"
+              value={authPassword}
+              onChange={(e) => setAuthPassword(e.target.value)}
+              placeholder="Password"
+              onKeyDown={(e) => e.key === 'Enter' && handleAuth()}
+              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-[#1DB954] transition-all"
+            />
+            <div className="flex gap-2">
+              <button
+                onClick={() => { setAuthMode('none'); setError(null); }}
+                className="flex-1 text-xs text-gray-400 hover:text-white py-2 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleAuth}
+                disabled={!authUsername.trim() || !authPassword.trim() || authLoading}
+                className="flex-[2] bg-[#1DB954] hover:bg-[#1ed760] disabled:opacity-50 text-black text-xs font-bold py-2 rounded-xl transition-all flex items-center justify-center gap-1"
+              >
+                {authLoading ? (
+                  <Loader2 className="w-3 h-3 animate-spin" />
+                ) : authMode === 'register' ? (
+                  <>
+                    <UserPlus className="w-3 h-3" />
+                    Create Account
+                  </>
+                ) : (
+                  <>
+                    <LogIn className="w-3 h-3" />
+                    Sign In
+                  </>
+                )}
+              </button>
+            </div>
+          </motion.div>
+        ) : (
+          <button
+            onClick={() => setAuthMode('login')}
+            className="text-xs text-gray-500 hover:text-gray-300 transition-colors self-center"
+          >
+            Have an account? Sign in
+          </button>
+        )}
 
         {error && (
           <motion.p
