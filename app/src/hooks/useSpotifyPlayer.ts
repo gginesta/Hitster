@@ -3,9 +3,10 @@ import { useGameStore } from '../store';
 import { refreshAccessToken } from '../services/spotify';
 import {
   initPlayer,
+  activateElement,
   playTrack,
   pause,
-  resume,
+  togglePlay,
   disconnect,
   isInitialized,
 } from '../services/spotifyPlayer';
@@ -13,8 +14,6 @@ import {
   initFallbackAudio,
   playPreviewUrl,
   pauseFallback,
-  resumeFallback,
-  isFallbackPlaying,
   destroyFallback,
 } from '../services/audioFallback';
 
@@ -25,14 +24,14 @@ export function useSpotifyPlayer() {
   const myId = useGameStore((s) => s.myId);
   const phase = useGameStore((s) => s.phase);
   const currentTrackId = useGameStore((s) => s.currentTrackId);
-  const currentPreviewUrl = useGameStore((s) => s.currentPreviewUrl);
   const spotifyReady = useGameStore((s) => s.spotifyReady);
 
   const isHost = myId === hostId && !!spotifyToken;
   const lastTrackRef = useRef<string | null>(null);
   const tokenRef = useRef<string | null>(spotifyToken);
-  // Track whether we're using fallback audio for the current track
   const usingFallbackRef = useRef(false);
+  // Track whether autoplay was blocked — user needs to click play
+  const autoplayBlockedRef = useRef(false);
 
   // Keep token ref current
   useEffect(() => {
@@ -60,7 +59,7 @@ export function useSpotifyPlayer() {
   useEffect(() => {
     if (!isHost || isInitialized()) return;
 
-    // Always init fallback audio for state changes
+    // Init fallback audio in parallel
     initFallbackAudio({
       onStateChange: (paused) => {
         if (usingFallbackRef.current) {
@@ -70,29 +69,33 @@ export function useSpotifyPlayer() {
     });
 
     initPlayer(getToken, {
-      onReady: (deviceId) => {
-        console.log('[Hitster] Spotify SDK ready, device:', deviceId);
+      onReady: (_deviceId) => {
         useGameStore.setState({
-          spotifyDeviceId: deviceId,
+          spotifyDeviceId: _deviceId,
           spotifyReady: true,
           spotifyError: null,
         });
       },
       onNotReady: () => {
-        console.warn('[Hitster] Spotify SDK not ready');
         useGameStore.setState({ spotifyReady: false, spotifyDeviceId: null });
       },
       onError: (message) => {
-        console.error('[Hitster] Spotify SDK error:', message);
-        // Still mark as ready so the play button shows — we'll use fallback
-        useGameStore.setState({
-          spotifyError: message,
-          spotifyReady: true,
-        });
+        useGameStore.setState({ spotifyError: message, spotifyReady: false });
+      },
+      onAutoplayFailed: () => {
+        // Browser blocked autoplay — the user must click the play button
+        autoplayBlockedRef.current = true;
+        useGameStore.setState({ isPlaying: false });
+        console.log('[Hitster] Autoplay blocked — waiting for user to click play');
       },
       onStateChange: (paused) => {
         if (!usingFallbackRef.current) {
           useGameStore.setState({ isPlaying: !paused });
+        }
+      },
+      onActive: (active) => {
+        if (!active) {
+          console.log('[Hitster] Player state is null — device not yet active');
         }
       },
     });
@@ -108,71 +111,75 @@ export function useSpotifyPlayer() {
     };
   }, [isHost, getToken]);
 
+  /**
+   * Attempt to play a track. Tries SDK first, falls back to preview URL.
+   * Returns true if playback started.
+   */
+  const attemptPlayTrack = useCallback(async (trackId: string): Promise<boolean> => {
+    usingFallbackRef.current = false;
+
+    // Get a fresh token
+    let token: string;
+    try {
+      token = await getToken();
+    } catch {
+      console.warn('[Hitster] Could not get token for playback');
+      return tryFallback();
+    }
+
+    // Try SDK playback
+    const success = await playTrack(trackId, token);
+    if (success) {
+      // If token was 401, refresh and retry once
+      return true;
+    }
+
+    // Token might be expired — refresh and retry
+    console.log('[Hitster] Refreshing token and retrying playTrack...');
+    try {
+      tokenRef.current = null; // Force refresh
+      token = await getToken();
+      const retrySuccess = await playTrack(trackId, token);
+      if (retrySuccess) return true;
+    } catch {
+      console.warn('[Hitster] Token refresh failed');
+    }
+
+    // SDK failed — try preview URL fallback
+    return tryFallback();
+  }, [getToken]);
+
+  const tryFallback = useCallback(async (): Promise<boolean> => {
+    const previewUrl = useGameStore.getState().currentPreviewUrl;
+    if (previewUrl) {
+      console.log('[Hitster] Using preview URL fallback');
+      usingFallbackRef.current = true;
+      const ok = await playPreviewUrl(previewUrl);
+      if (ok) {
+        useGameStore.setState({ isPlaying: true });
+        return true;
+      }
+    }
+    console.error('[Hitster] All playback methods failed');
+    useGameStore.setState({
+      spotifyError: 'Could not play this song. Try clicking the play button.',
+    });
+    return false;
+  }, []);
+
   // Auto-play on new turn
   useEffect(() => {
-    if (!isHost || !currentTrackId) return;
+    if (!isHost || !spotifyReady || !currentTrackId) return;
     if (phase !== 'playing') return;
     if (currentTrackId === lastTrackRef.current) return;
 
     lastTrackRef.current = currentTrackId;
-    usingFallbackRef.current = false;
+    autoplayBlockedRef.current = false;
 
-    const attemptPlay = async () => {
-      // Try Spotify SDK first
-      let sdkSuccess = false;
-      let token = tokenRef.current;
-      if (!token) {
-        try {
-          token = await getToken();
-        } catch {
-          console.warn('[Hitster] Failed to get Spotify token');
-        }
-      }
+    attemptPlayTrack(currentTrackId);
+  }, [isHost, spotifyReady, currentTrackId, phase, attemptPlayTrack]);
 
-      if (token && spotifyReady) {
-        try {
-          await playTrack(currentTrackId, token);
-          // Check if playback actually started after a short delay
-          await new Promise((r) => setTimeout(r, 1500));
-          const { isPlaying } = useGameStore.getState();
-          sdkSuccess = isPlaying;
-          if (sdkSuccess) {
-            console.log('[Hitster] Spotify SDK playback started');
-          } else {
-            console.warn('[Hitster] Spotify SDK playTrack called but not playing');
-          }
-        } catch (err) {
-          console.warn('[Hitster] Spotify SDK playTrack failed:', err);
-        }
-      }
-
-      // Fallback to preview URL if SDK didn't work
-      if (!sdkSuccess) {
-        const previewUrl = useGameStore.getState().currentPreviewUrl;
-        if (previewUrl) {
-          console.log('[Hitster] Falling back to preview URL');
-          usingFallbackRef.current = true;
-          const ok = await playPreviewUrl(previewUrl);
-          if (ok) {
-            useGameStore.setState({ isPlaying: true, spotifyError: null });
-          } else {
-            useGameStore.setState({
-              spotifyError: 'Could not play audio. Check your browser permissions.',
-            });
-          }
-        } else {
-          console.error('[Hitster] No preview URL available for fallback');
-          useGameStore.setState({
-            spotifyError: 'Could not play this song. Spotify Premium may be required.',
-          });
-        }
-      }
-    };
-
-    attemptPlay();
-  }, [isHost, spotifyReady, currentTrackId, phase, getToken]);
-
-  // Auto-pause on challenge/reveal
+  // Auto-pause on challenge/reveal/game_over
   useEffect(() => {
     if (!isHost) return;
     if (phase === 'challenge' || phase === 'reveal' || phase === 'game_over') {
@@ -181,59 +188,37 @@ export function useSpotifyPlayer() {
     }
   }, [isHost, phase]);
 
-  // Expose controls
+  // Play button handler — called on user gesture (click)
   const togglePlayback = useCallback(async () => {
-    const { isPlaying: playing, currentTrackId: trackId, currentPreviewUrl: previewUrl } = useGameStore.getState();
+    // This is a user gesture — activate the audio element
+    activateElement();
+
+    const {
+      isPlaying: playing,
+      currentTrackId: trackId,
+    } = useGameStore.getState();
 
     if (playing) {
+      // Pause
       if (usingFallbackRef.current) {
         pauseFallback();
         useGameStore.setState({ isPlaying: false });
       } else {
-        await pause();
+        await togglePlay();
       }
     } else {
-      if (usingFallbackRef.current) {
-        // Resume or restart fallback
-        if (isFallbackPlaying()) return;
-        if (previewUrl) {
-          await playPreviewUrl(previewUrl);
-          useGameStore.setState({ isPlaying: true });
-        } else {
-          resumeFallback();
+      // Play — if autoplay was blocked or SDK failed, start from scratch
+      if (trackId) {
+        const success = await attemptPlayTrack(trackId);
+        if (!success) {
+          // Last resort: try togglePlay in case SDK has a track queued
+          await togglePlay();
         }
       } else {
-        // Try SDK playTrack, then fall back
-        const token = tokenRef.current;
-        if (trackId && token) {
-          try {
-            await playTrack(trackId, token);
-            // Give SDK a moment to respond
-            await new Promise((r) => setTimeout(r, 1000));
-            const { isPlaying: nowPlaying } = useGameStore.getState();
-            if (!nowPlaying && previewUrl) {
-              console.log('[Hitster] SDK toggle failed, using fallback');
-              usingFallbackRef.current = true;
-              await playPreviewUrl(previewUrl);
-              useGameStore.setState({ isPlaying: true });
-            }
-          } catch {
-            if (previewUrl) {
-              usingFallbackRef.current = true;
-              await playPreviewUrl(previewUrl);
-              useGameStore.setState({ isPlaying: true });
-            }
-          }
-        } else if (previewUrl) {
-          usingFallbackRef.current = true;
-          await playPreviewUrl(previewUrl);
-          useGameStore.setState({ isPlaying: true });
-        } else {
-          await resume();
-        }
+        await togglePlay();
       }
     }
-  }, []);
+  }, [attemptPlayTrack]);
 
   return {
     isHost,

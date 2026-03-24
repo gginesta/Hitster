@@ -3,6 +3,7 @@ declare namespace Spotify {
     constructor(options: PlayerOptions);
     connect(): Promise<boolean>;
     disconnect(): void;
+    activateElement(): void;
     pause(): Promise<void>;
     resume(): Promise<void>;
     togglePlay(): Promise<void>;
@@ -15,6 +16,7 @@ declare namespace Spotify {
     addListener(event: 'authentication_error', callback: (error: WebPlaybackError) => void): void;
     addListener(event: 'account_error', callback: (error: WebPlaybackError) => void): void;
     addListener(event: 'playback_error', callback: (error: WebPlaybackError) => void): void;
+    addListener(event: 'autoplay_failed', callback: () => void): void;
     removeListener(event: string): void;
   }
 
