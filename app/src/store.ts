@@ -9,11 +9,19 @@ import type {
 
 export type Screen = 'home' | 'lobby' | 'game' | 'results' | 'rules';
 
+interface ModeResult {
+  placementCorrect: boolean;
+  songNamed: boolean;
+  yearCorrect?: boolean;
+  coopPenalty?: boolean;
+}
+
 interface RevealData {
   song: SongCard;
   correct: boolean;
   winnerId: string | null;
   stolenBy: string | null;
+  modeResult?: ModeResult;
 }
 
 interface GameStore {
@@ -36,6 +44,9 @@ interface GameStore {
   pendingPlacement: number | null;
   challengers: string[];
   deckSize: number;
+
+  // Shared timeline (co-op)
+  sharedTimeline: SongCard[];
 
   // Reveal
   lastReveal: RevealData | null;
@@ -60,6 +71,7 @@ interface GameStore {
   setPendingPlacement: (pos: number | null) => void;
   addChallenger: (id: string) => void;
   setDeckSize: (size: number) => void;
+  setSharedTimeline: (timeline: SongCard[]) => void;
   setLastReveal: (reveal: RevealData | null) => void;
   setSongNameResult: (playerId: string, correct: boolean) => void;
   setWinner: (winnerId: string, players: Record<string, Player>) => void;
@@ -86,6 +98,7 @@ const initialState = {
   pendingPlacement: null,
   challengers: [],
   deckSize: 0,
+  sharedTimeline: [] as SongCard[],
   lastReveal: null,
   songNameResult: null,
   winnerId: null,
@@ -109,6 +122,7 @@ export const useGameStore = create<GameStore>((set) => ({
   setPendingPlacement: (pendingPlacement) => set({ pendingPlacement }),
   addChallenger: (id) => set((s) => ({ challengers: [...s.challengers, id] })),
   setDeckSize: (deckSize) => set({ deckSize }),
+  setSharedTimeline: (sharedTimeline) => set({ sharedTimeline }),
   setLastReveal: (lastReveal) => set({ lastReveal }),
   setSongNameResult: (playerId, correct) => set({ songNameResult: { playerId, correct } }),
   setWinner: (winnerId, players) => set({ winnerId, finalPlayers: players }),
@@ -146,6 +160,7 @@ export const useGameStore = create<GameStore>((set) => ({
       pendingPlacement: room.gameState.pendingPlacement,
       challengers: room.gameState.challengers,
       deckSize: room.gameState.deckSize,
+      sharedTimeline: room.gameState.sharedTimeline || [],
     }),
   reset: () => set(initialState),
 }));

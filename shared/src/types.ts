@@ -35,6 +35,7 @@ export interface GameState {
   turnOrder: string[];
   turnIndex: number;
   deckSize: number;
+  sharedTimeline: SongCard[];
 }
 
 export interface Room {
@@ -53,4 +54,5 @@ export interface PublicGameView {
 export interface SongGuess {
   title: string;
   artist: string;
+  year?: number;
 }

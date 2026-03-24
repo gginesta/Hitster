@@ -36,7 +36,14 @@ export interface ServerToClientEvents {
     correct: boolean;
     winnerId: string | null;
     stolenBy: string | null;
+    modeResult?: {
+      placementCorrect: boolean;
+      songNamed: boolean;
+      yearCorrect?: boolean;
+      coopPenalty?: boolean;
+    };
   }) => void;
+  'shared-timeline-updated': (data: { timeline: SongCard[] }) => void;
   'tokens-updated': (data: { playerId: string; tokens: number }) => void;
   'timeline-updated': (data: { playerId: string; timeline: SongCard[] }) => void;
   'song-named': (data: { playerId: string; correct: boolean }) => void;

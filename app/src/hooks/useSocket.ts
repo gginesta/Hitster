@@ -81,6 +81,10 @@ export function useSocket() {
       store.updatePlayerTimeline(playerId, timeline);
     });
 
+    socket.on('shared-timeline-updated', ({ timeline }) => {
+      store.setSharedTimeline(timeline);
+    });
+
     socket.on('song-named', ({ playerId, correct }) => {
       store.setSongNameResult(playerId, correct);
     });

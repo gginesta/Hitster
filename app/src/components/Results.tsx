@@ -6,8 +6,11 @@ import { useGameStore } from '../store';
 export function Results() {
   const winnerId = useGameStore((s) => s.winnerId);
   const finalPlayers = useGameStore((s) => s.finalPlayers);
+  const settings = useGameStore((s) => s.settings);
+  const sharedTimeline = useGameStore((s) => s.sharedTimeline);
   const reset = useGameStore((s) => s.reset);
 
+  const isCoop = settings.mode === 'coop';
   const playerList = Object.values(finalPlayers);
   const sortedPlayers = [...playerList].sort(
     (a, b) => b.timeline.length - a.timeline.length
@@ -39,10 +42,10 @@ export function Results() {
           <Trophy className="w-32 h-32 text-[#FFD700] relative z-10" />
         </div>
         <h1 className="text-5xl font-black tracking-tighter text-center mb-2">
-          {winner.name} WINS!
+          {isCoop ? 'TEAM WINS!' : `${winner.name} WINS!`}
         </h1>
         <p className="text-[#1DB954] font-bold text-xl">
-          {winner.timeline.length} Cards Collected
+          {isCoop ? `${sharedTimeline.length} Cards Collected Together` : `${winner.timeline.length} Cards Collected`}
         </p>
       </motion.div>
 

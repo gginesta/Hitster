@@ -48,6 +48,7 @@ function createDefaultGameState(): GameState {
     turnOrder: [],
     turnIndex: 0,
     deckSize: 0,
+    sharedTimeline: [],
   };
 }
 

@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { Disc, Coins, Check, X, SkipForward, AlertTriangle, ShoppingCart } from 'lucide-react';
+import { Disc, Coins, Check, X, SkipForward, AlertTriangle, ShoppingCart, Star, Calendar } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { getSocket } from '../services/socket';
 import { useGameStore } from '../store';
 import { SKIP_COST, CHALLENGE_COST, BUY_CARD_COST } from '@hitster/shared';
-import type { SongCard } from '@hitster/shared';
+import type { SongCard, GameMode } from '@hitster/shared';
 
 const DECADE_COLORS: Record<number, string> = {
   1930: 'from-amber-900 to-yellow-900',
@@ -24,6 +24,20 @@ function getCardColor(year: number): string {
   return DECADE_COLORS[decade] || 'from-gray-600 to-gray-800';
 }
 
+const MODE_LABELS: Record<GameMode, string> = {
+  original: 'Original',
+  pro: 'Pro',
+  expert: 'Expert',
+  coop: 'Co-op',
+};
+
+const MODE_COLORS: Record<GameMode, string> = {
+  original: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
+  pro: 'bg-purple-500/20 text-purple-400 border-purple-500/30',
+  expert: 'bg-red-500/20 text-red-400 border-red-500/30',
+  coop: 'bg-green-500/20 text-green-400 border-green-500/30',
+};
+
 export function Game() {
   const myId = useGameStore((s) => s.myId);
   const players = useGameStore((s) => s.players);
@@ -34,9 +48,11 @@ export function Game() {
   const deckSize = useGameStore((s) => s.deckSize);
   const challengers = useGameStore((s) => s.challengers);
   const settings = useGameStore((s) => s.settings);
+  const sharedTimeline = useGameStore((s) => s.sharedTimeline);
 
   const [guessTitle, setGuessTitle] = useState('');
   const [guessArtist, setGuessArtist] = useState('');
+  const [guessYear, setGuessYear] = useState('');
   const [selectedPosition, setSelectedPosition] = useState<number | null>(null);
   const songNameResult = useGameStore((s) => s.songNameResult);
 
@@ -45,8 +61,13 @@ export function Game() {
   const me = players[myId];
   const activePlayer = currentTurnPlayerId ? players[currentTurnPlayerId] : null;
   const playerList = Object.values(players);
+  const mode = settings.mode;
+  const isCoop = mode === 'coop';
 
   if (!me || !activePlayer) return null;
+
+  // Timeline to display: shared for co-op, personal otherwise
+  const displayTimeline = isCoop ? sharedTimeline : me.timeline;
 
   const handlePlaceCard = () => {
     if (selectedPosition === null) return;
@@ -58,6 +79,7 @@ export function Game() {
     socket.emit('skip-song');
     setGuessTitle('');
     setGuessArtist('');
+    setGuessYear('');
     useGameStore.setState({ songNameResult: null });
   };
 
@@ -67,7 +89,14 @@ export function Game() {
 
   const handleNameSong = () => {
     if (!guessTitle.trim() || !guessArtist.trim()) return;
-    socket.emit('name-song', { title: guessTitle.trim(), artist: guessArtist.trim() });
+    const guess: { title: string; artist: string; year?: number } = {
+      title: guessTitle.trim(),
+      artist: guessArtist.trim(),
+    };
+    if (mode === 'expert' && guessYear.trim()) {
+      guess.year = parseInt(guessYear.trim(), 10);
+    }
+    socket.emit('name-song', guess);
   };
 
   const handleBuyCard = () => {
@@ -78,12 +107,17 @@ export function Game() {
     socket.emit('confirm-reveal');
     setGuessTitle('');
     setGuessArtist('');
+    setGuessYear('');
     setSelectedPosition(null);
     useGameStore.setState({ songNameResult: null });
   };
 
   const revealedSong = lastReveal?.song;
   const isRevealed = phase === 'reveal' && revealedSong;
+  const modeResult = lastReveal?.modeResult;
+
+  // Whether song naming is required for the active player
+  const songNamingRequired = mode === 'pro' || mode === 'expert';
 
   return (
     <div className="flex flex-col h-screen text-white bg-[#1a1a2e] overflow-hidden">
@@ -94,9 +128,14 @@ export function Game() {
             {activePlayer.name.charAt(0).toUpperCase()}
           </div>
           <div>
-            <p className="text-xs text-gray-400 uppercase tracking-wider font-bold">
-              {deckSize} cards left
-            </p>
+            <div className="flex items-center gap-2">
+              <p className="text-xs text-gray-400 uppercase tracking-wider font-bold">
+                {deckSize} cards left
+              </p>
+              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${MODE_COLORS[mode]}`}>
+                {MODE_LABELS[mode]}
+              </span>
+            </div>
             <p className="font-bold text-[#1DB954]">
               {isMyTurn ? 'Your Turn' : `${activePlayer.name}'s Turn`}
             </p>
@@ -105,17 +144,39 @@ export function Game() {
 
         {/* Player score chips */}
         <div className="flex gap-3 overflow-x-auto hide-scrollbar">
-          {playerList.map((p) => (
-            <div
-              key={p.id}
-              className={`flex flex-col items-center ${
-                p.id === currentTurnPlayerId ? 'opacity-100' : 'opacity-50'
-              }`}
-            >
+          {isCoop ? (
+            <div className="flex flex-col items-center">
               <div className="flex items-center gap-1 text-xs font-bold">
-                <div className="w-2 h-3 bg-white/20 rounded-sm" />
-                {p.timeline.length}/{settings.cardsToWin}
+                <div className="w-2 h-3 bg-green-400/40 rounded-sm" />
+                {sharedTimeline.length}/{settings.cardsToWin}
               </div>
+              <span className="text-[10px] text-green-400 font-bold">Team</span>
+            </div>
+          ) : (
+            playerList.map((p) => (
+              <div
+                key={p.id}
+                className={`flex flex-col items-center ${
+                  p.id === currentTurnPlayerId ? 'opacity-100' : 'opacity-50'
+                }`}
+              >
+                <div className="flex items-center gap-1 text-xs font-bold">
+                  <div className="w-2 h-3 bg-white/20 rounded-sm" />
+                  {p.timeline.length}/{settings.cardsToWin}
+                </div>
+                <div className="flex items-center gap-1 text-xs text-[#FFD700] font-bold">
+                  <Coins className="w-3 h-3" />
+                  {p.tokens}
+                </div>
+                <span className="text-[10px] text-gray-500 truncate max-w-[50px]">
+                  {p.id === myId ? 'You' : p.name}
+                </span>
+              </div>
+            ))
+          )}
+          {/* Show individual tokens in co-op too */}
+          {isCoop && playerList.map((p) => (
+            <div key={p.id} className="flex flex-col items-center opacity-80">
               <div className="flex items-center gap-1 text-xs text-[#FFD700] font-bold">
                 <Coins className="w-3 h-3" />
                 {p.tokens}
@@ -155,21 +216,48 @@ export function Game() {
                 <p className="text-lg font-bold leading-tight">{revealedSong!.title}</p>
                 <p className="text-sm text-white/80">{revealedSong!.artist}</p>
 
-                <div className="mt-6">
-                  {lastReveal!.correct ? (
-                    <div className="flex items-center justify-center gap-2 text-white bg-black/20 px-4 py-2 rounded-full">
-                      <Check className="w-5 h-5" /> Correct!
-                    </div>
-                  ) : lastReveal!.stolenBy ? (
-                    <div className="flex items-center justify-center gap-2 text-white bg-black/20 px-4 py-2 rounded-full">
-                      <AlertTriangle className="w-5 h-5" /> Stolen by{' '}
-                      {players[lastReveal!.stolenBy]?.name || 'challenger'}!
-                    </div>
-                  ) : (
-                    <div className="flex items-center justify-center gap-2 text-white bg-black/20 px-4 py-2 rounded-full">
-                      <X className="w-5 h-5" /> Wrong placement
+                <div className="mt-4 space-y-2">
+                  {/* Mode-specific result breakdown */}
+                  {modeResult && (mode === 'pro' || mode === 'expert') && (
+                    <div className="flex flex-col gap-1 text-xs">
+                      <div className={`flex items-center justify-center gap-1 ${modeResult.placementCorrect ? 'text-green-300' : 'text-red-300'}`}>
+                        {modeResult.placementCorrect ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
+                        Placement
+                      </div>
+                      <div className={`flex items-center justify-center gap-1 ${modeResult.songNamed ? 'text-green-300' : 'text-red-300'}`}>
+                        {modeResult.songNamed ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
+                        Song Name
+                      </div>
+                      {mode === 'expert' && (
+                        <div className={`flex items-center justify-center gap-1 ${modeResult.yearCorrect ? 'text-green-300' : 'text-red-300'}`}>
+                          {modeResult.yearCorrect ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
+                          Exact Year
+                        </div>
+                      )}
                     </div>
                   )}
+
+                  {/* Main result message */}
+                  <div>
+                    {lastReveal!.correct ? (
+                      <div className="flex items-center justify-center gap-2 text-white bg-black/20 px-4 py-2 rounded-full">
+                        <Check className="w-5 h-5" /> {isCoop ? 'Correct!' : 'Correct!'}
+                      </div>
+                    ) : isCoop && modeResult?.coopPenalty ? (
+                      <div className="flex items-center justify-center gap-2 text-white bg-black/20 px-4 py-2 rounded-full">
+                        <X className="w-5 h-5" /> Wrong! -1 Token
+                      </div>
+                    ) : lastReveal!.stolenBy ? (
+                      <div className="flex items-center justify-center gap-2 text-white bg-black/20 px-4 py-2 rounded-full">
+                        <AlertTriangle className="w-5 h-5" /> Stolen by{' '}
+                        {players[lastReveal!.stolenBy]?.name || 'challenger'}!
+                      </div>
+                    ) : (
+                      <div className="flex items-center justify-center gap-2 text-white bg-black/20 px-4 py-2 rounded-full">
+                        <X className="w-5 h-5" /> {mode === 'pro' || mode === 'expert' ? 'Requirements not met' : 'Wrong placement'}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </motion.div>
             </motion.div>
@@ -191,15 +279,25 @@ export function Game() {
                   <span className="w-1 h-2 bg-[#1DB954] rounded-full animate-pulse" style={{ animationDelay: '300ms' }} />
                 </div>
                 <span className="text-xs font-bold text-white/70 uppercase tracking-widest">
-                  {phase === 'challenge' ? 'Challenge!' : 'Now Playing'}
+                  {phase === 'challenge' ? (isCoop ? 'Revealing...' : 'Challenge!') : 'Now Playing'}
                 </span>
               </div>
               <h2 className="text-6xl font-black text-white/90 mt-4">?</h2>
               <p className="text-white/50 font-medium mt-2">
                 {phase === 'challenge'
-                  ? 'Waiting for challenges...'
+                  ? (isCoop ? 'Checking placement...' : 'Waiting for challenges...')
                   : 'Guess the year'}
               </p>
+
+              {/* Mode requirement hint */}
+              {isMyTurn && phase === 'playing' && (mode === 'pro' || mode === 'expert') && (
+                <div className="mt-3 flex flex-col items-center gap-1">
+                  <div className="flex items-center gap-1 text-xs text-yellow-400">
+                    <Star className="w-3 h-3" />
+                    {mode === 'pro' ? 'Must name the song to keep card' : 'Must name song + exact year'}
+                  </div>
+                </div>
+              )}
             </motion.div>
           )}
         </AnimatePresence>
@@ -216,27 +314,47 @@ export function Game() {
           </motion.button>
         )}
 
-        {/* Song naming inputs (for active player during playing phase) */}
+        {/* Song naming inputs */}
         {isMyTurn && phase === 'playing' && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="mt-8 w-full max-w-xs space-y-3"
           >
+            {songNamingRequired && (
+              <div className={`text-center text-xs font-bold px-3 py-1.5 rounded-xl border ${
+                mode === 'expert'
+                  ? 'bg-red-500/10 text-red-400 border-red-500/20'
+                  : 'bg-purple-500/10 text-purple-400 border-purple-500/20'
+              }`}>
+                {mode === 'expert'
+                  ? 'Required: Name the song + guess the exact year'
+                  : 'Required: Name the song to keep the card'}
+              </div>
+            )}
             <input
               type="text"
-              placeholder="Guess Title (Optional, +1 token)"
+              placeholder={songNamingRequired ? 'Song Title (Required)' : 'Guess Title (Optional, +1 token)'}
               value={guessTitle}
               onChange={(e) => setGuessTitle(e.target.value)}
               className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#1DB954]"
             />
             <input
               type="text"
-              placeholder="Guess Artist (Optional)"
+              placeholder={songNamingRequired ? 'Artist (Required)' : 'Guess Artist (Optional)'}
               value={guessArtist}
               onChange={(e) => setGuessArtist(e.target.value)}
               className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#1DB954]"
             />
+            {mode === 'expert' && (
+              <input
+                type="number"
+                placeholder="Exact Year (Required)"
+                value={guessYear}
+                onChange={(e) => setGuessYear(e.target.value)}
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#1DB954]"
+              />
+            )}
             {songNameResult && songNameResult.playerId === myId ? (
               <div className={`text-center py-2 px-4 rounded-xl text-sm font-bold ${
                 songNameResult.correct
@@ -256,8 +374,8 @@ export function Game() {
           </motion.div>
         )}
 
-        {/* Challenge button for non-active players */}
-        {!isMyTurn && phase === 'challenge' && !challengers.includes(myId) && (
+        {/* Challenge button for non-active players (not in co-op) */}
+        {!isMyTurn && phase === 'challenge' && !isCoop && !challengers.includes(myId) && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -277,18 +395,20 @@ export function Game() {
           </motion.div>
         )}
 
-        {!isMyTurn && phase === 'challenge' && challengers.includes(myId) && (
+        {!isMyTurn && phase === 'challenge' && !isCoop && challengers.includes(myId) && (
           <p className="mt-8 text-[#1DB954] font-medium">Challenge submitted!</p>
         )}
 
         {!isMyTurn && phase === 'playing' && (
           <p className="mt-8 text-gray-400">
-            Waiting for {activePlayer.name} to place the card...
+            {isCoop
+              ? `${activePlayer.name} is placing a card for the team...`
+              : `Waiting for ${activePlayer.name} to place the card...`}
           </p>
         )}
 
         {/* Challengers display */}
-        {challengers.length > 0 && phase === 'challenge' && (
+        {!isCoop && challengers.length > 0 && phase === 'challenge' && (
           <div className="mt-4 text-sm text-gray-400">
             Challengers: {challengers.map((id) => players[id]?.name || 'Unknown').join(', ')}
           </div>
@@ -303,7 +423,11 @@ export function Game() {
       >
         <div className="flex items-center justify-between mb-3">
           <h3 className="font-bold text-gray-300 uppercase tracking-widest text-sm">
-            {isMyTurn ? 'Your Timeline' : `${activePlayer.name}'s Timeline`}
+            {isCoop
+              ? 'Team Timeline'
+              : isMyTurn
+                ? 'Your Timeline'
+                : `${activePlayer.name}'s Timeline`}
           </h3>
         </div>
 
@@ -317,7 +441,7 @@ export function Game() {
             />
           )}
 
-          {me.timeline.map((card, idx) => (
+          {displayTimeline.map((card, idx) => (
             <div key={card.id} className="flex items-center">
               <TimelineCard card={card} />
               {isMyTurn && phase === 'playing' && (
@@ -330,7 +454,7 @@ export function Game() {
             </div>
           ))}
 
-          {me.timeline.length === 0 && !isMyTurn && (
+          {displayTimeline.length === 0 && !isMyTurn && (
             <p className="text-gray-500 text-sm italic mx-auto">No cards yet</p>
           )}
         </div>
