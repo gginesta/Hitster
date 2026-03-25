@@ -4,8 +4,11 @@ import { v4 as uuidv4 } from 'uuid';
 import type { SongCard, SongData } from '@hitster/shared';
 import { DECK_SIZE } from '@hitster/shared';
 import { logger } from './logger';
+import { fisherYatesShuffle } from './shuffle';
 
 let allSongs: SongData[] = [];
+/** The resolved path to songs.json (set during loadSongs) */
+let songsFilePath: string | null = null;
 
 // In-memory cache: "title::artist" → { trackId, previewUrl }
 const trackCache = new Map<string, { trackId: string; previewUrl?: string }>();
@@ -30,11 +33,11 @@ export function loadSongs() {
     candidates: candidates.map(c => ({ path: c, exists: fs.existsSync(c) })),
   });
 
-  const songsPath = candidates.find(p => fs.existsSync(p)) || candidates[0];
-  logger.info('Loading songs', { path: songsPath });
+  songsFilePath = candidates.find(p => fs.existsSync(p)) || candidates[0];
+  logger.info('Loading songs', { path: songsFilePath });
 
   try {
-    const raw = fs.readFileSync(songsPath, 'utf-8');
+    const raw = fs.readFileSync(songsFilePath, 'utf-8');
     allSongs = JSON.parse(raw);
     logger.info('Songs loaded successfully', { count: allSongs.length });
   } catch (err) {
@@ -46,20 +49,37 @@ export function loadSongs() {
 /**
  * Select a game deck from the built-in song database.
  * @param decades - Optional array of decade start years to filter by (e.g. [1980, 1990])
+ * @param genres - Optional array of genres to filter by (e.g. ['rock', 'pop'])
+ * @param regions - Optional array of regions to filter by (e.g. ['global', 'uk'])
  */
-export function selectGameDeck(count: number = DECK_SIZE, decades?: number[]): SongCard[] {
+export function selectGameDeck(
+  count: number = DECK_SIZE,
+  decades?: number[],
+  genres?: string[],
+  regions?: string[],
+): SongCard[] {
   if (allSongs.length === 0) {
     logger.warn('No songs loaded, returning empty deck');
     return [];
   }
 
-  // Filter by selected decades if provided
-  const pool = decades && decades.length > 0
-    ? allSongs.filter((song) => {
-        const decade = Math.floor(song.year / 10) * 10;
-        return decades.includes(decade);
-      })
-    : allSongs;
+  // Filter by selected decades, genres, and regions
+  let pool = allSongs;
+
+  if (decades && decades.length > 0) {
+    pool = pool.filter((song) => {
+      const decade = Math.floor(song.year / 10) * 10;
+      return decades.includes(decade);
+    });
+  }
+
+  if (genres && genres.length > 0) {
+    pool = pool.filter((song) => song.genre && genres.includes(song.genre));
+  }
+
+  if (regions && regions.length > 0) {
+    pool = pool.filter((song) => song.region && regions.includes(song.region));
+  }
 
   if (pool.length === 0) {
     logger.warn('No songs match the selected decades', { decades });
@@ -81,18 +101,19 @@ export function selectGameDeck(count: number = DECK_SIZE, decades?: number[]): S
   // Pick from each decade
   for (const decade of decadeKeys) {
     const songs = byDecade.get(decade)!;
-    const shuffled = [...songs].sort(() => Math.random() - 0.5);
+    const shuffled = fisherYatesShuffle([...songs]);
     selected.push(...shuffled.slice(0, perDecade));
   }
 
   // Shuffle and trim to count
-  const deck: SongCard[] = selected
-    .sort(() => Math.random() - 0.5)
+  const deck: SongCard[] = fisherYatesShuffle(selected)
     .slice(0, count)
     .map((song) => ({
       ...song,
       id: uuidv4(),
-      spotifyTrackId: undefined,
+      // Preserve pre-baked Spotify data from songs.json if available
+      spotifyTrackId: song.spotifyTrackId || undefined,
+      previewUrl: song.previewUrl || undefined,
     }));
 
   return deck;
@@ -117,6 +138,9 @@ export async function fetchPlaylistDeck(
   logger.info('Fetching Spotify playlist', { playlistId });
 
   const cards: SongCard[] = [];
+  let totalItemsSeen = 0;
+  let skippedNoTrack = 0;
+  let skippedNoDate = 0;
   let url: string | null = `https://api.spotify.com/v1/playlists/${playlistId}/tracks?fields=items(track(id,name,artists,album(release_date),preview_url)),next&limit=100`;
 
   while (url && cards.length < count * 2) {
@@ -135,8 +159,16 @@ export async function fetchPlaylistDeck(
       const items: PlaylistItem[] = data.items || [];
 
       for (const item of items) {
+        totalItemsSeen++;
         const track = item.track;
-        if (!track?.id || !track.name || !track.album?.release_date) continue;
+        if (!track?.id || !track.name) {
+          skippedNoTrack++;
+          continue;
+        }
+        if (!track.album?.release_date) {
+          skippedNoDate++;
+          continue;
+        }
 
         const year = parseInt(track.album.release_date.slice(0, 4), 10);
         if (isNaN(year)) continue;
@@ -160,10 +192,25 @@ export async function fetchPlaylistDeck(
     }
   }
 
+  // Log track statistics
+  logger.info('Playlist track scan complete', {
+    playlistId,
+    totalItemsSeen,
+    usableTracks: cards.length,
+    skippedNoTrack,
+    skippedNoDate,
+  });
+
+  if (cards.length === 0) {
+    logger.warn('No usable tracks from playlist', {
+      playlistId,
+      hint: 'Possible reasons: playlist is empty, playlist is private/deleted, all tracks lack release dates, or the Spotify token lacks permissions.',
+    });
+    return [];
+  }
+
   // Shuffle and trim
-  const deck = cards
-    .sort(() => Math.random() - 0.5)
-    .slice(0, count);
+  const deck = fisherYatesShuffle(cards).slice(0, count);
 
   logger.info('Playlist deck created', { playlistId, total: cards.length, selected: deck.length });
   return deck;
@@ -272,5 +319,112 @@ export async function resolveTrackIds(
     playable: playable.length,
   });
 
+  // Persist newly resolved preview URLs back to songs.json for preview mode
+  persistPreviewUrls();
+
+  // Opportunistically resolve more uncached songs in the background
+  // so preview mode fills up faster (doesn't block the game start)
+  backgroundResolveUncached(accessToken);
+
   return playable;
+}
+
+/** Whether a background resolve is currently running */
+let backgroundResolveRunning = false;
+
+/**
+ * Resolve uncached songs in the background so preview mode fills up
+ * faster. Runs after each Spotify game start without blocking it.
+ * Resolves up to 100 songs per invocation.
+ */
+async function backgroundResolveUncached(accessToken: string): Promise<void> {
+  if (backgroundResolveRunning) return;
+  backgroundResolveRunning = true;
+
+  try {
+    const uncached = allSongs.filter(
+      (s) => !s.spotifyTrackId && s.spotifyTrackId !== null, // skip songs marked null (already attempted)
+    );
+
+    if (uncached.length === 0) {
+      logger.info('All songs already have Spotify data, nothing to background-resolve');
+      return;
+    }
+
+    const batch = uncached.slice(0, 100);
+    logger.info('Background-resolving uncached songs', {
+      batchSize: batch.length,
+      totalUncached: uncached.length,
+    });
+
+    const CONCURRENCY = 3;
+    let resolved = 0;
+
+    for (let i = 0; i < batch.length; i += CONCURRENCY) {
+      const chunk = batch.slice(i, i + CONCURRENCY);
+      await Promise.all(
+        chunk.map(async (song) => {
+          const key = cacheKey(song);
+          if (trackCache.has(key)) return;
+
+          const result = await resolveSpotifyTrack(song, accessToken);
+          if (result) {
+            trackCache.set(key, result);
+            resolved++;
+          } else {
+            // Mark as attempted so we don't retry on next game
+            trackCache.set(key, { trackId: '', previewUrl: undefined });
+          }
+        }),
+      );
+      // Gentle delay to avoid rate limits
+      await new Promise((r) => setTimeout(r, 300));
+    }
+
+    logger.info('Background resolve complete', { resolved, attempted: batch.length });
+    persistPreviewUrls();
+  } catch (err) {
+    logger.error('Background resolve failed', { error: String(err) });
+  } finally {
+    backgroundResolveRunning = false;
+  }
+}
+
+/**
+ * Write resolved preview URLs and track IDs from the in-memory cache
+ * back to songs.json. This gradually populates preview data so that
+ * "Host without Spotify" mode gains audio over time as Spotify games
+ * are played.
+ */
+function persistPreviewUrls(): void {
+  if (!songsFilePath || allSongs.length === 0) return;
+
+  let updated = 0;
+  for (const song of allSongs) {
+    if (song.spotifyTrackId) continue; // already has data
+    if (song.spotifyTrackId === null) continue; // already marked as attempted
+
+    const key = cacheKey(song);
+    const cached = trackCache.get(key);
+    if (!cached) continue;
+
+    if (cached.trackId) {
+      song.spotifyTrackId = cached.trackId;
+      song.previewUrl = cached.previewUrl ?? null;
+    } else {
+      // Mark as attempted (failed to resolve)
+      song.spotifyTrackId = null;
+      song.previewUrl = null;
+    }
+    updated++;
+  }
+
+  if (updated === 0) return;
+
+  try {
+    fs.writeFileSync(songsFilePath, JSON.stringify(allSongs, null, 2) + '\n', 'utf-8');
+    logger.info('Persisted preview URLs to songs.json', { updated, total: allSongs.length });
+  } catch (err) {
+    logger.error('Failed to persist preview URLs', { error: String(err) });
+  }
 }

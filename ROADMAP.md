@@ -11,7 +11,7 @@ The game is fully playable as a real-time multiplayer experience with Spotify in
 - [x] Full game loop: turns, placement, challenges, reveals, scoring
 - [x] Token economy (skip, challenge, buy, name-song bonus)
 - [x] 4 game modes fully implemented (Original, Pro, Expert, Co-op)
-- [x] 500+ song database spanning 1930s-2020s
+- [x] 640+ song database spanning 1930s-2020s with genre/region metadata
 - [x] Decade-balanced deck selection
 - [x] Zustand state management with typed Socket.io events
 - [x] Connection tracking and host reassignment
@@ -42,42 +42,48 @@ The game is fully playable as a real-time multiplayer experience with Spotify in
 - [x] Challenge placement visibility (challengers see where card was placed)
 - [x] Spotify autoplay fix (pre-activate on user gesture, tap-to-play indicator)
 - [x] iOS keyboard fix (no sensitive text field behavior on inputs)
+- [x] Fuzzy song name matching (Levenshtein distance, article stripping, typo tolerance for Pro/Expert)
+- [x] Round recap / song history browser (scrollable modal on Game and Results screens)
+- [x] End-of-game stats and awards (Fastest Fingers, Sharpshooter, Hot Streak, Challenge King, Name That Tune)
+- [x] Volume control slider (music + SFX, persisted to localStorage)
+- [x] Disconnect grace period (30s to rejoin before turn skip, with countdown banner)
+- [x] Genre packs (Rock, Pop, Hip-Hop, R&B, Country, Electronic, Jazz, Latin) with multi-select
+- [x] Genre + decade combo filtering for themed game nights
+- [x] Regional packs (UK, Latin, K-Pop, Bollywood — 140 new songs)
+- [x] Shareable invite links (/join/ABCD URLs with copy-to-clipboard)
+- [x] "I know this!" buzz button (non-active players signal they know the song)
+- [x] Better waiting state (music trivia, animated visualizer, buzz badges)
+- [x] Custom Spotify playlist import (URL validation, preset cards, genre pack presets)
+- [x] Leaderboards (global ranked table, medals, win rate, best streak)
+- [x] Game history tracking (per-player, saved to SQLite on game end)
+- [x] Player statistics profile (accuracy, streaks, challenges, songs named)
+- [x] Preview Mode — host without Spotify using 30-second preview clips (no account needed, unlimited players)
+- [x] Preview URL pre-baking script (`scripts/prebake-previews.ts`)
 
 ---
 
 ## Future: Gameplay Improvements
 
-- [ ] **Fuzzy song name matching** -- Allow minor typos, missing "The", punctuation differences when guessing song names in Pro/Expert modes (e.g. "Beatles" ≈ "The Beatles", "dont stop" ≈ "Don't Stop")
 - [ ] **Streak bonus** -- Reward consecutive correct placements with bonus tokens or visual flair; adds excitement and a "hot hand" feeling
 - [ ] **Difficulty scaling** -- In Original mode, start with songs from widely different decades (easy to place) and gradually narrow the gaps as timelines grow; makes early game accessible and late game tense
-- [ ] **Round recap / song history** -- During or after a game, let players scroll through all songs that were played, showing which ones each player got right/wrong
-- [ ] **End-of-game stats** -- Beyond rankings: "Fastest correct placement", "Most challenges won", "Best decade accuracy", "Longest streak" on the results screen
-- [ ] **Volume control** -- Add a slider in the game screen for music volume (currently hardcoded to 0.8/0.35)
-- [ ] **Disconnect grace period** -- If a player disconnects mid-game, give them 30-60 seconds to rejoin before skipping their turn
 
 ## Future: Content Expansion
 
-- [ ] **Genre packs** -- Rock, Hip-Hop, Pop, Country, Electronic, etc.
-- [ ] **Decade packs** -- Focus on specific eras (60s, 80s, 2000s, etc.)
-- [ ] **Genre + decade combos** -- Curated packs like "80s Rock", "2000s Hip-Hop" for themed game nights
-- [ ] **Regional packs** -- UK hits, Latin music, K-pop, Bollywood
-- [ ] **Custom playlists** -- Host imports a Spotify playlist as the song source
+(All content expansion items completed)
 
 ## Future: Social & UX Features
 
-- [ ] **Shareable invite links** -- Generate a link like `hitster.app/join/ABCD` that players can share via messaging apps, instead of just a 4-letter code
 - [ ] **Spectator mode** -- Join a room as an observer without being in the turn order; great for parties where people arrive late
-- [ ] **"I know this!" buzz button** -- During another player's turn, let non-active players tap a button to signal they know the song (for fun/bragging, no game effect); adds engagement when waiting
-- [ ] **Better waiting state** -- When it's not your turn, show a mini music trivia question, fun fact about the current decade, or an animated visualization instead of an empty screen
 - [ ] **Chat / reactions** -- Quick reactions during gameplay
 - [ ] **Player avatars** -- Custom images or preset avatar selection
 
 ## Future: Persistence and Accounts
 
 - [x] **Persistent storage** -- SQLite database at data/hitster.db; rooms saved on state changes, restored on startup via restoreRoomsFromDatabase()
-- [ ] **Leaderboards** -- Global and friend-based rankings
-- [ ] **Game history** -- Track wins, streaks, and favourite decades
-- [ ] **Statistics** -- Which decades you're strongest at, most challenged songs, etc.
+- [x] **Leaderboards** -- Global ranked table with medals, win rate, best streak; accessible from Home screen
+- [x] **Game history** -- Per-player game history with mode, result, cards won; saved to SQLite on game end
+- [x] **Statistics** -- Player profile with stats cards (accuracy, streaks, challenges, songs named, fastest placement)
+- [x] **Custom playlists** -- Spotify playlist import with URL validation, preset cards (Summer Hits, Rock Classics, Hip-Hop, Latin, 90s, Indie, All-Time Greatest), album-art-style UI
 
 ## Future: Deployment and Infrastructure
 
@@ -89,7 +95,47 @@ The game is fully playable as a real-time multiplayer experience with Spotify in
 
 ---
 
+## Code Audit (Completed)
+
+A full-stack audit was performed covering 30 server issues and 20 client issues. All critical, high, and medium priority items have been fixed:
+
+**Critical fixes:**
+- Race condition: double start-game prevented with phase guard
+- Game stuck after reconnect during challenge phase — timers now restarted
+- Infinite turn loop when all players disconnect — now ends game gracefully
+
+**High-priority fixes:**
+- Reconnect no longer leaks song year to rejoining players
+- buyCard now checks game phase before allowing purchase
+- Async start-game handler wrapped in try/catch
+- Settings validated (cardsToWin bounds, valid game modes)
+- Restored games reset to lobby (deck not persisted)
+- Host transfer clears old host's isHost flag
+- Rules of Hooks violation fixed in Game.tsx
+- Challengers cleared between turns
+- Premature connected state removed
+
+**Medium-priority fixes:**
+- Fisher-Yates shuffle replaces biased sort
+- Settings changes now persisted to DB
+- Card placement position bounds-checked
+- Player names validated (1-30 chars, trimmed)
+- confirmReveal restricted to host
+- Voluntary leave skips disconnect grace period
+- Password field uses type="password"
+- Start button disabled without playlist URL
+- WaitingState timer cleanup on unmount
+- Case-insensitive leaderboard username matching
+- useSocket optimized (getState instead of full store subscription)
+- Dead code removed (normalize, unused imports)
+- LOG_LEVEL env var validated
+
+---
+
 ## Known Limitations
 
 - Spotify Premium is required for the host to use the Web Playback SDK
 - SQLite limits horizontal scaling to a single server instance (Redis would be needed for multi-instance)
+- Password hashing uses SHA-256 without salt (acceptable for a game, not for sensitive data)
+- No rate limiting on auth endpoints
+- CORS origin is wildcard (should be restricted in production)

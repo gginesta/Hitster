@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Disc, Coins, Check, X, SkipForward, AlertTriangle, ShoppingCart, Star, Play, Pause, Volume2, VolumeX } from 'lucide-react';
+import { Disc, Check, X, SkipForward, AlertTriangle, ShoppingCart, Star, Play, Pause, Volume2, Volume1, VolumeX, Clock } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { getSocket } from '../services/socket';
 import { useGameStore } from '../store';
@@ -16,6 +16,8 @@ import {
   toggleMute,
 } from '../services/sounds';
 import type { SongCard, GameMode } from '@hitster/shared';
+import { SongHistory } from './SongHistory';
+import { WaitingState } from './WaitingState';
 
 const DECADE_COLORS: Record<number, string> = {
   1930: 'from-amber-900 to-yellow-900',
@@ -83,10 +85,14 @@ export function Game() {
   const sharedTimeline = useGameStore((s) => s.sharedTimeline);
   const isPlayingMusic = useGameStore((s) => s.isPlaying);
   const spotifyError = useGameStore((s) => s.spotifyError);
+  const pendingPlacement = useGameStore((s) => s.pendingPlacement);
+
+  const disconnectedPlayers = useGameStore((s) => s.disconnectedPlayers);
 
   const challengeDeadline = useGameStore((s) => s.challengeDeadline);
   const turnDeadline = useGameStore((s) => s.turnDeadline);
   const [noChallengeClicked, setNoChallengeClicked] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
 
   const [guessTitle, setGuessTitle] = useState('');
   const [guessArtist, setGuessArtist] = useState('');
@@ -132,12 +138,56 @@ export function Game() {
     return () => clearInterval(interval);
   }, [phase, turnDeadline]);
 
-  // --- Sound effects ---
-  const [soundMuted, setSoundMuted] = useState(isMuted);
+  // Countdown for disconnected players
+  const [disconnectCountdowns, setDisconnectCountdowns] = useState<Record<string, number>>({});
+  useEffect(() => {
+    const playerIds = Object.keys(disconnectedPlayers);
+    if (playerIds.length === 0) {
+      setDisconnectCountdowns({});
+      return;
+    }
+    const tick = () => {
+      const countdowns: Record<string, number> = {};
+      for (const [pid, deadline] of Object.entries(disconnectedPlayers)) {
+        countdowns[pid] = Math.max(0, Math.ceil((deadline - Date.now()) / 1000));
+      }
+      setDisconnectCountdowns(countdowns);
+    };
+    tick();
+    const interval = setInterval(tick, 500);
+    return () => clearInterval(interval);
+  }, [disconnectedPlayers]);
+
+  // --- Volume & sound effects ---
+  const volume = useGameStore((s) => s.volume);
+  const setVolume = useGameStore((s) => s.setVolume);
+  const [soundMuted, setSoundMuted] = useState(() => isMuted());
+  const prevVolumeRef = useRef(volume || 0.8);
+
   const handleToggleMute = useCallback(() => {
+    if (volume > 0) {
+      prevVolumeRef.current = volume;
+      setVolume(0);
+    } else {
+      setVolume(prevVolumeRef.current || 0.8);
+    }
     const nowMuted = toggleMute();
     setSoundMuted(nowMuted);
-  }, []);
+  }, [volume, setVolume]);
+
+  const handleVolumeChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const v = parseFloat(e.target.value);
+    setVolume(v);
+    if (v > 0 && soundMuted) {
+      const nowMuted = toggleMute();
+      setSoundMuted(nowMuted);
+    } else if (v === 0 && !soundMuted) {
+      const nowMuted = toggleMute();
+      setSoundMuted(nowMuted);
+    }
+  }, [setVolume, soundMuted]);
+
+  const VolumeIcon = volume > 0.5 ? Volume2 : volume > 0 ? Volume1 : VolumeX;
 
   // Track first turn to play start sound
   const hasPlayedStartRef = useRef(false);
@@ -214,8 +264,6 @@ export function Game() {
   const isCoop = mode === 'coop';
 
   if (!me || !activePlayer) return null;
-
-  const pendingPlacement = useGameStore((s) => s.pendingPlacement);
 
   // Timeline to display:
   // - Co-op: shared timeline always
@@ -330,12 +378,30 @@ export function Game() {
               ))
             )}
           </div>
-          <button
-            onClick={handleToggleMute}
-            className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-colors flex-shrink-0"
-          >
-            {soundMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
-          </button>
+          <div className="flex items-center gap-1 flex-shrink-0">
+            <button
+              onClick={() => setShowHistory(true)}
+              className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
+              title="Song History"
+            >
+              <Clock className="w-4 h-4" />
+            </button>
+            <button
+              onClick={handleToggleMute}
+              className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
+            >
+              <VolumeIcon className="w-4 h-4" />
+            </button>
+            <input
+              type="range"
+              min="0"
+              max="1"
+              step="0.05"
+              value={volume}
+              onChange={handleVolumeChange}
+              className="w-16 h-1 accent-[#1DB954] bg-white/10 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[#1DB954]"
+            />
+          </div>
         </div>
       </div>
 
@@ -361,8 +427,77 @@ export function Game() {
         </div>
       )}
 
+      {/* Disconnected player banner(s) */}
+      <AnimatePresence>
+        {Object.entries(disconnectCountdowns).map(([pid, secs]) => {
+          const dcPlayer = players[pid];
+          if (!dcPlayer) return null;
+          const isTheirTurn = currentTurnPlayerId === pid;
+          return (
+            <motion.div
+              key={`dc-${pid}`}
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className={`border-b px-4 py-2.5 text-center text-sm font-semibold ${
+                isTheirTurn
+                  ? 'bg-amber-500/20 border-amber-500/30 text-amber-300'
+                  : 'bg-yellow-500/10 border-yellow-500/20 text-yellow-400'
+              }`}
+            >
+              <motion.div
+                animate={{ opacity: [1, 0.6, 1] }}
+                transition={{ duration: 2, repeat: Infinity }}
+                className="flex items-center justify-center gap-2"
+              >
+                <AlertTriangle className="w-4 h-4 flex-shrink-0" />
+                <span>
+                  {dcPlayer.name} disconnected{isTheirTurn ? ' (their turn)' : ''} &mdash; waiting {secs}s...
+                </span>
+              </motion.div>
+            </motion.div>
+          );
+        })}
+      </AnimatePresence>
+
       {/* Center Area */}
       <div className="flex-1 flex flex-col items-center justify-center p-6 relative overflow-y-auto">
+        {/* Turn countdown timer - positioned above the mystery card */}
+        {phase === 'playing' && turnCountdown !== null && turnCountdown > 0 && (
+          <motion.div
+            key="turn-countdown"
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            className="mb-4 flex-shrink-0"
+          >
+            <div className="relative">
+              <svg className="w-14 h-14 -rotate-90" viewBox="0 0 100 100">
+                <circle
+                  cx="50" cy="50" r="42"
+                  fill="none"
+                  stroke="rgba(255,255,255,0.1)"
+                  strokeWidth="6"
+                />
+                <circle
+                  cx="50" cy="50" r="42"
+                  fill="none"
+                  stroke={turnCountdown <= 5 ? '#ef4444' : turnCountdown <= 10 ? '#f97316' : '#3b82f6'}
+                  strokeWidth="6"
+                  strokeLinecap="round"
+                  strokeDasharray={`${2 * Math.PI * 42}`}
+                  strokeDashoffset={`${2 * Math.PI * 42 * (1 - turnCountdown / TURN_TIME_SECONDS)}`}
+                  className="transition-all duration-100"
+                />
+              </svg>
+              <span className={`absolute inset-0 flex items-center justify-center text-lg font-black ${
+                turnCountdown <= 5 ? 'text-red-400' : turnCountdown <= 10 ? 'text-orange-400' : 'text-white'
+              }`}>
+                {turnCountdown}
+              </span>
+            </div>
+          </motion.div>
+        )}
+
         <AnimatePresence mode="wait">
           {isRevealed ? (
             <motion.div
@@ -474,42 +609,6 @@ export function Game() {
                 </div>
               ) : (
                 <h2 className="text-6xl font-black text-white/90 mt-4">?</h2>
-              )}
-
-              {/* Countdown timer during playing phase (turn timer) */}
-              {phase === 'playing' && turnCountdown !== null && turnCountdown > 0 && (
-                <motion.div
-                  key="turn-countdown"
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  className="absolute top-3 right-3 z-20"
-                >
-                  <div className="relative">
-                    <svg className="w-14 h-14 -rotate-90" viewBox="0 0 100 100">
-                      <circle
-                        cx="50" cy="50" r="42"
-                        fill="none"
-                        stroke="rgba(255,255,255,0.1)"
-                        strokeWidth="6"
-                      />
-                      <circle
-                        cx="50" cy="50" r="42"
-                        fill="none"
-                        stroke={turnCountdown <= 5 ? '#ef4444' : turnCountdown <= 10 ? '#f97316' : '#3b82f6'}
-                        strokeWidth="6"
-                        strokeLinecap="round"
-                        strokeDasharray={`${2 * Math.PI * 42}`}
-                        strokeDashoffset={`${2 * Math.PI * 42 * (1 - turnCountdown / TURN_TIME_SECONDS)}`}
-                        className="transition-all duration-100"
-                      />
-                    </svg>
-                    <span className={`absolute inset-0 flex items-center justify-center text-lg font-black ${
-                      turnCountdown <= 5 ? 'text-red-400' : turnCountdown <= 10 ? 'text-orange-400' : 'text-white'
-                    }`}>
-                      {turnCountdown}
-                    </span>
-                  </div>
-                </motion.div>
               )}
 
               {/* Countdown timer during challenge phase */}
@@ -692,11 +791,7 @@ export function Game() {
         )}
 
         {!isMyTurn && phase === 'playing' && (
-          <p className="mt-8 text-gray-400">
-            {isCoop
-              ? `${activePlayer.name} is placing a card for the team...`
-              : `Waiting for ${activePlayer.name} to place the card...`}
-          </p>
+          <WaitingState />
         )}
 
         {/* Challengers display */}
@@ -787,6 +882,8 @@ export function Game() {
           </div>
         )}
       </div>
+
+      <SongHistory isOpen={showHistory} onClose={() => setShowHistory(false)} />
     </div>
   );
 }

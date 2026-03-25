@@ -5,6 +5,9 @@ import type {
   Room,
   SongCard,
   SongGuess,
+  PlayedSong,
+  PlayerStats,
+  GameStats,
 } from '@hitster/shared';
 import {
   STARTING_TOKENS,
@@ -15,8 +18,11 @@ import {
   CHALLENGE_WINDOW_MS,
   TURN_TIME_MS,
   COOP_WRONG_PENALTY,
+  DISCONNECT_GRACE_MS,
 } from '@hitster/shared';
 import { logger } from './logger';
+import { fuzzyMatch } from './fuzzy';
+import { fisherYatesShuffle } from './shuffle';
 
 type HitsterServer = Server<ClientToServerEvents, ServerToClientEvents>;
 
@@ -32,10 +38,28 @@ export class GameEngine {
   private songNameCorrect = new Map<string, boolean>();
   /** Tracks the active player's year guess for Expert mode */
   private yearGuess: number | null = null;
+  /** Grace period timers for disconnected players */
+  private disconnectTimers: Map<string, ReturnType<typeof setTimeout>> = new Map();
+  /** Per-player stats tracked throughout the game */
+  private playerStats: Map<string, PlayerStats> = new Map();
+  /** Timestamp when the current turn started (for fastest placement tracking) */
+  private turnStartTime: number = 0;
+  /** Total rounds played */
+  private totalRounds: number = 0;
+  /** History of all played songs */
+  private songHistory: PlayedSong[] = [];
+  /** Current round number */
+  private roundNumber: number = 0;
+  /** Callback invoked after game ends */
+  private onGameEndCallback: (() => void) | null = null;
 
   constructor(room: Room, io: HitsterServer) {
     this.room = room;
     this.io = io;
+  }
+
+  onGameEnd(callback: () => void) {
+    this.onGameEndCallback = callback;
   }
 
   private get mode() {
@@ -50,6 +74,33 @@ export class GameEngine {
     this.spotifyAccessToken = token;
   }
 
+  getSongHistory(): PlayedSong[] {
+    return this.songHistory;
+  }
+
+  getGameStats(): { playerStats: Map<string, PlayerStats>; totalRounds: number } {
+    return { playerStats: this.playerStats, totalRounds: this.totalRounds };
+  }
+
+  getWinnerId(): string {
+    if (this.isCoop) {
+      return this.room.gameState.turnOrder[0] || '';
+    }
+    let winnerId = '';
+    let maxCards = 0;
+    for (const [id, player] of Object.entries(this.room.players)) {
+      if (player.timeline.length > maxCards) {
+        maxCards = player.timeline.length;
+        winnerId = id;
+      }
+    }
+    return winnerId;
+  }
+
+  getRoom(): Room {
+    return this.room;
+  }
+
   resetGame() {
     // Clear timers
     if (this.challengeTimer) {
@@ -61,11 +112,22 @@ export class GameEngine {
       this.turnTimer = null;
     }
 
+    // Clear disconnect timers
+    for (const timer of this.disconnectTimers.values()) {
+      clearTimeout(timer);
+    }
+    this.disconnectTimers.clear();
+
     // Clear engine state
     this.deck = [];
     this.songNamed.clear();
     this.songNameCorrect.clear();
     this.yearGuess = null;
+    this.songHistory = [];
+    this.roundNumber = 0;
+    this.playerStats.clear();
+    this.totalRounds = 0;
+    this.turnStartTime = 0;
 
     // Reset all players: clear timelines, restore starting tokens
     for (const player of Object.values(this.room.players)) {
@@ -89,7 +151,24 @@ export class GameEngine {
 
   startGame(deck: SongCard[]) {
     this.deck = [...deck];
+    this.totalRounds = 0;
     const playerIds = Object.keys(this.room.players);
+
+    // Initialize player stats
+    this.playerStats.clear();
+    for (const id of playerIds) {
+      this.playerStats.set(id, {
+        correctPlacements: 0,
+        totalPlacements: 0,
+        challengesWon: 0,
+        challengesLost: 0,
+        longestStreak: 0,
+        currentStreak: 0,
+        fastestPlacementMs: null,
+        decadeAccuracy: {},
+        songsNamed: 0,
+      });
+    }
 
     // Give each player a starting card (or shared timeline for co-op)
     if (this.isCoop) {
@@ -112,7 +191,7 @@ export class GameEngine {
     }
 
     // Shuffle turn order
-    const turnOrder = [...playerIds].sort(() => Math.random() - 0.5);
+    const turnOrder = fisherYatesShuffle([...playerIds]);
     this.room.gameState = {
       ...this.room.gameState,
       phase: 'playing',
@@ -167,6 +246,8 @@ export class GameEngine {
     this.songNamed.clear();
     this.songNameCorrect.clear();
     this.yearGuess = null;
+    this.turnStartTime = Date.now();
+    this.roundNumber++;
 
     const turnPlayerId = this.room.gameState.currentTurnPlayerId!;
     const turnPlayer = this.room.players[turnPlayerId];
@@ -201,9 +282,9 @@ export class GameEngine {
     }, TURN_TIME_MS);
 
     // Tell host to play the song
-    if (song.spotifyTrackId) {
+    if (song.spotifyTrackId || song.previewUrl) {
       this.io.to(this.room.code).emit('play-song', {
-        spotifyTrackId: song.spotifyTrackId,
+        spotifyTrackId: song.spotifyTrackId || '',
         previewUrl: song.previewUrl,
       });
     }
@@ -213,10 +294,21 @@ export class GameEngine {
     const gs = this.room.gameState;
     if (gs.phase !== 'playing' || gs.currentTurnPlayerId !== playerId) return;
 
+    // Bounds-check position
+    const timeline = this.isCoop ? gs.sharedTimeline : this.room.players[playerId]?.timeline;
+    if (!timeline || position < 0 || position > timeline.length) return;
+
     // Clear turn timer since player acted
     if (this.turnTimer) {
       clearTimeout(this.turnTimer);
       this.turnTimer = null;
+    }
+
+    // Track placement speed for stats
+    const placementMs = Date.now() - this.turnStartTime;
+    const stats = this.playerStats.get(playerId);
+    if (stats && (stats.fastestPlacementMs === null || placementMs < stats.fastestPlacementMs)) {
+      stats.fastestPlacementMs = placementMs;
     }
 
     gs.pendingPlacement = position;
@@ -273,8 +365,8 @@ export class GameEngine {
 
     this.songNamed.add(playerId);
 
-    const titleMatch = normalize(guess.title) === normalize(gs.currentSong.title);
-    const artistMatch = normalize(guess.artist) === normalize(gs.currentSong.artist);
+    const titleMatch = fuzzyMatch(guess.title, gs.currentSong.title);
+    const artistMatch = fuzzyMatch(guess.artist, gs.currentSong.artist);
     const correct = titleMatch && artistMatch;
 
     this.songNameCorrect.set(playerId, correct);
@@ -285,6 +377,12 @@ export class GameEngine {
     }
 
     if (correct) {
+      // Track songsNamed stat
+      const stats = this.playerStats.get(playerId);
+      if (stats) {
+        stats.songsNamed++;
+      }
+
       const player = this.room.players[playerId];
       if (player && player.tokens < MAX_TOKENS) {
         player.tokens += 1;
@@ -321,6 +419,9 @@ export class GameEngine {
   }
 
   buyCard(playerId: string) {
+    const gs = this.room.gameState;
+    if (gs.phase === 'lobby' || gs.phase === 'game_over') return;
+
     const player = this.room.players[playerId];
     if (!player || player.tokens < BUY_CARD_COST) return;
 
@@ -353,8 +454,8 @@ export class GameEngine {
     }
   }
 
-  confirmReveal() {
-    if (this.room.gameState.phase === 'reveal') {
+  confirmReveal(playerId: string) {
+    if (this.room.gameState.phase === 'reveal' && playerId === this.room.hostId) {
       this.advanceTurn();
     }
   }
@@ -390,6 +491,45 @@ export class GameEngine {
     } else if (this.mode === 'expert') {
       // Expert: must place correctly AND name the song AND guess the exact year
       correct = placementCorrect && activePlayerNamedSong && (yearCorrect === true);
+    }
+
+    // Update active player stats
+    this.totalRounds++;
+    const activeStats = this.playerStats.get(activePlayerId);
+    if (activeStats) {
+      activeStats.totalPlacements++;
+      if (correct) {
+        activeStats.correctPlacements++;
+        activeStats.currentStreak++;
+        if (activeStats.currentStreak > activeStats.longestStreak) {
+          activeStats.longestStreak = activeStats.currentStreak;
+        }
+      } else {
+        activeStats.currentStreak = 0;
+      }
+      // Update decade accuracy
+      const decade = Math.floor(song.year / 10) * 10;
+      if (!activeStats.decadeAccuracy[decade]) {
+        activeStats.decadeAccuracy[decade] = { correct: 0, total: 0 };
+      }
+      activeStats.decadeAccuracy[decade].total++;
+      if (placementCorrect) {
+        activeStats.decadeAccuracy[decade].correct++;
+      }
+    }
+
+    // Update challenger stats
+    for (const challengerId of gs.challengers) {
+      const challengerStats = this.playerStats.get(challengerId);
+      if (challengerStats) {
+        if (!correct) {
+          // Challenger was right (placement was wrong)
+          challengerStats.challengesWon++;
+        } else {
+          // Challenger was wrong (placement was correct)
+          challengerStats.challengesLost++;
+        }
+      }
     }
 
     let stolenBy: string | null = null;
@@ -438,7 +578,19 @@ export class GameEngine {
       },
     });
 
-    if (winnerId) {
+    // Record song history entry
+    this.songHistory.push({
+      song,
+      turnPlayerId: activePlayerId,
+      correct,
+      stolenBy,
+      roundNumber: this.roundNumber,
+    });
+    this.io.to(this.room.code).emit('song-history', { history: this.songHistory });
+
+    // Only emit timeline-updated for winnerId if the card wasn't stolen
+    // (stolen cards already had their timeline-updated emitted above)
+    if (winnerId && !stolenBy) {
       this.io.to(this.room.code).emit('timeline-updated', {
         playerId: winnerId,
         timeline: this.room.players[winnerId].timeline,
@@ -461,6 +613,30 @@ export class GameEngine {
     const gs = this.room.gameState;
     const sharedTimeline = gs.sharedTimeline;
     const placementCorrect = this.isPlacementCorrect(sharedTimeline, song, position);
+
+    // Update active player stats for co-op
+    this.totalRounds++;
+    const activeStats = this.playerStats.get(activePlayerId);
+    if (activeStats) {
+      activeStats.totalPlacements++;
+      if (placementCorrect) {
+        activeStats.correctPlacements++;
+        activeStats.currentStreak++;
+        if (activeStats.currentStreak > activeStats.longestStreak) {
+          activeStats.longestStreak = activeStats.currentStreak;
+        }
+      } else {
+        activeStats.currentStreak = 0;
+      }
+      const decade = Math.floor(song.year / 10) * 10;
+      if (!activeStats.decadeAccuracy[decade]) {
+        activeStats.decadeAccuracy[decade] = { correct: 0, total: 0 };
+      }
+      activeStats.decadeAccuracy[decade].total++;
+      if (placementCorrect) {
+        activeStats.decadeAccuracy[decade].correct++;
+      }
+    }
 
     if (placementCorrect) {
       // Card goes into shared timeline
@@ -494,6 +670,16 @@ export class GameEngine {
       timeline: sharedTimeline,
     });
 
+    // Record song history entry
+    this.songHistory.push({
+      song,
+      turnPlayerId: activePlayerId,
+      correct: placementCorrect,
+      stolenBy: null,
+      roundNumber: this.roundNumber,
+    });
+    this.io.to(this.room.code).emit('song-history', { history: this.songHistory });
+
     // Check co-op win condition
     if (sharedTimeline.length >= this.room.settings.cardsToWin) {
       this.endGame();
@@ -522,7 +708,7 @@ export class GameEngine {
   }
 
   /**
-   * Called when a player disconnects. If it's their turn, skip to the next player.
+   * Called when a player disconnects. Starts a grace period before skipping their turn.
    */
   handlePlayerDisconnect(playerId: string): void {
     const gs = this.room.gameState;
@@ -532,8 +718,112 @@ export class GameEngine {
     const connected = Object.values(this.room.players).filter((p) => p.connected);
     if (connected.length === 0) return; // room cleanup handles this
 
+    const reconnectDeadline = Date.now() + DISCONNECT_GRACE_MS;
+
+    // Emit disconnected event so clients can show a countdown
+    this.io.to(this.room.code).emit('player-disconnected', { playerId, reconnectDeadline });
+
+    logger.info('Player disconnect grace period started', {
+      roomCode: this.room.code,
+      playerId,
+      playerName: this.room.players[playerId]?.name,
+      graceMs: DISCONNECT_GRACE_MS,
+    });
+
+    // If it's their turn, pause turn timer and start grace period
     if (gs.currentTurnPlayerId === playerId && (gs.phase === 'playing' || gs.phase === 'challenge')) {
       // Clear any running timers for this turn
+      if (this.turnTimer) {
+        clearTimeout(this.turnTimer);
+        this.turnTimer = null;
+      }
+      if (this.challengeTimer) {
+        clearTimeout(this.challengeTimer);
+        this.challengeTimer = null;
+      }
+
+      const timer = setTimeout(() => {
+        this.disconnectTimers.delete(playerId);
+        logger.info('Player disconnect grace period expired, skipping turn', {
+          roomCode: this.room.code,
+          playerId,
+          playerName: this.room.players[playerId]?.name,
+        });
+        this.io.to(this.room.code).emit('player-timed-out', { playerId });
+        this.advanceTurn();
+      }, DISCONNECT_GRACE_MS);
+
+      this.disconnectTimers.set(playerId, timer);
+    } else {
+      // Not their turn — just track a grace timer so we can cancel it on reconnect
+      const timer = setTimeout(() => {
+        this.disconnectTimers.delete(playerId);
+        this.io.to(this.room.code).emit('player-timed-out', { playerId });
+      }, DISCONNECT_GRACE_MS);
+
+      this.disconnectTimers.set(playerId, timer);
+    }
+  }
+
+  /**
+   * Called when a player reconnects. Clears any pending disconnect timer
+   * and restarts phase-appropriate timers if it was their turn.
+   */
+  handlePlayerReconnect(playerId: string): void {
+    const timer = this.disconnectTimers.get(playerId);
+    if (timer) {
+      clearTimeout(timer);
+      this.disconnectTimers.delete(playerId);
+
+      logger.info('Player reconnected within grace period', {
+        roomCode: this.room.code,
+        playerId,
+        playerName: this.room.players[playerId]?.name,
+      });
+
+      this.io.to(this.room.code).emit('player-reconnected', { playerId });
+
+      // Restart phase-appropriate timers if it was the reconnecting player's turn
+      const gs = this.room.gameState;
+      if (gs.currentTurnPlayerId === playerId) {
+        if (gs.phase === 'challenge') {
+          this.challengeTimer = setTimeout(() => {
+            this.resolveRound();
+          }, CHALLENGE_WINDOW_MS);
+        } else if (gs.phase === 'playing') {
+          const turnPlayerId = playerId;
+          this.turnTimer = setTimeout(() => {
+            this.turnTimer = null;
+            if (this.room.gameState.phase === 'playing' && this.room.gameState.currentTurnPlayerId === turnPlayerId) {
+              this.advanceTurn();
+            }
+          }, TURN_TIME_MS);
+        }
+      }
+    }
+  }
+
+  /**
+   * Called when a player voluntarily leaves. Skips grace period and
+   * immediately advances the turn if it was their turn.
+   */
+  handlePlayerVoluntaryLeave(playerId: string): void {
+    const gs = this.room.gameState;
+    if (gs.phase === 'lobby' || gs.phase === 'game_over') return;
+
+    // Clear any existing disconnect timer for this player
+    const existingTimer = this.disconnectTimers.get(playerId);
+    if (existingTimer) {
+      clearTimeout(existingTimer);
+      this.disconnectTimers.delete(playerId);
+    }
+
+    // Emit disconnected event (no reconnect expected)
+    this.io.to(this.room.code).emit('player-disconnected', { playerId, reconnectDeadline: Date.now() });
+    this.io.to(this.room.code).emit('player-timed-out', { playerId });
+
+    // If it's their turn, immediately advance
+    if (gs.currentTurnPlayerId === playerId && (gs.phase === 'playing' || gs.phase === 'challenge')) {
       if (this.turnTimer) {
         clearTimeout(this.turnTimer);
         this.turnTimer = null;
@@ -557,6 +847,14 @@ export class GameEngine {
       if (this.room.players[pid]?.connected) break;
       gs.turnIndex = (gs.turnIndex + 1) % gs.turnOrder.length;
       attempts++;
+    }
+
+    // If no connected player was found, end the game
+    const nextPid = gs.turnOrder[gs.turnIndex];
+    if (!this.room.players[nextPid]?.connected) {
+      logger.warn('No connected players remaining, ending game', { roomCode: this.room.code });
+      this.endGame();
+      return;
     }
 
     gs.currentTurnPlayerId = gs.turnOrder[gs.turnIndex];
@@ -597,13 +895,27 @@ export class GameEngine {
       finalScores,
     });
 
+    // Build and emit game stats
+    const playerStatsObj: Record<string, PlayerStats> = {};
+    for (const [id, stats] of this.playerStats.entries()) {
+      playerStatsObj[id] = { ...stats };
+    }
+    const gameStats: GameStats = {
+      playerStats: playerStatsObj,
+      totalRounds: this.totalRounds,
+    };
+    this.io.to(this.room.code).emit('game-stats', gameStats);
+
+    // Emit final song history
+    this.io.to(this.room.code).emit('song-history', { history: this.songHistory });
+
     this.io.to(this.room.code).emit('game-over', {
       winnerId,
       players: this.room.players,
     });
-  }
-}
 
-function normalize(s: string): string {
-  return s.toLowerCase().replace(/[^a-z0-9]/g, '');
+    if (this.onGameEndCallback) {
+      this.onGameEndCallback();
+    }
+  }
 }

@@ -1,10 +1,10 @@
-import { useState } from 'react';
-import { Users, Crown, Settings, LogOut, Play, Music, ListMusic, Link } from 'lucide-react';
+import { useState, useCallback } from 'react';
+import { Users, Crown, Settings, LogOut, Play, Music, ListMusic, Link, Share2, Check, Globe, CheckCircle, XCircle, ArrowDownToLine } from 'lucide-react';
 import { motion } from 'motion/react';
 import { getSocket, clearSession } from '../services/socket';
 import { useGameStore } from '../store';
 import { requestActivation } from '../services/spotifyPlayer';
-import type { GameMode, SongPack } from '@hitster/shared';
+import type { GameMode, SongPack, SongGenre, SongRegion } from '@hitster/shared';
 import { MIN_CARDS_TO_WIN, MAX_CARDS_TO_WIN, MIN_PLAYERS } from '@hitster/shared';
 
 const AVAILABLE_DECADES = [
@@ -18,13 +18,34 @@ const AVAILABLE_DECADES = [
   { value: 2020, label: '20s' },
 ];
 
+const AVAILABLE_GENRES: { value: SongGenre; label: string }[] = [
+  { value: 'rock', label: 'Rock' },
+  { value: 'pop', label: 'Pop' },
+  { value: 'hip-hop', label: 'Hip-Hop' },
+  { value: 'r-and-b', label: 'R&B' },
+  { value: 'country', label: 'Country' },
+  { value: 'electronic', label: 'Electronic' },
+  { value: 'jazz', label: 'Jazz' },
+  { value: 'latin', label: 'Latin' },
+];
+
+const AVAILABLE_REGIONS: { value: SongRegion; label: string }[] = [
+  { value: 'uk', label: 'UK' },
+  { value: 'latin', label: 'Latin' },
+  { value: 'kpop', label: 'K-Pop' },
+  { value: 'bollywood', label: 'Bollywood' },
+];
+
 /** Curated Spotify playlists for genre packs */
 const GENRE_PACKS = [
-  { label: 'Summer Hits', icon: '\u2600', playlistId: '37i9dQZF1DXdwTUxmGKrdN' },
-  { label: 'Movie Soundtracks', icon: '\uD83C\uDFAC', playlistId: '37i9dQZF1DX4dyzvuaRJ0n' },
-  { label: 'Rock Classics', icon: '\uD83E\uDD18', playlistId: '37i9dQZF1DWXRqgorJj26U' },
-  { label: 'Hip-Hop', icon: '\uD83C\uDFA4', playlistId: '37i9dQZF1DX48TTZL62Yht' },
-  { label: 'Latin Hits', icon: '\uD83D\uDD25', playlistId: '37i9dQZF1DX10zKzsJ2jva' },
+  { label: 'Summer Hits', icon: '\u2600', playlistId: '37i9dQZF1DXdwTUxmGKrdN', color: 'from-amber-500 to-orange-600' },
+  { label: 'Movie Soundtracks', icon: '\uD83C\uDFAC', playlistId: '37i9dQZF1DX4dyzvuaRJ0n', color: 'from-purple-600 to-indigo-700' },
+  { label: 'Rock Classics', icon: '\uD83E\uDD18', playlistId: '37i9dQZF1DWXRqgorJj26U', color: 'from-red-600 to-rose-800' },
+  { label: 'Hip-Hop', icon: '\uD83C\uDFA4', playlistId: '37i9dQZF1DX48TTZL62Yht', color: 'from-yellow-500 to-amber-700' },
+  { label: 'Latin Hits', icon: '\uD83D\uDD25', playlistId: '37i9dQZF1DX10zKzsJ2jva', color: 'from-pink-500 to-red-600' },
+  { label: '90s Throwback', icon: '\uD83D\uDCFC', playlistId: '37i9dQZF1DXbTxRt5MxAvz', color: 'from-cyan-500 to-blue-600' },
+  { label: 'Indie Hits', icon: '\uD83C\uDF3B', playlistId: '37i9dQZF1DX2Nc3B70tvx0', color: 'from-emerald-500 to-teal-700' },
+  { label: 'All-Time Greatest', icon: '\uD83C\uDFC6', playlistId: '37i9dQZF1DXcBWIGoYBM5M', color: 'from-yellow-400 to-yellow-600' },
 ];
 
 export function Lobby() {
@@ -43,6 +64,26 @@ export function Lobby() {
   const socket = getSocket();
 
   const [playlistInput, setPlaylistInput] = useState(settings.playlistUrl || '');
+  const [playlistImported, setPlaylistImported] = useState(!!settings.playlistUrl);
+  const [copied, setCopied] = useState(false);
+
+  /** Check if a string looks like a valid Spotify playlist URL/URI */
+  const isValidPlaylistUrl = useCallback((url: string): boolean => {
+    if (!url.trim()) return false;
+    return /open\.spotify\.com\/playlist\/[a-zA-Z0-9]+/.test(url)
+      || /spotify:playlist:[a-zA-Z0-9]+/.test(url);
+  }, []);
+
+  const handleCopyInviteLink = async () => {
+    const link = `${window.location.origin}/join/${roomCode}`;
+    try {
+      await navigator.clipboard.writeText(link);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Fallback: do nothing
+    }
+  };
 
   const handleLeave = () => {
     socket.emit('leave-room');
@@ -64,7 +105,7 @@ export function Lobby() {
   };
 
   const handleSetSongPack = (songPack: SongPack) => {
-    socket.emit('update-settings', { songPack, decades: undefined, playlistUrl: undefined });
+    socket.emit('update-settings', { songPack, decades: undefined, genres: undefined, playlistUrl: undefined });
   };
 
   const handleToggleDecade = (decade: number) => {
@@ -72,18 +113,42 @@ export function Lobby() {
     const next = current.includes(decade)
       ? current.filter((d) => d !== decade)
       : [...current, decade];
-    socket.emit('update-settings', { songPack: 'decades', decades: next });
+    const pack = settings.songPack === 'genre-decade' ? 'genre-decade' : 'decades';
+    socket.emit('update-settings', { songPack: pack, decades: next });
+  };
+
+  const handleToggleGenre = (genre: SongGenre) => {
+    const current = settings.genres || [];
+    const next = current.includes(genre)
+      ? current.filter((g) => g !== genre)
+      : [...current, genre];
+    socket.emit('update-settings', { genres: next });
+  };
+
+  const handleToggleRegion = (region: SongRegion) => {
+    const current = settings.regions || [];
+    const next = current.includes(region)
+      ? current.filter((r) => r !== region)
+      : [...current, region];
+    socket.emit('update-settings', { regions: next });
   };
 
   const handleSelectGenrePack = (playlistId: string) => {
     const url = `https://open.spotify.com/playlist/${playlistId}`;
     setPlaylistInput(url);
+    setPlaylistImported(true);
     socket.emit('update-settings', { songPack: 'playlist', playlistUrl: url });
   };
 
   const handlePlaylistUrlChange = (url: string) => {
     setPlaylistInput(url);
-    socket.emit('update-settings', { songPack: 'playlist', playlistUrl: url });
+    setPlaylistImported(false);
+  };
+
+  const handleImportPlaylist = () => {
+    if (!isValidPlaylistUrl(playlistInput)) return;
+    setPlaylistImported(true);
+    socket.emit('update-settings', { songPack: 'playlist', playlistUrl: playlistInput });
   };
 
   const modes: { value: GameMode; label: string; desc: string }[] = [
@@ -97,7 +162,14 @@ export function Lobby() {
     ? 'Standard Mix'
     : settings.songPack === 'decades'
       ? `Decades: ${(settings.decades || []).sort().map(d => `${d}s`).join(', ') || 'None'}`
-      : 'Spotify Playlist';
+      : settings.songPack === 'genre'
+        ? `Genre: ${(settings.genres || []).join(', ') || 'None'}`
+        : settings.songPack === 'genre-decade'
+          ? `Genre+Decade`
+          : 'Spotify Playlist';
+
+  const needsGenreSelection = settings.songPack === 'genre' || settings.songPack === 'genre-decade';
+  const needsDecadeSelection = settings.songPack === 'decades' || settings.songPack === 'genre-decade';
 
   return (
     <div className="flex flex-col min-h-screen p-6 text-white bg-[#1a1a2e]">
@@ -115,6 +187,22 @@ export function Lobby() {
           <h2 className="text-4xl font-black tracking-widest text-[#1DB954]">
             {roomCode}
           </h2>
+          <button
+            onClick={handleCopyInviteLink}
+            className="mt-1.5 flex items-center gap-1.5 text-xs text-gray-400 hover:text-white transition-colors px-3 py-1.5 rounded-full bg-white/5 hover:bg-white/10 mx-auto"
+          >
+            {copied ? (
+              <>
+                <Check className="w-3.5 h-3.5 text-[#1DB954]" />
+                <span className="text-[#1DB954]">Copied!</span>
+              </>
+            ) : (
+              <>
+                <Share2 className="w-3.5 h-3.5" />
+                Copy Invite Link
+              </>
+            )}
+          </button>
         </div>
         <div className="w-9" />
       </div>
@@ -240,7 +328,7 @@ export function Lobby() {
           </div>
         )}
 
-        {/* Song Packs — host only, Spotify required */}
+        {/* Song Packs — host only */}
         {isHost && hasSpotify ? (
           <div className="bg-white/5 rounded-3xl p-6 border border-white/10 space-y-5">
             <h3 className="text-lg font-bold flex items-center gap-2">
@@ -273,6 +361,29 @@ export function Lobby() {
                 <span className="text-xs font-bold block">Decades</span>
               </button>
               <button
+                onClick={() => handleSetSongPack('genre')}
+                className={`py-3 px-2 rounded-xl text-center transition-all ${
+                  settings.songPack === 'genre'
+                    ? 'bg-[#1DB954] text-black'
+                    : 'bg-black/30 text-gray-300 hover:bg-black/50'
+                }`}
+              >
+                <Music className={`w-5 h-5 mx-auto mb-1 ${settings.songPack === 'genre' ? 'text-black' : ''}`} />
+                <span className="text-xs font-bold block">By Genre</span>
+              </button>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                onClick={() => handleSetSongPack('genre-decade')}
+                className={`py-3 px-2 rounded-xl text-center transition-all ${
+                  settings.songPack === 'genre-decade'
+                    ? 'bg-[#1DB954] text-black'
+                    : 'bg-black/30 text-gray-300 hover:bg-black/50'
+                }`}
+              >
+                <span className={`text-xs font-bold block ${settings.songPack === 'genre-decade' ? 'text-black' : ''}`}>Genre + Decade</span>
+              </button>
+              <button
                 onClick={() => handleSetSongPack('playlist')}
                 className={`py-3 px-2 rounded-xl text-center transition-all ${
                   settings.songPack === 'playlist'
@@ -285,8 +396,39 @@ export function Lobby() {
               </button>
             </div>
 
+            {/* Genre chips */}
+            {needsGenreSelection && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                className="space-y-2"
+              >
+                <label className="text-xs text-gray-400 font-medium block">
+                  Select genres (pick at least one)
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  {AVAILABLE_GENRES.map(({ value, label }) => {
+                    const selected = (settings.genres || []).includes(value);
+                    return (
+                      <button
+                        key={value}
+                        onClick={() => handleToggleGenre(value)}
+                        className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${
+                          selected
+                            ? 'bg-[#1DB954] text-black'
+                            : 'bg-black/30 text-gray-300 hover:bg-black/50'
+                        }`}
+                      >
+                        {label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </motion.div>
+            )}
+
             {/* Decade chips */}
-            {settings.songPack === 'decades' && (
+            {needsDecadeSelection && (
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
@@ -321,56 +463,294 @@ export function Lobby() {
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
-                className="space-y-3"
+                className="space-y-4"
               >
-                {/* Genre presets */}
+                {/* Genre presets as album-art-style cards */}
                 <label className="text-xs text-gray-400 font-medium block">
-                  Genre Packs
+                  Quick Pick a Playlist
                 </label>
-                <div className="flex flex-wrap gap-2">
-                  {GENRE_PACKS.map(({ label, icon, playlistId }) => {
+                <div className="grid grid-cols-2 gap-3">
+                  {GENRE_PACKS.map(({ label, icon, playlistId, color }) => {
                     const isActive = playlistInput.includes(playlistId);
                     return (
                       <button
                         key={playlistId}
                         onClick={() => handleSelectGenrePack(playlistId)}
-                        className={`px-3 py-2 rounded-full text-sm font-bold transition-all flex items-center gap-1.5 ${
+                        className={`relative overflow-hidden rounded-2xl p-4 text-left transition-all transform hover:scale-[1.02] active:scale-95 ${
                           isActive
-                            ? 'bg-[#1DB954] text-black'
-                            : 'bg-black/30 text-gray-300 hover:bg-black/50'
+                            ? 'ring-2 ring-[#1DB954] ring-offset-2 ring-offset-[#1a1a2e]'
+                            : ''
                         }`}
                       >
-                        <span>{icon}</span>
-                        {label}
+                        <div className={`absolute inset-0 bg-gradient-to-br ${color} opacity-${isActive ? '100' : '80'}`} />
+                        <div className="relative z-10">
+                          <span className="text-2xl block mb-1">{icon}</span>
+                          <span className="text-sm font-bold text-white block leading-tight">{label}</span>
+                        </div>
+                        {isActive && (
+                          <div className="absolute top-2 right-2 z-10">
+                            <CheckCircle className="w-5 h-5 text-white drop-shadow" />
+                          </div>
+                        )}
                       </button>
                     );
                   })}
                 </div>
 
-                <div className="relative">
-                  <label className="text-xs text-gray-400 font-medium block mb-1">
+                <div className="space-y-2">
+                  <label className="text-xs text-gray-400 font-medium block">
                     Or paste a Spotify playlist link
                   </label>
-                  <input
-                    type="text"
-                    placeholder="https://open.spotify.com/playlist/..."
-                    value={playlistInput}
-                    onChange={(e) => handlePlaylistUrlChange(e.target.value)}
-                    autoComplete="off"
-                    autoCorrect="off"
-                    autoCapitalize="off"
-                    spellCheck={false}
-                    className="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#1DB954] transition-all"
-                  />
+                  <div className="flex gap-2">
+                    <div className="relative flex-1">
+                      <input
+                        type="text"
+                        placeholder="https://open.spotify.com/playlist/..."
+                        value={playlistInput}
+                        onChange={(e) => handlePlaylistUrlChange(e.target.value)}
+                        onBlur={handleImportPlaylist}
+                        onKeyDown={(e) => { if (e.key === 'Enter') handleImportPlaylist(); }}
+                        autoComplete="off"
+                        autoCorrect="off"
+                        autoCapitalize="off"
+                        spellCheck={false}
+                        className={`w-full bg-black/30 border rounded-xl px-4 py-3 pr-10 text-sm text-white placeholder-gray-500 focus:outline-none transition-all ${
+                          playlistInput.trim() === ''
+                            ? 'border-white/10'
+                            : isValidPlaylistUrl(playlistInput)
+                              ? 'border-green-500/50'
+                              : 'border-red-500/50'
+                        }`}
+                      />
+                      {playlistInput.trim() !== '' && (
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                          {isValidPlaylistUrl(playlistInput) ? (
+                            <CheckCircle className="w-4 h-4 text-green-500" />
+                          ) : (
+                            <XCircle className="w-4 h-4 text-red-500" />
+                          )}
+                        </div>
+                      )}
+                    </div>
+                    <button
+                      onClick={handleImportPlaylist}
+                      disabled={!isValidPlaylistUrl(playlistInput)}
+                      className="px-4 py-3 rounded-xl bg-[#1DB954] hover:bg-[#1ed760] disabled:opacity-40 disabled:hover:bg-[#1DB954] text-black font-bold text-sm transition-all flex items-center gap-1.5 whitespace-nowrap"
+                    >
+                      <ArrowDownToLine className="w-4 h-4" />
+                      Import
+                    </button>
+                  </div>
+                  {playlistImported && isValidPlaylistUrl(playlistInput) && (
+                    <motion.p
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="text-xs text-green-400 flex items-center gap-1.5"
+                    >
+                      <CheckCircle className="w-3.5 h-3.5" />
+                      Playlist loaded — ready to start
+                    </motion.p>
+                  )}
+                  {playlistInput.trim() !== '' && !isValidPlaylistUrl(playlistInput) && (
+                    <p className="text-xs text-red-400">
+                      Enter a valid Spotify playlist URL (e.g. https://open.spotify.com/playlist/...)
+                    </p>
+                  )}
                 </div>
               </motion.div>
             )}
 
             {settings.songPack === 'standard' && (
               <p className="text-xs text-gray-500">
-                500+ songs spanning 1950s–2020s, balanced across decades
+                500+ songs spanning 1950s-2020s, balanced across decades
               </p>
             )}
+
+            {/* Regional Packs — combine with any song pack */}
+            <div className="space-y-2 pt-2 border-t border-white/10">
+              <label className="text-xs text-gray-400 font-medium flex items-center gap-1.5">
+                <Globe className="w-3.5 h-3.5" />
+                Regional Packs (optional, combines with selection above)
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {AVAILABLE_REGIONS.map(({ value, label }) => {
+                  const selected = (settings.regions || []).includes(value);
+                  return (
+                    <button
+                      key={value}
+                      onClick={() => handleToggleRegion(value)}
+                      className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${
+                        selected
+                          ? 'bg-[#1DB954] text-black'
+                          : 'bg-black/30 text-gray-300 hover:bg-black/50'
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  );
+                })}
+              </div>
+              <p className="text-[10px] text-gray-500">
+                Select regions to include songs from those regions. Leave empty to include all.
+              </p>
+            </div>
+          </div>
+        ) : isHost && !hasSpotify ? (
+          <div className="bg-white/5 rounded-3xl p-6 border border-white/10 space-y-5">
+            <h3 className="text-lg font-bold flex items-center gap-2">
+              <Music className="w-5 h-5 text-[#1DB954]" />
+              Song Source
+            </h3>
+
+            <p className="text-xs text-amber-400/80 bg-amber-500/10 border border-amber-500/20 rounded-xl px-3 py-2">
+              Preview mode: 30-second clips from the built-in song library
+            </p>
+
+            {/* Pack type selector — no playlist option */}
+            <div className="grid grid-cols-3 gap-2">
+              <button
+                onClick={() => handleSetSongPack('standard')}
+                className={`py-3 px-2 rounded-xl text-center transition-all ${
+                  settings.songPack === 'standard'
+                    ? 'bg-[#1DB954] text-black'
+                    : 'bg-black/30 text-gray-300 hover:bg-black/50'
+                }`}
+              >
+                <ListMusic className={`w-5 h-5 mx-auto mb-1 ${settings.songPack === 'standard' ? 'text-black' : ''}`} />
+                <span className="text-xs font-bold block">Standard</span>
+              </button>
+              <button
+                onClick={() => handleSetSongPack('decades')}
+                className={`py-3 px-2 rounded-xl text-center transition-all ${
+                  settings.songPack === 'decades'
+                    ? 'bg-[#1DB954] text-black'
+                    : 'bg-black/30 text-gray-300 hover:bg-black/50'
+                }`}
+              >
+                <span className={`text-lg block ${settings.songPack === 'decades' ? 'text-black' : ''}`}>#</span>
+                <span className="text-xs font-bold block">Decades</span>
+              </button>
+              <button
+                onClick={() => handleSetSongPack('genre')}
+                className={`py-3 px-2 rounded-xl text-center transition-all ${
+                  settings.songPack === 'genre'
+                    ? 'bg-[#1DB954] text-black'
+                    : 'bg-black/30 text-gray-300 hover:bg-black/50'
+                }`}
+              >
+                <Music className={`w-5 h-5 mx-auto mb-1 ${settings.songPack === 'genre' ? 'text-black' : ''}`} />
+                <span className="text-xs font-bold block">By Genre</span>
+              </button>
+            </div>
+            <div className="grid grid-cols-1 gap-2">
+              <button
+                onClick={() => handleSetSongPack('genre-decade')}
+                className={`py-3 px-2 rounded-xl text-center transition-all ${
+                  settings.songPack === 'genre-decade'
+                    ? 'bg-[#1DB954] text-black'
+                    : 'bg-black/30 text-gray-300 hover:bg-black/50'
+                }`}
+              >
+                <span className={`text-xs font-bold block ${settings.songPack === 'genre-decade' ? 'text-black' : ''}`}>Genre + Decade</span>
+              </button>
+            </div>
+
+            {/* Genre chips */}
+            {needsGenreSelection && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                className="space-y-2"
+              >
+                <label className="text-xs text-gray-400 font-medium block">
+                  Select genres (pick at least one)
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  {AVAILABLE_GENRES.map(({ value, label }) => {
+                    const selected = (settings.genres || []).includes(value);
+                    return (
+                      <button
+                        key={value}
+                        onClick={() => handleToggleGenre(value)}
+                        className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${
+                          selected
+                            ? 'bg-[#1DB954] text-black'
+                            : 'bg-black/30 text-gray-300 hover:bg-black/50'
+                        }`}
+                      >
+                        {label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </motion.div>
+            )}
+
+            {/* Decade chips */}
+            {needsDecadeSelection && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                className="space-y-2"
+              >
+                <label className="text-xs text-gray-400 font-medium block">
+                  Select decades (pick at least one)
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  {AVAILABLE_DECADES.map(({ value, label }) => {
+                    const selected = (settings.decades || []).includes(value);
+                    return (
+                      <button
+                        key={value}
+                        onClick={() => handleToggleDecade(value)}
+                        className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${
+                          selected
+                            ? 'bg-[#1DB954] text-black'
+                            : 'bg-black/30 text-gray-300 hover:bg-black/50'
+                        }`}
+                      >
+                        {label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </motion.div>
+            )}
+
+            {settings.songPack === 'standard' && (
+              <p className="text-xs text-gray-500">
+                500+ songs spanning 1950s-2020s, balanced across decades
+              </p>
+            )}
+
+            {/* Regional Packs — combine with any song pack */}
+            <div className="space-y-2 pt-2 border-t border-white/10">
+              <label className="text-xs text-gray-400 font-medium flex items-center gap-1.5">
+                <Globe className="w-3.5 h-3.5" />
+                Regional Packs (optional, combines with selection above)
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {AVAILABLE_REGIONS.map(({ value, label }) => {
+                  const selected = (settings.regions || []).includes(value);
+                  return (
+                    <button
+                      key={value}
+                      onClick={() => handleToggleRegion(value)}
+                      className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${
+                        selected
+                          ? 'bg-[#1DB954] text-black'
+                          : 'bg-black/30 text-gray-300 hover:bg-black/50'
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  );
+                })}
+              </div>
+              <p className="text-[10px] text-gray-500">
+                Select regions to include songs from those regions. Leave empty to include all.
+              </p>
+            </div>
           </div>
         ) : isHost ? null : (
           /* Non-host: show what the host picked */
@@ -403,7 +783,12 @@ export function Lobby() {
         <div className="mt-6 max-w-lg mx-auto w-full">
           <button
             onClick={handleStart}
-            disabled={playerList.length < MIN_PLAYERS || (settings.songPack === 'decades' && (!settings.decades || settings.decades.length === 0))}
+            disabled={
+              playerList.length < MIN_PLAYERS
+              || (needsDecadeSelection && (!settings.decades || settings.decades.length === 0))
+              || (needsGenreSelection && (!settings.genres || settings.genres.length === 0))
+              || (settings.songPack === 'playlist' && !settings.playlistUrl)
+            }
             className="w-full bg-[#1DB954] hover:bg-[#1ed760] disabled:opacity-50 disabled:hover:bg-[#1DB954] text-black font-black text-xl py-5 rounded-2xl flex items-center justify-center gap-2 shadow-[0_0_30px_rgba(29,185,84,0.4)] transition-all transform active:scale-95"
           >
             <Play className="w-6 h-6 fill-current" />

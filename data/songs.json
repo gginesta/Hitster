@@ -2,2506 +2,4488 @@
   {
     "title": "Minnie the Moocher",
     "artist": "Cab Calloway",
-    "year": 1931
+    "year": 1931,
+    "genre": "jazz",
+    "region": "global"
   },
   {
     "title": "Brother, Can You Spare a Dime?",
     "artist": "Bing Crosby",
-    "year": 1932
+    "year": 1932,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Stormy Weather",
     "artist": "Ethel Waters",
-    "year": 1933
+    "year": 1933,
+    "genre": "jazz",
+    "region": "global"
   },
   {
     "title": "Cheek to Cheek",
     "artist": "Fred Astaire",
-    "year": 1935
+    "year": 1935,
+    "genre": "jazz",
+    "region": "global"
   },
   {
     "title": "Summertime",
     "artist": "George Gershwin",
-    "year": 1935
+    "year": 1935,
+    "genre": "jazz",
+    "region": "global"
   },
   {
     "title": "The Way You Look Tonight",
     "artist": "Fred Astaire",
-    "year": 1936
+    "year": 1936,
+    "genre": "jazz",
+    "region": "global"
   },
   {
     "title": "Sing, Sing, Sing",
     "artist": "Benny Goodman",
-    "year": 1937
+    "year": 1937,
+    "genre": "jazz",
+    "region": "global"
   },
   {
     "title": "Bei Mir Bist Du Schoen",
     "artist": "The Andrews Sisters",
-    "year": 1937
+    "year": 1937,
+    "genre": "jazz",
+    "region": "global"
   },
   {
     "title": "My Funny Valentine",
     "artist": "Chet Baker",
-    "year": 1937
+    "year": 1937,
+    "genre": "jazz",
+    "region": "global"
   },
   {
     "title": "A-Tisket, A-Tasket",
     "artist": "Ella Fitzgerald",
-    "year": 1938
+    "year": 1938,
+    "genre": "jazz",
+    "region": "global"
   },
   {
     "title": "God Bless America",
     "artist": "Kate Smith",
-    "year": 1938
+    "year": 1938,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Begin the Beguine",
     "artist": "Artie Shaw",
-    "year": 1938
+    "year": 1938,
+    "genre": "jazz",
+    "region": "global"
   },
   {
     "title": "Jeepers Creepers",
     "artist": "Louis Armstrong",
-    "year": 1938
+    "year": 1938,
+    "genre": "jazz",
+    "region": "global"
   },
   {
     "title": "Somewhere Over the Rainbow",
     "artist": "Judy Garland",
-    "year": 1939
+    "year": 1939,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Body and Soul",
     "artist": "Coleman Hawkins",
-    "year": 1939
+    "year": 1939,
+    "genre": "jazz",
+    "region": "global"
   },
   {
     "title": "In the Mood",
     "artist": "Glenn Miller",
-    "year": 1940
+    "year": 1940,
+    "genre": "jazz",
+    "region": "global"
   },
   {
     "title": "When You Wish Upon a Star",
     "artist": "Cliff Edwards",
-    "year": 1940
+    "year": 1940,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Chattanooga Choo Choo",
     "artist": "Glenn Miller",
-    "year": 1941
+    "year": 1941,
+    "genre": "jazz",
+    "region": "global"
   },
   {
     "title": "Boogie Woogie Bugle Boy",
     "artist": "The Andrews Sisters",
-    "year": 1941
+    "year": 1941,
+    "genre": "jazz",
+    "region": "global"
   },
   {
     "title": "Take the 'A' Train",
     "artist": "Duke Ellington",
-    "year": 1941
+    "year": 1941,
+    "genre": "jazz",
+    "region": "global"
   },
   {
     "title": "White Christmas",
     "artist": "Bing Crosby",
-    "year": 1942
+    "year": 1942,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "As Time Goes By",
     "artist": "Dooley Wilson",
-    "year": 1942
+    "year": 1942,
+    "genre": "jazz",
+    "region": "global"
   },
   {
     "title": "It's a Long, Long Way to Tipperary",
     "artist": "Bing Crosby",
-    "year": 1942
+    "year": 1942,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Pistol Packin' Mama",
     "artist": "Al Dexter",
-    "year": 1943
+    "year": 1943,
+    "genre": "country",
+    "region": "global"
   },
   {
     "title": "I'll Be Seeing You",
     "artist": "Billie Holiday",
-    "year": 1944
+    "year": 1944,
+    "genre": "jazz",
+    "region": "global"
   },
   {
     "title": "Sentimental Journey",
     "artist": "Doris Day",
-    "year": 1945
+    "year": 1945,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Rum and Coca-Cola",
     "artist": "The Andrews Sisters",
-    "year": 1945
+    "year": 1945,
+    "genre": "jazz",
+    "region": "global"
   },
   {
     "title": "Saturday Night (Is the Loneliest Night of the Week)",
     "artist": "Frank Sinatra",
-    "year": 1945
+    "year": 1945,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "The Christmas Song",
     "artist": "Nat King Cole",
-    "year": 1946
+    "year": 1946,
+    "genre": "jazz",
+    "region": "global"
   },
   {
     "title": "Near You",
     "artist": "Francis Craig",
-    "year": 1947
+    "year": 1947,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Nature Boy",
     "artist": "Nat King Cole",
-    "year": 1948
+    "year": 1948,
+    "genre": "jazz",
+    "region": "global"
   },
   {
     "title": "Unforgettable",
     "artist": "Nat King Cole",
-    "year": 1951
+    "year": 1951,
+    "genre": "jazz",
+    "region": "global"
   },
   {
     "title": "Cry",
     "artist": "Johnnie Ray",
-    "year": 1951
+    "year": 1951,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Singin' in the Rain",
     "artist": "Gene Kelly",
-    "year": 1952
+    "year": 1952,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "That's Amore",
     "artist": "Dean Martin",
-    "year": 1953
+    "year": 1953,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Your Cheatin Heart",
     "artist": "Hank Williams",
-    "year": 1953
+    "year": 1953,
+    "genre": "country",
+    "region": "global"
   },
   {
     "title": "That's All Right",
     "artist": "Elvis Presley",
-    "year": 1954
+    "year": 1954,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Fly Me to the Moon",
     "artist": "Frank Sinatra",
-    "year": 1954
+    "year": 1954,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Shake, Rattle and Roll",
     "artist": "Big Joe Turner",
-    "year": 1954
+    "year": 1954,
+    "genre": "r-and-b",
+    "region": "global"
   },
   {
     "title": "Earth Angel",
     "artist": "The Penguins",
-    "year": 1954
+    "year": 1954,
+    "genre": "r-and-b",
+    "region": "global"
   },
   {
     "title": "Rock Around the Clock",
     "artist": "Bill Haley & His Comets",
-    "year": 1955
+    "year": 1955,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Tutti Frutti",
     "artist": "Little Richard",
-    "year": 1955
+    "year": 1955,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Only You",
     "artist": "The Platters",
-    "year": 1955
+    "year": 1955,
+    "genre": "r-and-b",
+    "region": "global"
   },
   {
     "title": "Aint That a Shame",
     "artist": "Fats Domino",
-    "year": 1955
+    "year": 1955,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Maybellene",
     "artist": "Chuck Berry",
-    "year": 1955
+    "year": 1955,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Sixteen Tons",
     "artist": "Tennessee Ernie Ford",
-    "year": 1955
+    "year": 1955,
+    "genre": "country",
+    "region": "global"
   },
   {
     "title": "Rock Around the Clock",
     "artist": "Bill Haley",
-    "year": 1955
+    "year": 1955,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Hound Dog",
     "artist": "Elvis Presley",
-    "year": 1956
+    "year": 1956,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Heartbreak Hotel",
     "artist": "Elvis Presley",
-    "year": 1956
+    "year": 1956,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Blueberry Hill",
     "artist": "Fats Domino",
-    "year": 1956
+    "year": 1956,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Blue Suede Shoes",
     "artist": "Carl Perkins",
-    "year": 1956
+    "year": 1956,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Dont Be Cruel",
     "artist": "Elvis Presley",
-    "year": 1956
+    "year": 1956,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Long Tall Sally",
     "artist": "Little Richard",
-    "year": 1956
+    "year": 1956,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Walk the Line",
     "artist": "Johnny Cash",
-    "year": 1956
+    "year": 1956,
+    "genre": "country",
+    "region": "global"
   },
   {
     "title": "Jailhouse Rock",
     "artist": "Elvis Presley",
-    "year": 1957
+    "year": 1957,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Great Balls of Fire",
     "artist": "Jerry Lee Lewis",
-    "year": 1957
+    "year": 1957,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Peggy Sue",
     "artist": "Buddy Holly",
-    "year": 1957
+    "year": 1957,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Whole Lotta Shakin Goin On",
     "artist": "Jerry Lee Lewis",
-    "year": 1957
+    "year": 1957,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Diana",
     "artist": "Paul Anka",
-    "year": 1957
+    "year": 1957,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "At the Hop",
     "artist": "Danny & the Juniors",
-    "year": 1957
+    "year": 1957,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Johnny B. Goode",
     "artist": "Chuck Berry",
-    "year": 1958
+    "year": 1958,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "La Bamba",
     "artist": "Ritchie Valens",
-    "year": 1958
+    "year": 1958,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Summertime Blues",
     "artist": "Eddie Cochran",
-    "year": 1958
+    "year": 1958,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Smoke Gets in Your Eyes",
     "artist": "The Platters",
-    "year": 1958
+    "year": 1958,
+    "genre": "r-and-b",
+    "region": "global"
   },
   {
     "title": "Splish Splash",
     "artist": "Bobby Darin",
-    "year": 1958
+    "year": 1958,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Mack the Knife",
     "artist": "Bobby Darin",
-    "year": 1959
+    "year": 1959,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "What'd I Say",
     "artist": "Ray Charles",
-    "year": 1959
+    "year": 1959,
+    "genre": "r-and-b",
+    "region": "global"
   },
   {
     "title": "What Id Say",
     "artist": "Ray Charles",
-    "year": 1959
+    "year": 1959,
+    "genre": "r-and-b",
+    "region": "global"
   },
   {
     "title": "Put Your Head on My Shoulder",
     "artist": "Paul Anka",
-    "year": 1959
+    "year": 1959,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Teenager in Love",
     "artist": "Dion and the Belmonts",
-    "year": 1959
+    "year": 1959,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Are You Lonesome Tonight",
     "artist": "Elvis Presley",
-    "year": 1960
+    "year": 1960,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "The Twist",
     "artist": "Chubby Checker",
-    "year": 1960
+    "year": 1960,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Will You Love Me Tomorrow",
     "artist": "The Shirelles",
-    "year": 1960
+    "year": 1960,
+    "genre": "r-and-b",
+    "region": "global"
   },
   {
     "title": "Wonderful World",
     "artist": "Sam Cooke",
-    "year": 1960
+    "year": 1960,
+    "genre": "r-and-b",
+    "region": "global"
   },
   {
     "title": "Stand by Me",
     "artist": "Ben E. King",
-    "year": 1961
+    "year": 1961,
+    "genre": "r-and-b",
+    "region": "global"
   },
   {
     "title": "Runaway",
     "artist": "Del Shannon",
-    "year": 1961
+    "year": 1961,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Hit the Road Jack",
     "artist": "Ray Charles",
-    "year": 1961
+    "year": 1961,
+    "genre": "r-and-b",
+    "region": "global"
   },
   {
     "title": "Blue Moon",
     "artist": "The Marcels",
-    "year": 1961
+    "year": 1961,
+    "genre": "r-and-b",
+    "region": "global"
   },
   {
     "title": "Please Mr. Postman",
     "artist": "The Marvelettes",
-    "year": 1961
+    "year": 1961,
+    "genre": "r-and-b",
+    "region": "global"
   },
   {
     "title": "The Loco-Motion",
     "artist": "Little Eva",
-    "year": 1962
+    "year": 1962,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Duke of Earl",
     "artist": "Gene Chandler",
-    "year": 1962
+    "year": 1962,
+    "genre": "r-and-b",
+    "region": "global"
   },
   {
     "title": "Sherry",
     "artist": "The Four Seasons",
-    "year": 1962
+    "year": 1962,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Big Girls Dont Cry",
     "artist": "The Four Seasons",
-    "year": 1962
+    "year": 1962,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "He s a Rebel",
     "artist": "The Crystals",
-    "year": 1962
+    "year": 1962,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Monster Mash",
     "artist": "Bobby Boris Pickett",
-    "year": 1962
+    "year": 1962,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Twist and Shout",
     "artist": "The Beatles",
-    "year": 1963
+    "year": 1963,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "I Want to Hold Your Hand",
     "artist": "The Beatles",
-    "year": 1963
+    "year": 1963,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Surfin USA",
     "artist": "The Beach Boys",
-    "year": 1963
+    "year": 1963,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Louie Louie",
     "artist": "The Kingsmen",
-    "year": 1963
+    "year": 1963,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Be My Baby",
     "artist": "The Ronettes",
-    "year": 1963
+    "year": 1963,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Blowin in the Wind",
     "artist": "Bob Dylan",
-    "year": 1963
+    "year": 1963,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Da Doo Ron Ron",
     "artist": "The Crystals",
-    "year": 1963
+    "year": 1963,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "A Change Is Gonna Come",
     "artist": "Sam Cooke",
-    "year": 1964
+    "year": 1964,
+    "genre": "r-and-b",
+    "region": "global"
   },
   {
     "title": "My Girl",
     "artist": "The Temptations",
-    "year": 1964
+    "year": 1964,
+    "genre": "r-and-b",
+    "region": "global"
   },
   {
     "title": "House of the Rising Sun",
     "artist": "The Animals",
-    "year": 1964
+    "year": 1964,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "You Really Got Me",
     "artist": "The Kinks",
-    "year": 1964
+    "year": 1964,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Dancing in the Street",
     "artist": "Martha and the Vandellas",
-    "year": 1964
+    "year": 1964,
+    "genre": "r-and-b",
+    "region": "global"
   },
   {
     "title": "Baby Love",
     "artist": "The Supremes",
-    "year": 1964
+    "year": 1964,
+    "genre": "r-and-b",
+    "region": "global"
   },
   {
     "title": "Under the Boardwalk",
     "artist": "The Drifters",
-    "year": 1964
+    "year": 1964,
+    "genre": "r-and-b",
+    "region": "global"
   },
   {
     "title": "Oh Pretty Woman",
     "artist": "Roy Orbison",
-    "year": 1964
+    "year": 1964,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "(I Can't Get No) Satisfaction",
     "artist": "The Rolling Stones",
-    "year": 1965
+    "year": 1965,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Like a Rolling Stone",
     "artist": "Bob Dylan",
-    "year": 1965
+    "year": 1965,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "The Sound of Silence",
     "artist": "Simon & Garfunkel",
-    "year": 1965
+    "year": 1965,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "California Dreamin'",
     "artist": "The Mamas & the Papas",
-    "year": 1965
+    "year": 1965,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Unchained Melody",
     "artist": "The Righteous Brothers",
-    "year": 1965
+    "year": 1965,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Mr. Tambourine Man",
     "artist": "The Byrds",
-    "year": 1965
+    "year": 1965,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "I Got You Babe",
     "artist": "Sonny & Cher",
-    "year": 1965
+    "year": 1965,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "My Generation",
     "artist": "The Who",
-    "year": 1965
+    "year": 1965,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Stop! In the Name of Love",
     "artist": "The Supremes",
-    "year": 1965
+    "year": 1965,
+    "genre": "r-and-b",
+    "region": "global"
   },
   {
     "title": "Yesterday",
     "artist": "The Beatles",
-    "year": 1965
+    "year": 1965,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Good Vibrations",
     "artist": "The Beach Boys",
-    "year": 1966
+    "year": 1966,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Paint It Black",
     "artist": "The Rolling Stones",
-    "year": 1966
+    "year": 1966,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "You Cant Hurry Love",
     "artist": "The Supremes",
-    "year": 1966
+    "year": 1966,
+    "genre": "r-and-b",
+    "region": "global"
   },
   {
     "title": "These Boots Are Made for Walkin",
     "artist": "Nancy Sinatra",
-    "year": 1966
+    "year": 1966,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Respect",
     "artist": "Aretha Franklin",
-    "year": 1967
+    "year": 1967,
+    "genre": "r-and-b",
+    "region": "global"
   },
   {
     "title": "What a Wonderful World",
     "artist": "Louis Armstrong",
-    "year": 1967
+    "year": 1967,
+    "genre": "jazz",
+    "region": "global"
   },
   {
     "title": "Purple Haze",
     "artist": "Jimi Hendrix",
-    "year": 1967
+    "year": 1967,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Soul Man",
     "artist": "Sam & Dave",
-    "year": 1967
+    "year": 1967,
+    "genre": "r-and-b",
+    "region": "global"
   },
   {
     "title": "Brown Eyed Girl",
     "artist": "Van Morrison",
-    "year": 1967
+    "year": 1967,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Somebody to Love",
     "artist": "Jefferson Airplane",
-    "year": 1967
+    "year": 1967,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "The Letter",
     "artist": "The Box Tops",
-    "year": 1967
+    "year": 1967,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Hey Jude",
     "artist": "The Beatles",
-    "year": 1968
+    "year": 1968,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "I Heard It Through the Grapevine",
     "artist": "Marvin Gaye",
-    "year": 1968
+    "year": 1968,
+    "genre": "r-and-b",
+    "region": "global"
   },
   {
     "title": "White Room",
     "artist": "Cream",
-    "year": 1968
+    "year": 1968,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Sittin On The Dock of the Bay",
     "artist": "Otis Redding",
-    "year": 1968
+    "year": 1968,
+    "genre": "r-and-b",
+    "region": "global"
   },
   {
     "title": "Everyday People",
     "artist": "Sly & The Family Stone",
-    "year": 1968
+    "year": 1968,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "All Along the Watchtower",
     "artist": "Jimi Hendrix",
-    "year": 1968
+    "year": 1968,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Born to Be Wild",
     "artist": "Steppenwolf",
-    "year": 1968
+    "year": 1968,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Proud Mary",
     "artist": "Creedence Clearwater Revival",
-    "year": 1969
+    "year": 1969,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Space Oddity",
     "artist": "David Bowie",
-    "year": 1969
+    "year": 1969,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Pinball Wizard",
     "artist": "The Who",
-    "year": 1969
+    "year": 1969,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Aquarius/Let the Sunshine In",
     "artist": "The 5th Dimension",
-    "year": 1969
+    "year": 1969,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Suspicious Minds",
     "artist": "Elvis Presley",
-    "year": 1969
+    "year": 1969,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Get Back",
     "artist": "The Beatles",
-    "year": 1969
+    "year": 1969,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Let It Be",
     "artist": "The Beatles",
-    "year": 1970
+    "year": 1970,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Bridge Over Troubled Water",
     "artist": "Simon & Garfunkel",
-    "year": 1970
+    "year": 1970,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Layla",
     "artist": "Derek and the Dominos",
-    "year": 1970
+    "year": 1970,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "War",
     "artist": "Edwin Starr",
-    "year": 1970
+    "year": 1970,
+    "genre": "r-and-b",
+    "region": "global"
   },
   {
     "title": "Your Song",
     "artist": "Elton John",
-    "year": 1970
+    "year": 1970,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "I ll Be There",
     "artist": "The Jackson 5",
-    "year": 1970
+    "year": 1970,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Stairway to Heaven",
     "artist": "Led Zeppelin",
-    "year": 1971
+    "year": 1971,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Imagine",
     "artist": "John Lennon",
-    "year": 1971
+    "year": 1971,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "What's Going On",
     "artist": "Marvin Gaye",
-    "year": 1971
+    "year": 1971,
+    "genre": "r-and-b",
+    "region": "global"
   },
   {
     "title": "Ain't No Sunshine",
     "artist": "Bill Withers",
-    "year": 1971
+    "year": 1971,
+    "genre": "r-and-b",
+    "region": "global"
   },
   {
     "title": "Brown Sugar",
     "artist": "The Rolling Stones",
-    "year": 1971
+    "year": 1971,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Riders on the Storm",
     "artist": "The Doors",
-    "year": 1971
+    "year": 1971,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Maggie May",
     "artist": "Rod Stewart",
-    "year": 1971
+    "year": 1971,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "American Pie",
     "artist": "Don McLean",
-    "year": 1971
+    "year": 1971,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Take Me Home Country Roads",
     "artist": "John Denver",
-    "year": 1971
+    "year": 1971,
+    "genre": "country",
+    "region": "global"
   },
   {
     "title": "Superstition",
     "artist": "Stevie Wonder",
-    "year": 1972
+    "year": 1972,
+    "genre": "r-and-b",
+    "region": "global"
   },
   {
     "title": "Lean on Me",
     "artist": "Bill Withers",
-    "year": 1972
+    "year": 1972,
+    "genre": "r-and-b",
+    "region": "global"
   },
   {
     "title": "Crocodile Rock",
     "artist": "Elton John",
-    "year": 1972
+    "year": 1972,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Rocket Man",
     "artist": "Elton John",
-    "year": 1972
+    "year": 1972,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Lets Stay Together",
     "artist": "Al Green",
-    "year": 1972
+    "year": 1972,
+    "genre": "r-and-b",
+    "region": "global"
   },
   {
     "title": "You re So Vain",
     "artist": "Carly Simon",
-    "year": 1972
+    "year": 1972,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Free Bird",
     "artist": "Lynyrd Skynyrd",
-    "year": 1973
+    "year": 1973,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Killing Me Softly with His Song",
     "artist": "Roberta Flack",
-    "year": 1973
+    "year": 1973,
+    "genre": "r-and-b",
+    "region": "global"
   },
   {
     "title": "Living for the City",
     "artist": "Stevie Wonder",
-    "year": 1973
+    "year": 1973,
+    "genre": "r-and-b",
+    "region": "global"
   },
   {
     "title": "Midnight Train to Georgia",
     "artist": "Gladys Knight",
-    "year": 1973
+    "year": 1973,
+    "genre": "r-and-b",
+    "region": "global"
   },
   {
     "title": "Bennie and the Jets",
     "artist": "Elton John",
-    "year": 1974
+    "year": 1974,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Kung Fu Fighting",
     "artist": "Carl Douglas",
-    "year": 1974
+    "year": 1974,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Bohemian Rhapsody",
     "artist": "Queen",
-    "year": 1975
+    "year": 1975,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Wish You Were Here",
     "artist": "Pink Floyd",
-    "year": 1975
+    "year": 1975,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "No Woman, No Cry",
     "artist": "Bob Marley & The Wailers",
-    "year": 1975
+    "year": 1975,
+    "genre": "other",
+    "region": "global"
   },
   {
     "title": "Born to Run",
     "artist": "Bruce Springsteen",
-    "year": 1975
+    "year": 1975,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Fame",
     "artist": "David Bowie",
-    "year": 1975
+    "year": 1975,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "December 1963 (Oh What a Night)",
     "artist": "The Four Seasons",
-    "year": 1975
+    "year": 1975,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Dancing Queen",
     "artist": "ABBA",
-    "year": 1976
+    "year": 1976,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Blitzkrieg Bop",
     "artist": "Ramones",
-    "year": 1976
+    "year": 1976,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Anarchy in the U.K.",
     "artist": "Sex Pistols",
-    "year": 1976
+    "year": 1976,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "More Than a Feeling",
     "artist": "Boston",
-    "year": 1976
+    "year": 1976,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Hotel California",
     "artist": "Eagles",
-    "year": 1977
+    "year": 1977,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Stayin' Alive",
     "artist": "Bee Gees",
-    "year": 1977
+    "year": 1977,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Go Your Own Way",
     "artist": "Fleetwood Mac",
-    "year": 1977
+    "year": 1977,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Dreams",
     "artist": "Fleetwood Mac",
-    "year": 1977
+    "year": 1977,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "We Will Rock You",
     "artist": "Queen",
-    "year": 1977
+    "year": 1977,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Barracuda",
     "artist": "Heart",
-    "year": 1977
+    "year": 1977,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Stayin Alive",
     "artist": "Bee Gees",
-    "year": 1977
+    "year": 1977,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Dont Stop",
     "artist": "Fleetwood Mac",
-    "year": 1977
+    "year": 1977,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "I Will Survive",
     "artist": "Gloria Gaynor",
-    "year": 1978
+    "year": 1978,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "September",
     "artist": "Earth, Wind & Fire",
-    "year": 1978
+    "year": 1978,
+    "genre": "r-and-b",
+    "region": "global"
   },
   {
     "title": "Le Freak",
     "artist": "Chic",
-    "year": 1978
+    "year": 1978,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Baker Street",
     "artist": "Gerry Rafferty",
-    "year": 1978
+    "year": 1978,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Sultans of Swing",
     "artist": "Dire Straits",
-    "year": 1978
+    "year": 1978,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Roxanne",
     "artist": "The Police",
-    "year": 1978
+    "year": 1978,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Y.M.C.A.",
     "artist": "Village People",
-    "year": 1978
+    "year": 1978,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "September",
     "artist": "Earth Wind & Fire",
-    "year": 1978
+    "year": 1978,
+    "genre": "r-and-b",
+    "region": "global"
   },
   {
     "title": "Heart of Glass",
     "artist": "Blondie",
-    "year": 1979
+    "year": 1979,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "London Calling",
     "artist": "The Clash",
-    "year": 1979
+    "year": 1979,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "My Sharona",
     "artist": "The Knack",
-    "year": 1979
+    "year": 1979,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Good Times",
     "artist": "Chic",
-    "year": 1979
+    "year": 1979,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Ring My Bell",
     "artist": "Anita Ward",
-    "year": 1979
+    "year": 1979,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Message in a Bottle",
     "artist": "The Police",
-    "year": 1979
+    "year": 1979,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Rappers Delight",
     "artist": "Sugarhill Gang",
-    "year": 1979
+    "year": 1979,
+    "genre": "hip-hop",
+    "region": "global"
   },
   {
     "title": "Back in Black",
     "artist": "AC/DC",
-    "year": 1980
+    "year": 1980,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Call Me",
     "artist": "Blondie",
-    "year": 1980
+    "year": 1980,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Whip It",
     "artist": "Devo",
-    "year": 1980
+    "year": 1980,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Another One Bites the Dust",
     "artist": "Queen",
-    "year": 1980
+    "year": 1980,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Don't Stop Believin'",
     "artist": "Journey",
-    "year": 1981
+    "year": 1981,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Under Pressure",
     "artist": "Queen & David Bowie",
-    "year": 1981
+    "year": 1981,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Tainted Love",
     "artist": "Soft Cell",
-    "year": 1981
+    "year": 1981,
+    "genre": "electronic",
+    "region": "global"
   },
   {
     "title": "Bette Davis Eyes",
     "artist": "Kim Carnes",
-    "year": 1981
+    "year": 1981,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Dont Stop Believin",
     "artist": "Journey",
-    "year": 1981
+    "year": 1981,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Jessies Girl",
     "artist": "Rick Springfield",
-    "year": 1981
+    "year": 1981,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "I Love Rock n Roll",
     "artist": "Joan Jett",
-    "year": 1981
+    "year": 1981,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Super Freak",
     "artist": "Rick James",
-    "year": 1981
+    "year": 1981,
+    "genre": "r-and-b",
+    "region": "global"
   },
   {
     "title": "Africa",
     "artist": "Toto",
-    "year": 1982
+    "year": 1982,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Eye of the Tiger",
     "artist": "Survivor",
-    "year": 1982
+    "year": 1982,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Down Under",
     "artist": "Men at Work",
-    "year": 1982
+    "year": 1982,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Come On Eileen",
     "artist": "Dexys Midnight Runners",
-    "year": 1982
+    "year": 1982,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Hungry Like the Wolf",
     "artist": "Duran Duran",
-    "year": 1982
+    "year": 1982,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Billie Jean",
     "artist": "Michael Jackson",
-    "year": 1983
+    "year": 1983,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Every Breath You Take",
     "artist": "The Police",
-    "year": 1983
+    "year": 1983,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Girls Just Want to Have Fun",
     "artist": "Cyndi Lauper",
-    "year": 1983
+    "year": 1983,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Blue Monday",
     "artist": "New Order",
-    "year": 1983
+    "year": 1983,
+    "genre": "electronic",
+    "region": "global"
   },
   {
     "title": "Karma Chameleon",
     "artist": "Culture Club",
-    "year": 1983
+    "year": 1983,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Total Eclipse of the Heart",
     "artist": "Bonnie Tyler",
-    "year": 1983
+    "year": 1983,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Sweet Dreams",
     "artist": "Eurythmics",
-    "year": 1983
+    "year": 1983,
+    "genre": "electronic",
+    "region": "global"
   },
   {
     "title": "Beat It",
     "artist": "Michael Jackson",
-    "year": 1983
+    "year": 1983,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Like a Virgin",
     "artist": "Madonna",
-    "year": 1984
+    "year": 1984,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Purple Rain",
     "artist": "Prince",
-    "year": 1984
+    "year": 1984,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Thriller",
     "artist": "Michael Jackson",
-    "year": 1984
+    "year": 1984,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Jump",
     "artist": "Van Halen",
-    "year": 1984
+    "year": 1984,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "When Doves Cry",
     "artist": "Prince",
-    "year": 1984
+    "year": 1984,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Footloose",
     "artist": "Kenny Loggins",
-    "year": 1984
+    "year": 1984,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Wake Me Up Before You Go-Go",
     "artist": "Wham!",
-    "year": 1984
+    "year": 1984,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Careless Whisper",
     "artist": "George Michael",
-    "year": 1984
+    "year": 1984,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Take On Me",
     "artist": "a-ha",
-    "year": 1985
+    "year": 1985,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Everybody Wants to Rule the World",
     "artist": "Tears for Fears",
-    "year": 1985
+    "year": 1985,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Shout",
     "artist": "Tears for Fears",
-    "year": 1985
+    "year": 1985,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Money for Nothing",
     "artist": "Dire Straits",
-    "year": 1985
+    "year": 1985,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Running Up That Hill",
     "artist": "Kate Bush",
-    "year": 1985
+    "year": 1985,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Raspberry Beret",
     "artist": "Prince",
-    "year": 1985
+    "year": 1985,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Livin' on a Prayer",
     "artist": "Bon Jovi",
-    "year": 1986
+    "year": 1986,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Walk This Way",
     "artist": "Run-D.M.C. & Aerosmith",
-    "year": 1986
+    "year": 1986,
+    "genre": "hip-hop",
+    "region": "global"
   },
   {
     "title": "Sledgehammer",
     "artist": "Peter Gabriel",
-    "year": 1986
+    "year": 1986,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Walk Like an Egyptian",
     "artist": "The Bangles",
-    "year": 1986
+    "year": 1986,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Livin on a Prayer",
     "artist": "Bon Jovi",
-    "year": 1986
+    "year": 1986,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "With or Without You",
     "artist": "U2",
-    "year": 1987
+    "year": 1987,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "I Wanna Dance with Somebody",
     "artist": "Whitney Houston",
-    "year": 1987
+    "year": 1987,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Just Like Heaven",
     "artist": "The Cure",
-    "year": 1987
+    "year": 1987,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Faith",
     "artist": "George Michael",
-    "year": 1987
+    "year": 1987,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Welcome to the Jungle",
     "artist": "Guns N' Roses",
-    "year": 1987
+    "year": 1987,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "La Bamba",
     "artist": "Los Lobos",
-    "year": 1987
+    "year": 1987,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Need You Tonight",
     "artist": "INXS",
-    "year": 1987
+    "year": 1987,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Never Gonna Give You Up",
     "artist": "Rick Astley",
-    "year": 1987
+    "year": 1987,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Pour Some Sugar on Me",
     "artist": "Def Leppard",
-    "year": 1987
+    "year": 1987,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Sweet Child O' Mine",
     "artist": "Guns N' Roses",
-    "year": 1988
+    "year": 1988,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Dont Worry Be Happy",
     "artist": "Bobby McFerrin",
-    "year": 1988
+    "year": 1988,
+    "genre": "jazz",
+    "region": "global"
   },
   {
     "title": "Every Rose Has Its Thorn",
     "artist": "Poison",
-    "year": 1988
+    "year": 1988,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Paradise City",
     "artist": "Guns N Roses",
-    "year": 1988
+    "year": 1988,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Sweet Child O Mine",
     "artist": "Guns N Roses",
-    "year": 1988
+    "year": 1988,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Straight Up",
     "artist": "Paula Abdul",
-    "year": 1989
+    "year": 1989,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Love Shack",
     "artist": "The B-52s",
-    "year": 1989
+    "year": 1989,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Like a Prayer",
     "artist": "Madonna",
-    "year": 1989
+    "year": 1989,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Nothing Compares 2 U",
     "artist": "Sinead O'Connor",
-    "year": 1990
+    "year": 1990,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Vogue",
     "artist": "Madonna",
-    "year": 1990
+    "year": 1990,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Ice Ice Baby",
     "artist": "Vanilla Ice",
-    "year": 1990
+    "year": 1990,
+    "genre": "hip-hop",
+    "region": "global"
   },
   {
     "title": "U Cant Touch This",
     "artist": "MC Hammer",
-    "year": 1990
+    "year": 1990,
+    "genre": "hip-hop",
+    "region": "global"
   },
   {
     "title": "Gonna Make You Sweat",
     "artist": "C+C Music Factory",
-    "year": 1990
+    "year": 1990,
+    "genre": "electronic",
+    "region": "global"
   },
   {
     "title": "Nothing Compares 2 U",
     "artist": "Sinead O Connor",
-    "year": 1990
+    "year": 1990,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Enjoy the Silence",
     "artist": "Depeche Mode",
-    "year": 1990
+    "year": 1990,
+    "genre": "electronic",
+    "region": "global"
   },
   {
     "title": "Smells Like Teen Spirit",
     "artist": "Nirvana",
-    "year": 1991
+    "year": 1991,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Unbelievable",
     "artist": "EMF",
-    "year": 1991
+    "year": 1991,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Losing My Religion",
     "artist": "R.E.M.",
-    "year": 1991
+    "year": 1991,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Black or White",
     "artist": "Michael Jackson",
-    "year": 1991
+    "year": 1991,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Enter Sandman",
     "artist": "Metallica",
-    "year": 1991
+    "year": 1991,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "November Rain",
     "artist": "Guns N Roses",
-    "year": 1991
+    "year": 1991,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Man in the Box",
     "artist": "Alice in Chains",
-    "year": 1991
+    "year": 1991,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Under the Bridge",
     "artist": "Red Hot Chili Peppers",
-    "year": 1992
+    "year": 1992,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Jump Around",
     "artist": "House of Pain",
-    "year": 1992
+    "year": 1992,
+    "genre": "hip-hop",
+    "region": "global"
   },
   {
     "title": "Nuthin' but a 'G' Thang",
     "artist": "Dr. Dre",
-    "year": 1992
+    "year": 1992,
+    "genre": "hip-hop",
+    "region": "global"
   },
   {
     "title": "I Will Always Love You",
     "artist": "Whitney Houston",
-    "year": 1992
+    "year": 1992,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Baby Got Back",
     "artist": "Sir Mix-a-Lot",
-    "year": 1992
+    "year": 1992,
+    "genre": "hip-hop",
+    "region": "global"
   },
   {
     "title": "End of the Road",
     "artist": "Boyz II Men",
-    "year": 1992
+    "year": 1992,
+    "genre": "r-and-b",
+    "region": "global"
   },
   {
     "title": "Tears in Heaven",
     "artist": "Eric Clapton",
-    "year": 1992
+    "year": 1992,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Informer",
     "artist": "Snow",
-    "year": 1992
+    "year": 1992,
+    "genre": "hip-hop",
+    "region": "global"
   },
   {
     "title": "Creep",
     "artist": "Radiohead",
-    "year": 1993
+    "year": 1993,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Whats Up",
     "artist": "4 Non Blondes",
-    "year": 1993
+    "year": 1993,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Nuthin but a G Thang",
     "artist": "Dr. Dre",
-    "year": 1993
+    "year": 1993,
+    "genre": "hip-hop",
+    "region": "global"
   },
   {
     "title": "Mr. Jones",
     "artist": "Counting Crows",
-    "year": 1993
+    "year": 1993,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Today",
     "artist": "Smashing Pumpkins",
-    "year": 1993
+    "year": 1993,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Black Hole Sun",
     "artist": "Soundgarden",
-    "year": 1994
+    "year": 1994,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Zombie",
     "artist": "The Cranberries",
-    "year": 1994
+    "year": 1994,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Juicy",
     "artist": "The Notorious B.I.G.",
-    "year": 1994
+    "year": 1994,
+    "genre": "hip-hop",
+    "region": "global"
   },
   {
     "title": "C.R.E.A.M.",
     "artist": "Wu-Tang Clan",
-    "year": 1994
+    "year": 1994,
+    "genre": "hip-hop",
+    "region": "global"
   },
   {
     "title": "Bump N Grind",
     "artist": "R. Kelly",
-    "year": 1994
+    "year": 1994,
+    "genre": "r-and-b",
+    "region": "global"
   },
   {
     "title": "All I Wanna Do",
     "artist": "Sheryl Crow",
-    "year": 1994
+    "year": 1994,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "I Swear",
     "artist": "All-4-One",
-    "year": 1994
+    "year": 1994,
+    "genre": "r-and-b",
+    "region": "global"
   },
   {
     "title": "Basket Case",
     "artist": "Green Day",
-    "year": 1994
+    "year": 1994,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Wonderwall",
     "artist": "Oasis",
-    "year": 1995
+    "year": 1995,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Waterfalls",
     "artist": "TLC",
-    "year": 1995
+    "year": 1995,
+    "genre": "r-and-b",
+    "region": "global"
   },
   {
     "title": "Gangsta's Paradise",
     "artist": "Coolio",
-    "year": 1995
+    "year": 1995,
+    "genre": "hip-hop",
+    "region": "global"
   },
   {
     "title": "Gangsta Paradise",
     "artist": "Coolio",
-    "year": 1995
+    "year": 1995,
+    "genre": "hip-hop",
+    "region": "global"
   },
   {
     "title": "Kiss from a Rose",
     "artist": "Seal",
-    "year": 1995
+    "year": 1995,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "California Love",
     "artist": "2Pac",
-    "year": 1995
+    "year": 1995,
+    "genre": "hip-hop",
+    "region": "global"
   },
   {
     "title": "One Sweet Day",
     "artist": "Mariah Carey & Boyz II Men",
-    "year": 1995
+    "year": 1995,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Wannabe",
     "artist": "Spice Girls",
-    "year": 1996
+    "year": 1996,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "No Diggity",
     "artist": "Blackstreet",
-    "year": 1996
+    "year": 1996,
+    "genre": "r-and-b",
+    "region": "global"
   },
   {
     "title": "Killing Me Softly",
     "artist": "Fugees",
-    "year": 1996
+    "year": 1996,
+    "genre": "hip-hop",
+    "region": "global"
   },
   {
     "title": "Return of the Mack",
     "artist": "Mark Morrison",
-    "year": 1996
+    "year": 1996,
+    "genre": "r-and-b",
+    "region": "global"
   },
   {
     "title": "Bitter Sweet Symphony",
     "artist": "The Verve",
-    "year": 1997
+    "year": 1997,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "My Heart Will Go On",
     "artist": "Celine Dion",
-    "year": 1997
+    "year": 1997,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "MMMBop",
     "artist": "Hanson",
-    "year": 1997
+    "year": 1997,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Everybody (Backstreet's Back)",
     "artist": "Backstreet Boys",
-    "year": 1997
+    "year": 1997,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Bittersweet Symphony",
     "artist": "The Verve",
-    "year": 1997
+    "year": 1997,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Tubthumping",
     "artist": "Chumbawamba",
-    "year": 1997
+    "year": 1997,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Semi-Charmed Life",
     "artist": "Third Eye Blind",
-    "year": 1997
+    "year": 1997,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Karma Police",
     "artist": "Radiohead",
-    "year": 1997
+    "year": 1997,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Iris",
     "artist": "Goo Goo Dolls",
-    "year": 1998
+    "year": 1998,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Gettin Jiggy wit It",
     "artist": "Will Smith",
-    "year": 1998
+    "year": 1998,
+    "genre": "hip-hop",
+    "region": "global"
   },
   {
     "title": "Believe",
     "artist": "Cher",
-    "year": 1998
+    "year": 1998,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Ray of Light",
     "artist": "Madonna",
-    "year": 1998
+    "year": 1998,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Intergalactic",
     "artist": "Beastie Boys",
-    "year": 1998
+    "year": 1998,
+    "genre": "hip-hop",
+    "region": "global"
   },
   {
     "title": "Lose Yourself",
     "artist": "Eminem",
-    "year": 1999
+    "year": 1999,
+    "genre": "hip-hop",
+    "region": "global"
   },
   {
     "title": "...Baby One More Time",
     "artist": "Britney Spears",
-    "year": 1999
+    "year": 1999,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "No Scrubs",
     "artist": "TLC",
-    "year": 1999
+    "year": 1999,
+    "genre": "r-and-b",
+    "region": "global"
   },
   {
     "title": "I Want It That Way",
     "artist": "Backstreet Boys",
-    "year": 1999
+    "year": 1999,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Smooth",
     "artist": "Santana ft. Rob Thomas",
-    "year": 1999
+    "year": 1999,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Livin la Vida Loca",
     "artist": "Ricky Martin",
-    "year": 1999
+    "year": 1999,
+    "genre": "latin",
+    "region": "global"
   },
   {
     "title": "Say My Name",
     "artist": "Destinys Child",
-    "year": 1999
+    "year": 1999,
+    "genre": "r-and-b",
+    "region": "global"
   },
   {
     "title": "Genie in a Bottle",
     "artist": "Christina Aguilera",
-    "year": 1999
+    "year": 1999,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Stan",
     "artist": "Eminem ft. Dido",
-    "year": 2000
+    "year": 2000,
+    "genre": "hip-hop",
+    "region": "global"
   },
   {
     "title": "Beautiful Day",
     "artist": "U2",
-    "year": 2000
+    "year": 2000,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Bye Bye Bye",
     "artist": "NSYNC",
-    "year": 2000
+    "year": 2000,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "It Wasnt Me",
     "artist": "Shaggy",
-    "year": 2000
+    "year": 2000,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Stan",
     "artist": "Eminem",
-    "year": 2000
+    "year": 2000,
+    "genre": "hip-hop",
+    "region": "global"
   },
   {
     "title": "Fallin",
     "artist": "Alicia Keys",
-    "year": 2001
+    "year": 2001,
+    "genre": "r-and-b",
+    "region": "global"
   },
   {
     "title": "Hanging by a Moment",
     "artist": "Lifehouse",
-    "year": 2001
+    "year": 2001,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Drops of Jupiter",
     "artist": "Train",
-    "year": 2001
+    "year": 2001,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Dilemma",
     "artist": "Nelly ft. Kelly Rowland",
-    "year": 2002
+    "year": 2002,
+    "genre": "hip-hop",
+    "region": "global"
   },
   {
     "title": "Clocks",
     "artist": "Coldplay",
-    "year": 2002
+    "year": 2002,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Complicated",
     "artist": "Avril Lavigne",
-    "year": 2002
+    "year": 2002,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Hot in Herre",
     "artist": "Nelly",
-    "year": 2002
+    "year": 2002,
+    "genre": "hip-hop",
+    "region": "global"
   },
   {
     "title": "Crazy in Love",
     "artist": "Beyonce ft. Jay-Z",
-    "year": 2003
+    "year": 2003,
+    "genre": "r-and-b",
+    "region": "global"
   },
   {
     "title": "Hey Ya!",
     "artist": "OutKast",
-    "year": 2003
+    "year": 2003,
+    "genre": "hip-hop",
+    "region": "global"
   },
   {
     "title": "In Da Club",
     "artist": "50 Cent",
-    "year": 2003
+    "year": 2003,
+    "genre": "hip-hop",
+    "region": "global"
   },
   {
     "title": "Seven Nation Army",
     "artist": "The White Stripes",
-    "year": 2003
+    "year": 2003,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Ignition (Remix)",
     "artist": "R. Kelly",
-    "year": 2003
+    "year": 2003,
+    "genre": "r-and-b",
+    "region": "global"
   },
   {
     "title": "Get Busy",
     "artist": "Sean Paul",
-    "year": 2003
+    "year": 2003,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Crazy in Love",
     "artist": "Beyonce",
-    "year": 2003
+    "year": 2003,
+    "genre": "r-and-b",
+    "region": "global"
   },
   {
     "title": "Where Is the Love",
     "artist": "Black Eyed Peas",
-    "year": 2003
+    "year": 2003,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Toxic",
     "artist": "Britney Spears",
-    "year": 2004
+    "year": 2004,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Mr. Brightside",
     "artist": "The Killers",
-    "year": 2004
+    "year": 2004,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Yeah!",
     "artist": "Usher ft. Lil Jon & Ludacris",
-    "year": 2004
+    "year": 2004,
+    "genre": "r-and-b",
+    "region": "global"
   },
   {
     "title": "Since U Been Gone",
     "artist": "Kelly Clarkson",
-    "year": 2004
+    "year": 2004,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "This Love",
     "artist": "Maroon 5",
-    "year": 2004
+    "year": 2004,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Boulevard of Broken Dreams",
     "artist": "Green Day",
-    "year": 2004
+    "year": 2004,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Yeah!",
     "artist": "Usher",
-    "year": 2004
+    "year": 2004,
+    "genre": "r-and-b",
+    "region": "global"
   },
   {
     "title": "Gold Digger",
     "artist": "Kanye West ft. Jamie Foxx",
-    "year": 2005
+    "year": 2005,
+    "genre": "hip-hop",
+    "region": "global"
   },
   {
     "title": "Don't Cha",
     "artist": "The Pussycat Dolls",
-    "year": 2005
+    "year": 2005,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Gold Digger",
     "artist": "Kanye West",
-    "year": 2005
+    "year": 2005,
+    "genre": "hip-hop",
+    "region": "global"
   },
   {
     "title": "Feel Good Inc",
     "artist": "Gorillaz",
-    "year": 2005
+    "year": 2005,
+    "genre": "electronic",
+    "region": "global"
   },
   {
     "title": "Hollaback Girl",
     "artist": "Gwen Stefani",
-    "year": 2005
+    "year": 2005,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Hips Don't Lie",
     "artist": "Shakira ft. Wyclef Jean",
-    "year": 2006
+    "year": 2006,
+    "genre": "latin",
+    "region": "global"
   },
   {
     "title": "Rehab",
     "artist": "Amy Winehouse",
-    "year": 2006
+    "year": 2006,
+    "genre": "r-and-b",
+    "region": "global"
   },
   {
     "title": "Crazy",
     "artist": "Gnarls Barkley",
-    "year": 2006
+    "year": 2006,
+    "genre": "r-and-b",
+    "region": "global"
   },
   {
     "title": "Hips Dont Lie",
     "artist": "Shakira",
-    "year": 2006
+    "year": 2006,
+    "genre": "latin",
+    "region": "global"
   },
   {
     "title": "SexyBack",
     "artist": "Justin Timberlake",
-    "year": 2006
+    "year": 2006,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "SOS",
     "artist": "Rihanna",
-    "year": 2006
+    "year": 2006,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Irreplaceable",
     "artist": "Beyonce",
-    "year": 2006
+    "year": 2006,
+    "genre": "r-and-b",
+    "region": "global"
   },
   {
     "title": "Umbrella",
     "artist": "Rihanna ft. Jay-Z",
-    "year": 2007
+    "year": 2007,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Umbrella",
     "artist": "Rihanna",
-    "year": 2007
+    "year": 2007,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Stronger",
     "artist": "Kanye West",
-    "year": 2007
+    "year": 2007,
+    "genre": "hip-hop",
+    "region": "global"
   },
   {
     "title": "Apologize",
     "artist": "Timbaland ft. OneRepublic",
-    "year": 2007
+    "year": 2007,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Hey There Delilah",
     "artist": "Plain White T s",
-    "year": 2007
+    "year": 2007,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "No One",
     "artist": "Alicia Keys",
-    "year": 2007
+    "year": 2007,
+    "genre": "r-and-b",
+    "region": "global"
   },
   {
     "title": "Poker Face",
     "artist": "Lady Gaga",
-    "year": 2008
+    "year": 2008,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Single Ladies (Put a Ring on It)",
     "artist": "Beyonce",
-    "year": 2008
+    "year": 2008,
+    "genre": "r-and-b",
+    "region": "global"
   },
   {
     "title": "Use Somebody",
     "artist": "Kings of Leon",
-    "year": 2008
+    "year": 2008,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Paper Planes",
     "artist": "M.I.A.",
-    "year": 2008
+    "year": 2008,
+    "genre": "hip-hop",
+    "region": "global"
   },
   {
     "title": "Viva la Vida",
     "artist": "Coldplay",
-    "year": 2008
+    "year": 2008,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "I Kissed a Girl",
     "artist": "Katy Perry",
-    "year": 2008
+    "year": 2008,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Love Story",
     "artist": "Taylor Swift",
-    "year": 2008
+    "year": 2008,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Single Ladies",
     "artist": "Beyonce",
-    "year": 2008
+    "year": 2008,
+    "genre": "r-and-b",
+    "region": "global"
   },
   {
     "title": "Just Dance",
     "artist": "Lady Gaga",
-    "year": 2008
+    "year": 2008,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "I Gotta Feeling",
     "artist": "The Black Eyed Peas",
-    "year": 2009
+    "year": 2009,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Boom Boom Pow",
     "artist": "Black Eyed Peas",
-    "year": 2009
+    "year": 2009,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Tik Tok",
     "artist": "Kesha",
-    "year": 2009
+    "year": 2009,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Bad Romance",
     "artist": "Lady Gaga",
-    "year": 2009
+    "year": 2009,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Empire State of Mind",
     "artist": "Jay-Z ft. Alicia Keys",
-    "year": 2009
+    "year": 2009,
+    "genre": "hip-hop",
+    "region": "global"
   },
   {
     "title": "Fireflies",
     "artist": "Owl City",
-    "year": 2009
+    "year": 2009,
+    "genre": "electronic",
+    "region": "global"
   },
   {
     "title": "Rolling in the Deep",
     "artist": "Adele",
-    "year": 2011
+    "year": 2011,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Someone Like You",
     "artist": "Adele",
-    "year": 2011
+    "year": 2011,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Somebody That I Used to Know",
     "artist": "Gotye ft. Kimbra",
-    "year": 2011
+    "year": 2011,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Somebody That I Used to Know",
     "artist": "Gotye",
-    "year": 2011
+    "year": 2011,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Party Rock Anthem",
     "artist": "LMFAO",
-    "year": 2011
+    "year": 2011,
+    "genre": "electronic",
+    "region": "global"
   },
   {
     "title": "Pumped Up Kicks",
     "artist": "Foster the People",
-    "year": 2011
+    "year": 2011,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "We Found Love",
     "artist": "Rihanna",
-    "year": 2011
+    "year": 2011,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Super Bass",
     "artist": "Nicki Minaj",
-    "year": 2011
+    "year": 2011,
+    "genre": "hip-hop",
+    "region": "global"
   },
   {
     "title": "Call Me Maybe",
     "artist": "Carly Rae Jepsen",
-    "year": 2012
+    "year": 2012,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Gangnam Style",
     "artist": "PSY",
-    "year": 2012
+    "year": 2012,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Thrift Shop",
     "artist": "Macklemore",
-    "year": 2012
+    "year": 2012,
+    "genre": "hip-hop",
+    "region": "global"
   },
   {
     "title": "Starships",
     "artist": "Nicki Minaj",
-    "year": 2012
+    "year": 2012,
+    "genre": "hip-hop",
+    "region": "global"
   },
   {
     "title": "We Are Young",
     "artist": "fun.",
-    "year": 2012
+    "year": 2012,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Locked Out of Heaven",
     "artist": "Bruno Mars",
-    "year": 2012
+    "year": 2012,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Happy",
     "artist": "Pharrell Williams",
-    "year": 2013
+    "year": 2013,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Get Lucky",
     "artist": "Daft Punk ft. Pharrell Williams",
-    "year": 2013
+    "year": 2013,
+    "genre": "electronic",
+    "region": "global"
   },
   {
     "title": "Royals",
     "artist": "Lorde",
-    "year": 2013
+    "year": 2013,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Get Lucky",
     "artist": "Daft Punk",
-    "year": 2013
+    "year": 2013,
+    "genre": "electronic",
+    "region": "global"
   },
   {
     "title": "Blurred Lines",
     "artist": "Robin Thicke",
-    "year": 2013
+    "year": 2013,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Wrecking Ball",
     "artist": "Miley Cyrus",
-    "year": 2013
+    "year": 2013,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Counting Stars",
     "artist": "OneRepublic",
-    "year": 2013
+    "year": 2013,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Timber",
     "artist": "Pitbull ft. Kesha",
-    "year": 2013
+    "year": 2013,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Uptown Funk",
     "artist": "Mark Ronson ft. Bruno Mars",
-    "year": 2014
+    "year": 2014,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Shake It Off",
     "artist": "Taylor Swift",
-    "year": 2014
+    "year": 2014,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Thinking Out Loud",
     "artist": "Ed Sheeran",
-    "year": 2014
+    "year": 2014,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Chandelier",
     "artist": "Sia",
-    "year": 2014
+    "year": 2014,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "All About That Bass",
     "artist": "Meghan Trainor",
-    "year": 2014
+    "year": 2014,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Stay with Me",
     "artist": "Sam Smith",
-    "year": 2014
+    "year": 2014,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Fancy",
     "artist": "Iggy Azalea",
-    "year": 2014
+    "year": 2014,
+    "genre": "hip-hop",
+    "region": "global"
   },
   {
     "title": "Blank Space",
     "artist": "Taylor Swift",
-    "year": 2014
+    "year": 2014,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Hotline Bling",
     "artist": "Drake",
-    "year": 2015
+    "year": 2015,
+    "genre": "hip-hop",
+    "region": "global"
   },
   {
     "title": "Can't Feel My Face",
     "artist": "The Weeknd",
-    "year": 2015
+    "year": 2015,
+    "genre": "r-and-b",
+    "region": "global"
   },
   {
     "title": "Alright",
     "artist": "Kendrick Lamar",
-    "year": 2015
+    "year": 2015,
+    "genre": "hip-hop",
+    "region": "global"
   },
   {
     "title": "Sorry",
     "artist": "Justin Bieber",
-    "year": 2015
+    "year": 2015,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Hello",
     "artist": "Adele",
-    "year": 2015
+    "year": 2015,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Cant Feel My Face",
     "artist": "The Weeknd",
-    "year": 2015
+    "year": 2015,
+    "genre": "r-and-b",
+    "region": "global"
   },
   {
     "title": "Stressed Out",
     "artist": "Twenty One Pilots",
-    "year": 2015
+    "year": 2015,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Stitches",
     "artist": "Shawn Mendes",
-    "year": 2015
+    "year": 2015,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Lean On",
     "artist": "Major Lazer & DJ Snake",
-    "year": 2015
+    "year": 2015,
+    "genre": "electronic",
+    "region": "global"
   },
   {
     "title": "Formation",
     "artist": "Beyonce",
-    "year": 2016
+    "year": 2016,
+    "genre": "r-and-b",
+    "region": "global"
   },
   {
     "title": "Redbone",
     "artist": "Childish Gambino",
-    "year": 2016
+    "year": 2016,
+    "genre": "hip-hop",
+    "region": "global"
   },
   {
     "title": "Closer",
     "artist": "The Chainsmokers ft. Halsey",
-    "year": 2016
+    "year": 2016,
+    "genre": "electronic",
+    "region": "global"
   },
   {
     "title": "Closer",
     "artist": "The Chainsmokers",
-    "year": 2016
+    "year": 2016,
+    "genre": "electronic",
+    "region": "global"
   },
   {
     "title": "Cheap Thrills",
     "artist": "Sia",
-    "year": 2016
+    "year": 2016,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Work",
     "artist": "Rihanna",
-    "year": 2016
+    "year": 2016,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "One Dance",
     "artist": "Drake",
-    "year": 2016
+    "year": 2016,
+    "genre": "hip-hop",
+    "region": "global"
   },
   {
     "title": "Starboy",
     "artist": "The Weeknd",
-    "year": 2016
+    "year": 2016,
+    "genre": "r-and-b",
+    "region": "global"
   },
   {
     "title": "Despacito",
     "artist": "Luis Fonsi ft. Daddy Yankee",
-    "year": 2017
+    "year": 2017,
+    "genre": "latin",
+    "region": "global"
   },
   {
     "title": "Shape of You",
     "artist": "Ed Sheeran",
-    "year": 2017
+    "year": 2017,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Humble",
     "artist": "Kendrick Lamar",
-    "year": 2017
+    "year": 2017,
+    "genre": "hip-hop",
+    "region": "global"
   },
   {
     "title": "Havana",
     "artist": "Camila Cabello ft. Young Thug",
-    "year": 2017
+    "year": 2017,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Havana",
     "artist": "Camila Cabello",
-    "year": 2017
+    "year": 2017,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Rockstar",
     "artist": "Post Malone",
-    "year": 2017
+    "year": 2017,
+    "genre": "hip-hop",
+    "region": "global"
   },
   {
     "title": "New Rules",
     "artist": "Dua Lipa",
-    "year": 2017
+    "year": 2017,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Thank U, Next",
     "artist": "Ariana Grande",
-    "year": 2018
+    "year": 2018,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Sicko Mode",
     "artist": "Travis Scott",
-    "year": 2018
+    "year": 2018,
+    "genre": "hip-hop",
+    "region": "global"
   },
   {
     "title": "Sunflower",
     "artist": "Post Malone & Swae Lee",
-    "year": 2018
+    "year": 2018,
+    "genre": "hip-hop",
+    "region": "global"
   },
   {
     "title": "Gods Plan",
     "artist": "Drake",
-    "year": 2018
+    "year": 2018,
+    "genre": "hip-hop",
+    "region": "global"
   },
   {
     "title": "Thank U Next",
     "artist": "Ariana Grande",
-    "year": 2018
+    "year": 2018,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Shallow",
     "artist": "Lady Gaga & Bradley Cooper",
-    "year": 2018
+    "year": 2018,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Psycho",
     "artist": "Post Malone",
-    "year": 2018
+    "year": 2018,
+    "genre": "hip-hop",
+    "region": "global"
   },
   {
     "title": "Lucid Dreams",
     "artist": "Juice WRLD",
-    "year": 2018
+    "year": 2018,
+    "genre": "hip-hop",
+    "region": "global"
   },
   {
     "title": "Old Town Road",
     "artist": "Lil Nas X",
-    "year": 2019
+    "year": 2019,
+    "genre": "hip-hop",
+    "region": "global"
   },
   {
     "title": "Bad Guy",
     "artist": "Billie Eilish",
-    "year": 2019
+    "year": 2019,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "7 Rings",
     "artist": "Ariana Grande",
-    "year": 2019
+    "year": 2019,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Cruel Summer",
     "artist": "Taylor Swift",
-    "year": 2019
+    "year": 2019,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Senorita",
     "artist": "Shawn Mendes & Camila Cabello",
-    "year": 2019
+    "year": 2019,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Truth Hurts",
     "artist": "Lizzo",
-    "year": 2019
+    "year": 2019,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Sucker",
     "artist": "Jonas Brothers",
-    "year": 2019
+    "year": 2019,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Circles",
     "artist": "Post Malone",
-    "year": 2019
+    "year": 2019,
+    "genre": "hip-hop",
+    "region": "global"
   },
   {
     "title": "Dancing with a Stranger",
     "artist": "Sam Smith & Normani",
-    "year": 2019
+    "year": 2019,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Blinding Lights",
     "artist": "The Weeknd",
-    "year": 2020
+    "year": 2020,
+    "genre": "r-and-b",
+    "region": "global"
   },
   {
     "title": "Levitating",
     "artist": "Dua Lipa",
-    "year": 2020
+    "year": 2020,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Watermelon Sugar",
     "artist": "Harry Styles",
-    "year": 2020
+    "year": 2020,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Save Your Tears",
     "artist": "The Weeknd",
-    "year": 2020
+    "year": 2020,
+    "genre": "r-and-b",
+    "region": "global"
   },
   {
     "title": "Heat Waves",
     "artist": "Glass Animals",
-    "year": 2020
+    "year": 2020,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Dynamite",
     "artist": "BTS",
-    "year": 2020
+    "year": 2020,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Savage Love",
     "artist": "Jawsh 685 & Jason Derulo",
-    "year": 2020
+    "year": 2020,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Rockstar",
     "artist": "DaBaby ft. Roddy Ricch",
-    "year": 2020
+    "year": 2020,
+    "genre": "hip-hop",
+    "region": "global"
   },
   {
     "title": "Dont Start Now",
     "artist": "Dua Lipa",
-    "year": 2020
+    "year": 2020,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Rain on Me",
     "artist": "Lady Gaga & Ariana Grande",
-    "year": 2020
+    "year": 2020,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "drivers license",
     "artist": "Olivia Rodrigo",
-    "year": 2021
+    "year": 2021,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "good 4 u",
     "artist": "Olivia Rodrigo",
-    "year": 2021
+    "year": 2021,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Stay",
     "artist": "The Kid LAROI & Justin Bieber",
-    "year": 2021
+    "year": 2021,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Montero (Call Me by Your Name)",
     "artist": "Lil Nas X",
-    "year": 2021
+    "year": 2021,
+    "genre": "hip-hop",
+    "region": "global"
   },
   {
     "title": "Peaches",
     "artist": "Justin Bieber ft. Daniel Caesar & Giveon",
-    "year": 2021
+    "year": 2021,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Butter",
     "artist": "BTS",
-    "year": 2021
+    "year": 2021,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Easy on Me",
     "artist": "Adele",
-    "year": 2021
+    "year": 2021,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Montero",
     "artist": "Lil Nas X",
-    "year": 2021
+    "year": 2021,
+    "genre": "hip-hop",
+    "region": "global"
   },
   {
     "title": "Peaches",
     "artist": "Justin Bieber",
-    "year": 2021
+    "year": 2021,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Industry Baby",
     "artist": "Lil Nas X & Jack Harlow",
-    "year": 2021
+    "year": 2021,
+    "genre": "hip-hop",
+    "region": "global"
   },
   {
     "title": "As It Was",
     "artist": "Harry Styles",
-    "year": 2022
+    "year": 2022,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Anti-Hero",
     "artist": "Taylor Swift",
-    "year": 2022
+    "year": 2022,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "About Damn Time",
     "artist": "Lizzo",
-    "year": 2022
+    "year": 2022,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Snap Out of It",
     "artist": "Arctic Monkeys",
-    "year": 2022
+    "year": 2022,
+    "genre": "rock",
+    "region": "global"
   },
   {
     "title": "Unholy",
     "artist": "Sam Smith & Kim Petras",
-    "year": 2022
+    "year": 2022,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "First Class",
     "artist": "Jack Harlow",
-    "year": 2022
+    "year": 2022,
+    "genre": "hip-hop",
+    "region": "global"
   },
   {
     "title": "Super Freaky Girl",
     "artist": "Nicki Minaj",
-    "year": 2022
+    "year": 2022,
+    "genre": "hip-hop",
+    "region": "global"
   },
   {
     "title": "Calm Down",
     "artist": "Rema & Selena Gomez",
-    "year": 2022
+    "year": 2022,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Stick Season",
     "artist": "Noah Kahan",
-    "year": 2022
+    "year": 2022,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Flowers",
     "artist": "Miley Cyrus",
-    "year": 2023
+    "year": 2023,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Kill Bill",
     "artist": "SZA",
-    "year": 2023
+    "year": 2023,
+    "genre": "r-and-b",
+    "region": "global"
   },
   {
     "title": "Vampire",
     "artist": "Olivia Rodrigo",
-    "year": 2023
+    "year": 2023,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Last Night",
     "artist": "Morgan Wallen",
-    "year": 2023
+    "year": 2023,
+    "genre": "country",
+    "region": "global"
   },
   {
     "title": "Lovin on Me",
     "artist": "Jack Harlow",
-    "year": 2023
+    "year": 2023,
+    "genre": "hip-hop",
+    "region": "global"
   },
   {
     "title": "Paint the Town Red",
     "artist": "Doja Cat",
-    "year": 2023
+    "year": 2023,
+    "genre": "hip-hop",
+    "region": "global"
   },
   {
     "title": "Greedy",
     "artist": "Tate McRae",
-    "year": 2023
+    "year": 2023,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Snooze",
     "artist": "SZA",
-    "year": 2023
+    "year": 2023,
+    "genre": "r-and-b",
+    "region": "global"
   },
   {
     "title": "What Was I Made For",
     "artist": "Billie Eilish",
-    "year": 2023
+    "year": 2023,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Water",
     "artist": "Tyla",
-    "year": 2023
+    "year": 2023,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Espresso",
     "artist": "Sabrina Carpenter",
-    "year": 2024
+    "year": 2024,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Fortnight",
     "artist": "Taylor Swift ft. Post Malone",
-    "year": 2024
+    "year": 2024,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Beautiful Things",
     "artist": "Benson Boone",
-    "year": 2024
+    "year": 2024,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Not Like Us",
     "artist": "Kendrick Lamar",
-    "year": 2024
+    "year": 2024,
+    "genre": "hip-hop",
+    "region": "global"
   },
   {
     "title": "Birds of a Feather",
     "artist": "Billie Eilish",
-    "year": 2024
+    "year": 2024,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "APT.",
     "artist": "Rose & Bruno Mars",
-    "year": 2024
+    "year": 2024,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "A Bar Song (Tipsy)",
     "artist": "Shaboozey",
-    "year": 2024
+    "year": 2024,
+    "genre": "country",
+    "region": "global"
   },
   {
     "title": "Taste",
     "artist": "Sabrina Carpenter",
-    "year": 2024
+    "year": 2024,
+    "genre": "pop",
+    "region": "global"
   },
   {
     "title": "Lunch",
     "artist": "Billie Eilish",
-    "year": 2024
+    "year": 2024,
+    "genre": "pop",
+    "region": "global"
+  },
+  {
+    "title": "Wonderwall",
+    "artist": "Oasis",
+    "year": 1995,
+    "genre": "rock",
+    "region": "uk"
+  },
+  {
+    "title": "Don't Look Back in Anger",
+    "artist": "Oasis",
+    "year": 1996,
+    "genre": "rock",
+    "region": "uk"
+  },
+  {
+    "title": "This Charming Man",
+    "artist": "The Smiths",
+    "year": 1983,
+    "genre": "rock",
+    "region": "uk"
+  },
+  {
+    "title": "How Soon Is Now?",
+    "artist": "The Smiths",
+    "year": 1985,
+    "genre": "rock",
+    "region": "uk"
+  },
+  {
+    "title": "Girls & Boys",
+    "artist": "Blur",
+    "year": 1994,
+    "genre": "rock",
+    "region": "uk"
+  },
+  {
+    "title": "Song 2",
+    "artist": "Blur",
+    "year": 1997,
+    "genre": "rock",
+    "region": "uk"
+  },
+  {
+    "title": "Wannabe",
+    "artist": "Spice Girls",
+    "year": 1996,
+    "genre": "pop",
+    "region": "uk"
+  },
+  {
+    "title": "Rolling in the Deep",
+    "artist": "Adele",
+    "year": 2011,
+    "genre": "pop",
+    "region": "uk"
+  },
+  {
+    "title": "Someone Like You",
+    "artist": "Adele",
+    "year": 2011,
+    "genre": "pop",
+    "region": "uk"
+  },
+  {
+    "title": "Shape of You",
+    "artist": "Ed Sheeran",
+    "year": 2017,
+    "genre": "pop",
+    "region": "uk"
+  },
+  {
+    "title": "Thinking Out Loud",
+    "artist": "Ed Sheeran",
+    "year": 2014,
+    "genre": "pop",
+    "region": "uk"
+  },
+  {
+    "title": "I Bet You Look Good on the Dancefloor",
+    "artist": "Arctic Monkeys",
+    "year": 2005,
+    "genre": "rock",
+    "region": "uk"
+  },
+  {
+    "title": "Do I Wanna Know?",
+    "artist": "Arctic Monkeys",
+    "year": 2013,
+    "genre": "rock",
+    "region": "uk"
+  },
+  {
+    "title": "Back to Black",
+    "artist": "Amy Winehouse",
+    "year": 2006,
+    "genre": "r-and-b",
+    "region": "uk"
+  },
+  {
+    "title": "Valerie",
+    "artist": "Amy Winehouse",
+    "year": 2007,
+    "genre": "r-and-b",
+    "region": "uk"
+  },
+  {
+    "title": "Common People",
+    "artist": "Pulp",
+    "year": 1995,
+    "genre": "rock",
+    "region": "uk"
+  },
+  {
+    "title": "Bitter Sweet Symphony",
+    "artist": "The Verve",
+    "year": 1997,
+    "genre": "rock",
+    "region": "uk"
+  },
+  {
+    "title": "Creep",
+    "artist": "Radiohead",
+    "year": 1993,
+    "genre": "rock",
+    "region": "uk"
+  },
+  {
+    "title": "Karma Police",
+    "artist": "Radiohead",
+    "year": 1997,
+    "genre": "rock",
+    "region": "uk"
+  },
+  {
+    "title": "Yellow",
+    "artist": "Coldplay",
+    "year": 2000,
+    "genre": "rock",
+    "region": "uk"
+  },
+  {
+    "title": "Fix You",
+    "artist": "Coldplay",
+    "year": 2005,
+    "genre": "rock",
+    "region": "uk"
+  },
+  {
+    "title": "Chasing Cars",
+    "artist": "Snow Patrol",
+    "year": 2006,
+    "genre": "rock",
+    "region": "uk"
+  },
+  {
+    "title": "Mr. Brightside",
+    "artist": "The Killers",
+    "year": 2004,
+    "genre": "rock",
+    "region": "uk"
+  },
+  {
+    "title": "Sit Down",
+    "artist": "James",
+    "year": 1991,
+    "genre": "rock",
+    "region": "uk"
+  },
+  {
+    "title": "There Is a Light That Never Goes Out",
+    "artist": "The Smiths",
+    "year": 1986,
+    "genre": "rock",
+    "region": "uk"
+  },
+  {
+    "title": "Don't Stop Me Now",
+    "artist": "Queen",
+    "year": 1979,
+    "genre": "rock",
+    "region": "uk"
+  },
+  {
+    "title": "Waterloo Sunset",
+    "artist": "The Kinks",
+    "year": 1967,
+    "genre": "rock",
+    "region": "uk"
+  },
+  {
+    "title": "Town Called Malice",
+    "artist": "The Jam",
+    "year": 1982,
+    "genre": "rock",
+    "region": "uk"
+  },
+  {
+    "title": "Love Will Tear Us Apart",
+    "artist": "Joy Division",
+    "year": 1980,
+    "genre": "rock",
+    "region": "uk"
+  },
+  {
+    "title": "Blue Monday",
+    "artist": "New Order",
+    "year": 1983,
+    "genre": "electronic",
+    "region": "uk"
+  },
+  {
+    "title": "West End Girls",
+    "artist": "Pet Shop Boys",
+    "year": 1985,
+    "genre": "electronic",
+    "region": "uk"
+  },
+  {
+    "title": "New Rules",
+    "artist": "Dua Lipa",
+    "year": 2017,
+    "genre": "pop",
+    "region": "uk"
+  },
+  {
+    "title": "Levitating",
+    "artist": "Dua Lipa",
+    "year": 2020,
+    "genre": "pop",
+    "region": "uk"
+  },
+  {
+    "title": "Set Fire to the Rain",
+    "artist": "Adele",
+    "year": 2011,
+    "genre": "pop",
+    "region": "uk"
+  },
+  {
+    "title": "Crazy Little Thing Called Love",
+    "artist": "Queen",
+    "year": 1980,
+    "genre": "rock",
+    "region": "uk"
+  },
+  {
+    "title": "Despacito",
+    "artist": "Luis Fonsi ft. Daddy Yankee",
+    "year": 2017,
+    "genre": "latin",
+    "region": "latin"
+  },
+  {
+    "title": "Gasolina",
+    "artist": "Daddy Yankee",
+    "year": 2004,
+    "genre": "latin",
+    "region": "latin"
+  },
+  {
+    "title": "Danza Kuduro",
+    "artist": "Don Omar ft. Lucenzo",
+    "year": 2010,
+    "genre": "latin",
+    "region": "latin"
+  },
+  {
+    "title": "Hips Don't Lie",
+    "artist": "Shakira",
+    "year": 2006,
+    "genre": "latin",
+    "region": "latin"
+  },
+  {
+    "title": "Waka Waka",
+    "artist": "Shakira",
+    "year": 2010,
+    "genre": "latin",
+    "region": "latin"
+  },
+  {
+    "title": "Whenever, Wherever",
+    "artist": "Shakira",
+    "year": 2001,
+    "genre": "latin",
+    "region": "latin"
+  },
+  {
+    "title": "Mi Gente",
+    "artist": "J Balvin & Willy William",
+    "year": 2017,
+    "genre": "latin",
+    "region": "latin"
+  },
+  {
+    "title": "Taki Taki",
+    "artist": "DJ Snake ft. Selena Gomez, Ozuna & Cardi B",
+    "year": 2018,
+    "genre": "latin",
+    "region": "latin"
+  },
+  {
+    "title": "Bailando",
+    "artist": "Enrique Iglesias",
+    "year": 2014,
+    "genre": "latin",
+    "region": "latin"
+  },
+  {
+    "title": "Vivir Mi Vida",
+    "artist": "Marc Anthony",
+    "year": 2013,
+    "genre": "latin",
+    "region": "latin"
+  },
+  {
+    "title": "La Bicicleta",
+    "artist": "Carlos Vives & Shakira",
+    "year": 2016,
+    "genre": "latin",
+    "region": "latin"
+  },
+  {
+    "title": "Suavemente",
+    "artist": "Elvis Crespo",
+    "year": 1998,
+    "genre": "latin",
+    "region": "latin"
+  },
+  {
+    "title": "Celia Cruz Medley",
+    "artist": "Celia Cruz",
+    "year": 1974,
+    "genre": "latin",
+    "region": "latin"
+  },
+  {
+    "title": "La Vida Es Un Carnaval",
+    "artist": "Celia Cruz",
+    "year": 1998,
+    "genre": "latin",
+    "region": "latin"
+  },
+  {
+    "title": "Livin' la Vida Loca",
+    "artist": "Ricky Martin",
+    "year": 1999,
+    "genre": "latin",
+    "region": "latin"
+  },
+  {
+    "title": "She Bangs",
+    "artist": "Ricky Martin",
+    "year": 2000,
+    "genre": "latin",
+    "region": "latin"
+  },
+  {
+    "title": "Calma",
+    "artist": "Pedro Capo & Farruko",
+    "year": 2018,
+    "genre": "latin",
+    "region": "latin"
+  },
+  {
+    "title": "Yo Perreo Sola",
+    "artist": "Bad Bunny",
+    "year": 2020,
+    "genre": "latin",
+    "region": "latin"
+  },
+  {
+    "title": "Dakiti",
+    "artist": "Bad Bunny & Jhay Cortez",
+    "year": 2020,
+    "genre": "latin",
+    "region": "latin"
+  },
+  {
+    "title": "Titi Me Pregunto",
+    "artist": "Bad Bunny",
+    "year": 2022,
+    "genre": "latin",
+    "region": "latin"
+  },
+  {
+    "title": "Ojitos Lindos",
+    "artist": "Bad Bunny & Bomba Estereo",
+    "year": 2022,
+    "genre": "latin",
+    "region": "latin"
+  },
+  {
+    "title": "Me Porto Bonito",
+    "artist": "Bad Bunny & Chencho Corleone",
+    "year": 2022,
+    "genre": "latin",
+    "region": "latin"
+  },
+  {
+    "title": "Felices los 4",
+    "artist": "Maluma",
+    "year": 2017,
+    "genre": "latin",
+    "region": "latin"
+  },
+  {
+    "title": "X (Equis)",
+    "artist": "Nicky Jam & J Balvin",
+    "year": 2018,
+    "genre": "latin",
+    "region": "latin"
+  },
+  {
+    "title": "Te Bote",
+    "artist": "Nio Garcia, Casper Magico & Bad Bunny",
+    "year": 2018,
+    "genre": "latin",
+    "region": "latin"
+  },
+  {
+    "title": "Con Calma",
+    "artist": "Daddy Yankee & Snow",
+    "year": 2019,
+    "genre": "latin",
+    "region": "latin"
+  },
+  {
+    "title": "Tusa",
+    "artist": "Karol G & Nicki Minaj",
+    "year": 2019,
+    "genre": "latin",
+    "region": "latin"
+  },
+  {
+    "title": "Bichota",
+    "artist": "Karol G",
+    "year": 2020,
+    "genre": "latin",
+    "region": "latin"
+  },
+  {
+    "title": "Pepas",
+    "artist": "Farruko",
+    "year": 2021,
+    "genre": "latin",
+    "region": "latin"
+  },
+  {
+    "title": "Provenza",
+    "artist": "Karol G",
+    "year": 2022,
+    "genre": "latin",
+    "region": "latin"
+  },
+  {
+    "title": "Obsesion",
+    "artist": "Aventura",
+    "year": 2002,
+    "genre": "latin",
+    "region": "latin"
+  },
+  {
+    "title": "La Tortura",
+    "artist": "Shakira ft. Alejandro Sanz",
+    "year": 2005,
+    "genre": "latin",
+    "region": "latin"
+  },
+  {
+    "title": "Reggaeton Lento",
+    "artist": "CNCO",
+    "year": 2016,
+    "genre": "latin",
+    "region": "latin"
+  },
+  {
+    "title": "El Perdon",
+    "artist": "Nicky Jam & Enrique Iglesias",
+    "year": 2015,
+    "genre": "latin",
+    "region": "latin"
+  },
+  {
+    "title": "Safaera",
+    "artist": "Bad Bunny",
+    "year": 2020,
+    "genre": "latin",
+    "region": "latin"
+  },
+  {
+    "title": "Gangnam Style",
+    "artist": "PSY",
+    "year": 2012,
+    "genre": "pop",
+    "region": "kpop"
+  },
+  {
+    "title": "Dynamite",
+    "artist": "BTS",
+    "year": 2020,
+    "genre": "pop",
+    "region": "kpop"
+  },
+  {
+    "title": "Butter",
+    "artist": "BTS",
+    "year": 2021,
+    "genre": "pop",
+    "region": "kpop"
+  },
+  {
+    "title": "Boy With Luv",
+    "artist": "BTS ft. Halsey",
+    "year": 2019,
+    "genre": "pop",
+    "region": "kpop"
+  },
+  {
+    "title": "Fake Love",
+    "artist": "BTS",
+    "year": 2018,
+    "genre": "pop",
+    "region": "kpop"
+  },
+  {
+    "title": "DNA",
+    "artist": "BTS",
+    "year": 2017,
+    "genre": "pop",
+    "region": "kpop"
+  },
+  {
+    "title": "Mic Drop",
+    "artist": "BTS",
+    "year": 2017,
+    "genre": "hip-hop",
+    "region": "kpop"
+  },
+  {
+    "title": "DDU-DU DDU-DU",
+    "artist": "BLACKPINK",
+    "year": 2018,
+    "genre": "pop",
+    "region": "kpop"
+  },
+  {
+    "title": "How You Like That",
+    "artist": "BLACKPINK",
+    "year": 2020,
+    "genre": "pop",
+    "region": "kpop"
+  },
+  {
+    "title": "Kill This Love",
+    "artist": "BLACKPINK",
+    "year": 2019,
+    "genre": "pop",
+    "region": "kpop"
+  },
+  {
+    "title": "Pink Venom",
+    "artist": "BLACKPINK",
+    "year": 2022,
+    "genre": "pop",
+    "region": "kpop"
+  },
+  {
+    "title": "Shut Down",
+    "artist": "BLACKPINK",
+    "year": 2022,
+    "genre": "pop",
+    "region": "kpop"
+  },
+  {
+    "title": "Lovesick Girls",
+    "artist": "BLACKPINK",
+    "year": 2020,
+    "genre": "pop",
+    "region": "kpop"
+  },
+  {
+    "title": "Monster",
+    "artist": "EXO",
+    "year": 2016,
+    "genre": "pop",
+    "region": "kpop"
+  },
+  {
+    "title": "Love Shot",
+    "artist": "EXO",
+    "year": 2018,
+    "genre": "pop",
+    "region": "kpop"
+  },
+  {
+    "title": "Growl",
+    "artist": "EXO",
+    "year": 2013,
+    "genre": "pop",
+    "region": "kpop"
+  },
+  {
+    "title": "TT",
+    "artist": "TWICE",
+    "year": 2016,
+    "genre": "pop",
+    "region": "kpop"
+  },
+  {
+    "title": "Fancy",
+    "artist": "TWICE",
+    "year": 2019,
+    "genre": "pop",
+    "region": "kpop"
+  },
+  {
+    "title": "What Is Love?",
+    "artist": "TWICE",
+    "year": 2018,
+    "genre": "pop",
+    "region": "kpop"
+  },
+  {
+    "title": "God's Menu",
+    "artist": "Stray Kids",
+    "year": 2020,
+    "genre": "pop",
+    "region": "kpop"
+  },
+  {
+    "title": "MANIAC",
+    "artist": "Stray Kids",
+    "year": 2022,
+    "genre": "pop",
+    "region": "kpop"
+  },
+  {
+    "title": "Back Door",
+    "artist": "Stray Kids",
+    "year": 2020,
+    "genre": "pop",
+    "region": "kpop"
+  },
+  {
+    "title": "Attention",
+    "artist": "NewJeans",
+    "year": 2022,
+    "genre": "pop",
+    "region": "kpop"
+  },
+  {
+    "title": "Hype Boy",
+    "artist": "NewJeans",
+    "year": 2022,
+    "genre": "pop",
+    "region": "kpop"
+  },
+  {
+    "title": "Super Shy",
+    "artist": "NewJeans",
+    "year": 2023,
+    "genre": "pop",
+    "region": "kpop"
+  },
+  {
+    "title": "Next Level",
+    "artist": "aespa",
+    "year": 2021,
+    "genre": "pop",
+    "region": "kpop"
+  },
+  {
+    "title": "Savage",
+    "artist": "aespa",
+    "year": 2021,
+    "genre": "pop",
+    "region": "kpop"
+  },
+  {
+    "title": "Ditto",
+    "artist": "NewJeans",
+    "year": 2022,
+    "genre": "pop",
+    "region": "kpop"
+  },
+  {
+    "title": "ANTIFRAGILE",
+    "artist": "LE SSERAFIM",
+    "year": 2022,
+    "genre": "pop",
+    "region": "kpop"
+  },
+  {
+    "title": "FEARLESS",
+    "artist": "LE SSERAFIM",
+    "year": 2022,
+    "genre": "pop",
+    "region": "kpop"
+  },
+  {
+    "title": "Psycho",
+    "artist": "Red Velvet",
+    "year": 2019,
+    "genre": "pop",
+    "region": "kpop"
+  },
+  {
+    "title": "Panorama",
+    "artist": "IZ*ONE",
+    "year": 2020,
+    "genre": "pop",
+    "region": "kpop"
+  },
+  {
+    "title": "TOMBOY",
+    "artist": "(G)I-DLE",
+    "year": 2022,
+    "genre": "pop",
+    "region": "kpop"
+  },
+  {
+    "title": "Cupid",
+    "artist": "FIFTY FIFTY",
+    "year": 2023,
+    "genre": "pop",
+    "region": "kpop"
+  },
+  {
+    "title": "Seven",
+    "artist": "Jung Kook ft. Latto",
+    "year": 2023,
+    "genre": "pop",
+    "region": "kpop"
+  },
+  {
+    "title": "Jai Ho",
+    "artist": "A.R. Rahman",
+    "year": 2008,
+    "genre": "pop",
+    "region": "bollywood"
+  },
+  {
+    "title": "Chaiyya Chaiyya",
+    "artist": "A.R. Rahman & Sukhwinder Singh",
+    "year": 1998,
+    "genre": "pop",
+    "region": "bollywood"
+  },
+  {
+    "title": "Maa Tujhe Salaam",
+    "artist": "A.R. Rahman",
+    "year": 1997,
+    "genre": "pop",
+    "region": "bollywood"
+  },
+  {
+    "title": "Roja Janeman",
+    "artist": "A.R. Rahman",
+    "year": 1992,
+    "genre": "pop",
+    "region": "bollywood"
+  },
+  {
+    "title": "Tum Hi Ho",
+    "artist": "Arijit Singh",
+    "year": 2013,
+    "genre": "pop",
+    "region": "bollywood"
+  },
+  {
+    "title": "Channa Mereya",
+    "artist": "Arijit Singh",
+    "year": 2016,
+    "genre": "pop",
+    "region": "bollywood"
+  },
+  {
+    "title": "Tujh Mein Rab Dikhta Hai",
+    "artist": "Roop Kumar Rathod",
+    "year": 2008,
+    "genre": "pop",
+    "region": "bollywood"
+  },
+  {
+    "title": "Gerua",
+    "artist": "Arijit Singh & Antara Mitra",
+    "year": 2015,
+    "genre": "pop",
+    "region": "bollywood"
+  },
+  {
+    "title": "Lag Ja Gale",
+    "artist": "Lata Mangeshkar",
+    "year": 1964,
+    "genre": "pop",
+    "region": "bollywood"
+  },
+  {
+    "title": "Ek Pyaar Ka Naghma Hai",
+    "artist": "Lata Mangeshkar",
+    "year": 1972,
+    "genre": "pop",
+    "region": "bollywood"
+  },
+  {
+    "title": "Tere Bina",
+    "artist": "A.R. Rahman",
+    "year": 2007,
+    "genre": "pop",
+    "region": "bollywood"
+  },
+  {
+    "title": "Dil Se Re",
+    "artist": "A.R. Rahman",
+    "year": 1998,
+    "genre": "pop",
+    "region": "bollywood"
+  },
+  {
+    "title": "Kajra Re",
+    "artist": "Alisha Chinai & Shankar Mahadevan",
+    "year": 2005,
+    "genre": "pop",
+    "region": "bollywood"
+  },
+  {
+    "title": "Munni Badnaam Hui",
+    "artist": "Mamta Sharma",
+    "year": 2010,
+    "genre": "pop",
+    "region": "bollywood"
+  },
+  {
+    "title": "Sheila Ki Jawani",
+    "artist": "Sunidhi Chauhan",
+    "year": 2010,
+    "genre": "pop",
+    "region": "bollywood"
+  },
+  {
+    "title": "Chammak Challo",
+    "artist": "Akon & Hamsika Iyer",
+    "year": 2011,
+    "genre": "pop",
+    "region": "bollywood"
+  },
+  {
+    "title": "Badtameez Dil",
+    "artist": "Benny Dayal",
+    "year": 2013,
+    "genre": "pop",
+    "region": "bollywood"
+  },
+  {
+    "title": "Lungi Dance",
+    "artist": "Yo Yo Honey Singh",
+    "year": 2013,
+    "genre": "hip-hop",
+    "region": "bollywood"
+  },
+  {
+    "title": "Kar Gayi Chull",
+    "artist": "Badshah & Neha Kakkar",
+    "year": 2016,
+    "genre": "pop",
+    "region": "bollywood"
+  },
+  {
+    "title": "Kala Chashma",
+    "artist": "Badshah & Neha Kakkar",
+    "year": 2016,
+    "genre": "pop",
+    "region": "bollywood"
+  },
+  {
+    "title": "Cheap Thrills (Bollywood Mix)",
+    "artist": "Sia ft. Badshah",
+    "year": 2017,
+    "genre": "pop",
+    "region": "bollywood"
+  },
+  {
+    "title": "Aankh Marey",
+    "artist": "Neha Kakkar & Mika Singh",
+    "year": 2018,
+    "genre": "pop",
+    "region": "bollywood"
+  },
+  {
+    "title": "Dilbar",
+    "artist": "Neha Kakkar & Dhvani Bhanushali",
+    "year": 2018,
+    "genre": "pop",
+    "region": "bollywood"
+  },
+  {
+    "title": "Ghoomar",
+    "artist": "Shreya Ghoshal & Swaroop Khan",
+    "year": 2018,
+    "genre": "pop",
+    "region": "bollywood"
+  },
+  {
+    "title": "Apna Time Aayega",
+    "artist": "Ranveer Singh",
+    "year": 2019,
+    "genre": "hip-hop",
+    "region": "bollywood"
+  },
+  {
+    "title": "Ghungroo",
+    "artist": "Arijit Singh & Shilpa Rao",
+    "year": 2019,
+    "genre": "pop",
+    "region": "bollywood"
+  },
+  {
+    "title": "Raataan Lambiyan",
+    "artist": "Jubin Nautiyal & Asees Kaur",
+    "year": 2021,
+    "genre": "pop",
+    "region": "bollywood"
+  },
+  {
+    "title": "Kesariya",
+    "artist": "Arijit Singh",
+    "year": 2022,
+    "genre": "pop",
+    "region": "bollywood"
+  },
+  {
+    "title": "Naatu Naatu",
+    "artist": "Rahul Sipligunj & Kaala Bhairava",
+    "year": 2022,
+    "genre": "pop",
+    "region": "bollywood"
+  },
+  {
+    "title": "Besharam Rang",
+    "artist": "Shilpa Rao & Caralisa Monteiro",
+    "year": 2022,
+    "genre": "pop",
+    "region": "bollywood"
+  },
+  {
+    "title": "Tere Liye",
+    "artist": "Atif Aslam & Shreya Ghoshal",
+    "year": 2009,
+    "genre": "pop",
+    "region": "bollywood"
+  },
+  {
+    "title": "Kal Ho Naa Ho",
+    "artist": "Sonu Nigam",
+    "year": 2003,
+    "genre": "pop",
+    "region": "bollywood"
+  },
+  {
+    "title": "Dil To Pagal Hai",
+    "artist": "Lata Mangeshkar & Udit Narayan",
+    "year": 1997,
+    "genre": "pop",
+    "region": "bollywood"
+  },
+  {
+    "title": "Tujhe Dekha Toh",
+    "artist": "Kumar Sanu & Lata Mangeshkar",
+    "year": 1995,
+    "genre": "pop",
+    "region": "bollywood"
+  },
+  {
+    "title": "Tera Ban Jaunga",
+    "artist": "Akhil Sachdeva & Tulsi Kumar",
+    "year": 2019,
+    "genre": "pop",
+    "region": "bollywood"
   }
 ]

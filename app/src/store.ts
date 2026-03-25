@@ -2,12 +2,16 @@ import { create } from 'zustand';
 import type {
   GamePhase,
   GameSettings,
+  GameStats,
+  GameHistoryEntry,
+  LeaderboardEntry,
+  PlayedSong,
   Player,
   SongCard,
   Room,
 } from '@hitster/shared';
 
-export type Screen = 'home' | 'lobby' | 'game' | 'results' | 'rules';
+export type Screen = 'home' | 'lobby' | 'game' | 'results' | 'rules' | 'leaderboard' | 'profile';
 
 interface ModeResult {
   placementCorrect: boolean;
@@ -31,6 +35,7 @@ interface GameStore {
   roomCode: string;
   connected: boolean;
   error: string | null;
+  pendingJoinCode: string | null;
 
   // Room
   players: Record<string, Player>;
@@ -58,6 +63,9 @@ interface GameStore {
   // Turn timer
   turnDeadline: number | null;
 
+  // Audio
+  volume: number;
+
   // Spotify
   spotifyToken: string | null;
   spotifyRefreshToken: string | null;
@@ -69,9 +77,26 @@ interface GameStore {
   currentTrackId: string | null;
   currentPreviewUrl: string | null;
 
+
+  // Buzz
+  buzzedPlayers: string[];
+  // Disconnect grace period
+  disconnectedPlayers: Record<string, number>; // playerId → reconnectDeadline timestamp
+
   // Winner
   winnerId: string | null;
   finalPlayers: Record<string, Player>;
+
+  // End-of-game stats
+  gameStats: GameStats | null;
+
+  // Song history
+  songHistory: PlayedSong[];
+
+  // Leaderboard & stats
+  leaderboard: LeaderboardEntry[];
+  myStats: LeaderboardEntry | null;
+  myHistory: GameHistoryEntry[];
 
   // Actions
   setScreen: (screen: Screen) => void;
@@ -79,6 +104,7 @@ interface GameStore {
   setRoomCode: (code: string) => void;
   setConnected: (connected: boolean) => void;
   setError: (error: string | null) => void;
+  setPendingJoinCode: (code: string | null) => void;
   setPlayers: (players: Record<string, Player>) => void;
   setHostId: (hostId: string) => void;
   setSettings: (settings: GameSettings) => void;
@@ -96,6 +122,7 @@ interface GameStore {
   updatePlayerTimeline: (playerId: string, timeline: SongCard[]) => void;
   addPlayer: (player: Player) => void;
   removePlayer: (playerId: string) => void;
+  setVolume: (v: number) => void;
   setSpotifyToken: (token: string | null) => void;
   setSpotifyRefreshToken: (token: string | null) => void;
   setSpotifyDeviceId: (id: string | null) => void;
@@ -103,6 +130,16 @@ interface GameStore {
   setSpotifyError: (error: string | null) => void;
   setIsPlaying: (playing: boolean) => void;
   setCurrentTrackId: (trackId: string | null, previewUrl?: string | null) => void;
+  setPlayerDisconnected: (playerId: string, deadline: number) => void;
+  setPlayerReconnected: (playerId: string) => void;
+  setPlayerTimedOut: (playerId: string) => void;
+  setGameStats: (stats: GameStats) => void;
+  setSongHistory: (history: PlayedSong[]) => void;
+  addBuzzedPlayer: (id: string) => void;
+  clearBuzzedPlayers: () => void;
+  setLeaderboard: (entries: LeaderboardEntry[]) => void;
+  setMyStats: (stats: LeaderboardEntry | null) => void;
+  setMyHistory: (games: GameHistoryEntry[]) => void;
   syncRoom: (room: Room) => void;
   reset: () => void;
 }
@@ -113,6 +150,7 @@ const initialState = {
   roomCode: '',
   connected: false,
   error: null,
+  pendingJoinCode: null,
   players: {} as Record<string, Player>,
   hostId: '',
   settings: { mode: 'original' as const, cardsToWin: 10, songPack: 'standard' as const },
@@ -125,6 +163,14 @@ const initialState = {
   sharedTimeline: [] as SongCard[],
   challengeDeadline: null as number | null,
   turnDeadline: null as number | null,
+  volume: (() => {
+    const stored = localStorage.getItem('hitster-volume');
+    if (stored !== null) {
+      const v = parseFloat(stored);
+      if (!isNaN(v) && v >= 0 && v <= 1) return v;
+    }
+    return 0.8;
+  })(),
   spotifyToken: null as string | null,
   spotifyRefreshToken: null as string | null,
   spotifyDeviceId: null as string | null,
@@ -134,10 +180,17 @@ const initialState = {
   autoplayBlocked: false,
   currentTrackId: null as string | null,
   currentPreviewUrl: null as string | null,
+  buzzedPlayers: [] as string[],
+  disconnectedPlayers: {} as Record<string, number>,
   lastReveal: null,
   songNameResult: null,
   winnerId: null,
   finalPlayers: {} as Record<string, Player>,
+  gameStats: null as GameStats | null,
+  songHistory: [] as PlayedSong[],
+  leaderboard: [] as LeaderboardEntry[],
+  myStats: null as LeaderboardEntry | null,
+  myHistory: [] as GameHistoryEntry[],
 };
 
 export const useGameStore = create<GameStore>((set) => ({
@@ -148,6 +201,7 @@ export const useGameStore = create<GameStore>((set) => ({
   setRoomCode: (roomCode) => set({ roomCode }),
   setConnected: (connected) => set({ connected }),
   setError: (error) => set({ error }),
+  setPendingJoinCode: (pendingJoinCode) => set({ pendingJoinCode }),
   setPlayers: (players) => set({ players }),
   setHostId: (hostId) => set({ hostId }),
   setSettings: (settings) => set({ settings }),
@@ -184,6 +238,11 @@ export const useGameStore = create<GameStore>((set) => ({
       const { [playerId]: _, ...rest } = s.players;
       return { players: rest };
     }),
+  setVolume: (v) => {
+    const volume = Math.max(0, Math.min(1, v));
+    localStorage.setItem('hitster-volume', String(volume));
+    set({ volume });
+  },
   setSpotifyToken: (spotifyToken) => set({ spotifyToken }),
   setSpotifyRefreshToken: (spotifyRefreshToken) => set({ spotifyRefreshToken }),
   setSpotifyDeviceId: (spotifyDeviceId) => set({ spotifyDeviceId }),
@@ -191,6 +250,30 @@ export const useGameStore = create<GameStore>((set) => ({
   setSpotifyError: (spotifyError) => set({ spotifyError }),
   setIsPlaying: (isPlaying) => set({ isPlaying }),
   setCurrentTrackId: (currentTrackId, previewUrl) => set({ currentTrackId, currentPreviewUrl: previewUrl ?? null }),
+  setPlayerDisconnected: (playerId, deadline) =>
+    set((s) => ({
+      disconnectedPlayers: { ...s.disconnectedPlayers, [playerId]: deadline },
+    })),
+  setPlayerReconnected: (playerId) =>
+    set((s) => {
+      const { [playerId]: _, ...rest } = s.disconnectedPlayers;
+      return { disconnectedPlayers: rest };
+    }),
+  setPlayerTimedOut: (playerId) =>
+    set((s) => {
+      const { [playerId]: _, ...rest } = s.disconnectedPlayers;
+      return { disconnectedPlayers: rest };
+    }),
+  setGameStats: (gameStats) => set({ gameStats }),
+  setSongHistory: (songHistory) => set({ songHistory }),
+  addBuzzedPlayer: (id) =>
+    set((s) => ({
+      buzzedPlayers: s.buzzedPlayers.includes(id) ? s.buzzedPlayers : [...s.buzzedPlayers, id],
+    })),
+  clearBuzzedPlayers: () => set({ buzzedPlayers: [] }),
+  setLeaderboard: (leaderboard) => set({ leaderboard }),
+  setMyStats: (myStats) => set({ myStats }),
+  setMyHistory: (myHistory) => set({ myHistory }),
   syncRoom: (room) =>
     set({
       players: room.players,

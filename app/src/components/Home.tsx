@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Music, Headphones, BookOpen, Wifi, WifiOff, Loader2, LogIn, LogOut, UserPlus } from 'lucide-react';
+import { Music, Headphones, BookOpen, Wifi, WifiOff, Loader2, LogIn, LogOut, UserPlus, Trophy, BarChart3 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { getSocket } from '../services/socket';
 import { openSpotifyLogin, refreshAccessToken } from '../services/spotify';
@@ -15,10 +15,13 @@ export function Home() {
   const [authPassword, setAuthPassword] = useState('');
   const [authLoading, setAuthLoading] = useState(false);
   const [signedInAs, setSignedInAs] = useState<string | null>(() => localStorage.getItem('hitster_username'));
+  const [inviteMessage, setInviteMessage] = useState<string | null>(null);
   const error = useGameStore((s) => s.error);
   const connected = useGameStore((s) => s.connected);
   const setScreen = useGameStore((s) => s.setScreen);
   const setError = useGameStore((s) => s.setError);
+  const pendingJoinCode = useGameStore((s) => s.pendingJoinCode);
+  const setPendingJoinCode = useGameStore((s) => s.setPendingJoinCode);
 
   const handleAuthResult = useCallback((data: { success: boolean; error?: string; displayName?: string }) => {
     setAuthLoading(false);
@@ -44,6 +47,15 @@ export function Home() {
       socket.off('auth-result', handleAuthResult);
     };
   }, [handleAuthResult]);
+
+  useEffect(() => {
+    if (pendingJoinCode) {
+      setMode('join');
+      setCode(pendingJoinCode.split('') as [string, string, string, string]);
+      setInviteMessage(`You've been invited to room ${pendingJoinCode}!`);
+      setPendingJoinCode(null);
+    }
+  }, [pendingJoinCode, setPendingJoinCode]);
 
   const handleAuth = () => {
     if (!authUsername.trim() || !authPassword.trim()) return;
@@ -241,7 +253,7 @@ export function Home() {
               className="w-full bg-black/20 border border-white/5 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:ring-1 focus:ring-[#1DB954]/50 transition-all"
             />
             <input
-              type="text"
+              type="password"
               value={authPassword}
               onChange={(e) => setAuthPassword(e.target.value)}
               placeholder="Password"
@@ -341,6 +353,24 @@ export function Home() {
                 <BookOpen className="w-4 h-4" />
                 How to Play
               </button>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setScreen('leaderboard')}
+                  className="flex-1 text-gray-500 hover:text-yellow-400 font-medium text-sm py-3 flex items-center justify-center gap-2 transition-colors rounded-xl hover:bg-white/5 border border-white/[0.05]"
+                >
+                  <Trophy className="w-4 h-4" />
+                  Leaderboard
+                </button>
+                {signedInAs && (
+                  <button
+                    onClick={() => setScreen('profile')}
+                    className="flex-1 text-gray-500 hover:text-[#1DB954] font-medium text-sm py-3 flex items-center justify-center gap-2 transition-colors rounded-xl hover:bg-white/5 border border-white/[0.05]"
+                  >
+                    <BarChart3 className="w-4 h-4" />
+                    My Stats
+                  </button>
+                )}
+              </div>
             </motion.div>
           ) : mode === 'host' ? (
             <motion.div
@@ -351,26 +381,45 @@ export function Home() {
               className="space-y-4 pt-2"
             >
               <p className="text-gray-400 text-sm text-center leading-relaxed">
-                Connect your Spotify Premium account to play music for the room.
+                Choose how you want to host your game.
               </p>
               <button
                 onClick={handleSpotifyLogin}
                 disabled={connecting}
-                className="w-full bg-[#1DB954] hover:bg-[#1ed760] disabled:opacity-70 text-black font-bold text-lg py-4 rounded-2xl flex items-center justify-center gap-3 transition-all transform active:scale-[0.97] shadow-[0_4px_20px_rgba(29,185,84,0.3)]"
+                className="w-full bg-[#1DB954] hover:bg-[#1ed760] disabled:opacity-70 text-black font-bold text-lg py-4 rounded-2xl flex flex-col items-center justify-center gap-1 transition-all transform active:scale-[0.97] shadow-[0_4px_20px_rgba(29,185,84,0.3)]"
               >
                 {connecting ? (
-                  <>
+                  <span className="flex items-center gap-3">
                     <Loader2 className="w-5 h-5 animate-spin" />
                     Connecting...
-                  </>
+                  </span>
                 ) : (
                   <>
-                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z" />
-                    </svg>
-                    Connect Spotify & Host
+                    <span className="flex items-center gap-3">
+                      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z" />
+                      </svg>
+                      Host with Spotify
+                    </span>
+                    <span className="text-xs font-medium text-black/60">Full tracks, all features</span>
                   </>
                 )}
+              </button>
+              <button
+                onClick={() => {
+                  if (!name.trim()) return;
+                  setError(null);
+                  const socket = getSocket();
+                  socket.emit('create-room', { playerName: name.trim() });
+                }}
+                disabled={!connected}
+                className="w-full bg-white/[0.07] hover:bg-white/[0.12] disabled:opacity-40 text-white font-bold text-lg py-4 rounded-2xl flex flex-col items-center justify-center gap-1 transition-all transform active:scale-[0.97] border border-white/[0.08]"
+              >
+                <span className="flex items-center gap-3">
+                  <Music className="w-5 h-5" />
+                  Host without Spotify
+                </span>
+                <span className="text-xs font-medium text-gray-400">30s preview clips, no account needed</span>
               </button>
               <button
                 onClick={() => { setMode('idle'); setError(null); }}
@@ -387,6 +436,15 @@ export function Home() {
               exit={{ opacity: 0, x: -20 }}
               className="space-y-5 pt-2"
             >
+              {inviteMessage && (
+                <motion.p
+                  initial={{ opacity: 0, y: -5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-[#1DB954] text-sm text-center bg-[#1DB954]/10 border border-[#1DB954]/20 rounded-xl px-4 py-2.5 font-medium"
+                >
+                  {inviteMessage}
+                </motion.p>
+              )}
               <div className="space-y-3">
                 <label className="text-xs font-bold text-gray-400 uppercase tracking-wider text-center block">
                   Enter Room Code

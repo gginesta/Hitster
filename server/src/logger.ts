@@ -14,8 +14,12 @@ const LOG_LEVELS: Record<LogLevel, number> = {
   error: 3,
 };
 
+const VALID_LOG_LEVELS: LogLevel[] = ['debug', 'info', 'warn', 'error'];
+
 const configuredLevel: LogLevel =
-  (process.env.LOG_LEVEL as LogLevel) || 'info';
+  VALID_LOG_LEVELS.includes(process.env.LOG_LEVEL as LogLevel)
+    ? (process.env.LOG_LEVEL as LogLevel)
+    : 'info';
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
 

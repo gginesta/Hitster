@@ -13,3 +13,5 @@ export const DECK_SIZE = 50;
 export const CHALLENGE_WINDOW_MS = 8000;
 export const TURN_TIME_MS = 45000;
 export const COOP_WRONG_PENALTY = 1;
+export const DISCONNECT_GRACE_MS = 30000;
+export const FUZZY_THRESHOLD_RATIO = 0.2;
