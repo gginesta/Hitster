@@ -462,6 +462,42 @@ export function Game() {
 
       {/* Center Area */}
       <div className="flex-1 flex flex-col items-center justify-center p-6 relative overflow-y-auto">
+        {/* Turn countdown timer - positioned above the mystery card */}
+        {phase === 'playing' && turnCountdown !== null && turnCountdown > 0 && (
+          <motion.div
+            key="turn-countdown"
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            className="mb-4 flex-shrink-0"
+          >
+            <div className="relative">
+              <svg className="w-14 h-14 -rotate-90" viewBox="0 0 100 100">
+                <circle
+                  cx="50" cy="50" r="42"
+                  fill="none"
+                  stroke="rgba(255,255,255,0.1)"
+                  strokeWidth="6"
+                />
+                <circle
+                  cx="50" cy="50" r="42"
+                  fill="none"
+                  stroke={turnCountdown <= 5 ? '#ef4444' : turnCountdown <= 10 ? '#f97316' : '#3b82f6'}
+                  strokeWidth="6"
+                  strokeLinecap="round"
+                  strokeDasharray={`${2 * Math.PI * 42}`}
+                  strokeDashoffset={`${2 * Math.PI * 42 * (1 - turnCountdown / TURN_TIME_SECONDS)}`}
+                  className="transition-all duration-100"
+                />
+              </svg>
+              <span className={`absolute inset-0 flex items-center justify-center text-lg font-black ${
+                turnCountdown <= 5 ? 'text-red-400' : turnCountdown <= 10 ? 'text-orange-400' : 'text-white'
+              }`}>
+                {turnCountdown}
+              </span>
+            </div>
+          </motion.div>
+        )}
+
         <AnimatePresence mode="wait">
           {isRevealed ? (
             <motion.div
@@ -573,42 +609,6 @@ export function Game() {
                 </div>
               ) : (
                 <h2 className="text-6xl font-black text-white/90 mt-4">?</h2>
-              )}
-
-              {/* Countdown timer during playing phase (turn timer) */}
-              {phase === 'playing' && turnCountdown !== null && turnCountdown > 0 && (
-                <motion.div
-                  key="turn-countdown"
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  className="absolute top-3 right-3 z-20"
-                >
-                  <div className="relative">
-                    <svg className="w-14 h-14 -rotate-90" viewBox="0 0 100 100">
-                      <circle
-                        cx="50" cy="50" r="42"
-                        fill="none"
-                        stroke="rgba(255,255,255,0.1)"
-                        strokeWidth="6"
-                      />
-                      <circle
-                        cx="50" cy="50" r="42"
-                        fill="none"
-                        stroke={turnCountdown <= 5 ? '#ef4444' : turnCountdown <= 10 ? '#f97316' : '#3b82f6'}
-                        strokeWidth="6"
-                        strokeLinecap="round"
-                        strokeDasharray={`${2 * Math.PI * 42}`}
-                        strokeDashoffset={`${2 * Math.PI * 42 * (1 - turnCountdown / TURN_TIME_SECONDS)}`}
-                        className="transition-all duration-100"
-                      />
-                    </svg>
-                    <span className={`absolute inset-0 flex items-center justify-center text-lg font-black ${
-                      turnCountdown <= 5 ? 'text-red-400' : turnCountdown <= 10 ? 'text-orange-400' : 'text-white'
-                    }`}>
-                      {turnCountdown}
-                    </span>
-                  </div>
-                </motion.div>
               )}
 
               {/* Countdown timer during challenge phase */}
