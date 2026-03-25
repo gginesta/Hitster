@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import type { SongCard, SongData } from '@hitster/shared';
 import { DECK_SIZE } from '@hitster/shared';
 import { logger } from './logger';
+import { fisherYatesShuffle } from './shuffle';
 
 let allSongs: SongData[] = [];
 
@@ -96,13 +97,12 @@ export function selectGameDeck(
   // Pick from each decade
   for (const decade of decadeKeys) {
     const songs = byDecade.get(decade)!;
-    const shuffled = [...songs].sort(() => Math.random() - 0.5);
+    const shuffled = fisherYatesShuffle([...songs]);
     selected.push(...shuffled.slice(0, perDecade));
   }
 
   // Shuffle and trim to count
-  const deck: SongCard[] = selected
-    .sort(() => Math.random() - 0.5)
+  const deck: SongCard[] = fisherYatesShuffle(selected)
     .slice(0, count)
     .map((song) => ({
       ...song,
@@ -204,9 +204,7 @@ export async function fetchPlaylistDeck(
   }
 
   // Shuffle and trim
-  const deck = cards
-    .sort(() => Math.random() - 0.5)
-    .slice(0, count);
+  const deck = fisherYatesShuffle(cards).slice(0, count);
 
   logger.info('Playlist deck created', { playlistId, total: cards.length, selected: deck.length });
   return deck;
