@@ -362,7 +362,7 @@ export function Game() {
     <div
       className="flex flex-col h-screen text-white bg-[#1a1a2e] overflow-hidden"
     >
-      {/* "Ready? Tap to Play!" overlay — unlocks audio from a real user gesture */}
+      {/* "Type GO" overlay — unlocks audio from a keyboard user gesture */}
       <AnimatePresence>
         {!audioReady && (
           <motion.div
@@ -371,7 +371,6 @@ export function Game() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0, transition: { duration: 0.3 } }}
             className="absolute inset-0 z-50 bg-[#1a1a2e]/95 backdrop-blur-xl flex flex-col items-center justify-center"
-            onClick={handleReadyTap}
           >
             <motion.div
               animate={{ scale: [1, 1.05, 1] }}
@@ -382,8 +381,25 @@ export function Game() {
                 <Play className="w-12 h-12 text-black ml-1" fill="currentColor" />
               </div>
               <div className="text-center">
-                <p className="text-2xl font-black text-white">TAP TO START</p>
-                <p className="text-sm text-gray-400 mt-2">This unlocks music playback</p>
+                <p className="text-2xl font-black text-white">READY?</p>
+                <p className="text-sm text-gray-400 mt-2 mb-4">Type <span className="text-[#1DB954] font-bold">GO</span> to start the music</p>
+                <input
+                  autoFocus
+                  type="text"
+                  placeholder="GO"
+                  className="w-32 text-center text-2xl font-black uppercase bg-white/10 border-2 border-[#1DB954]/50 rounded-xl px-4 py-3 text-white placeholder-white/20 focus:outline-none focus:border-[#1DB954] focus:shadow-[0_0_20px_rgba(29,185,84,0.3)]"
+                  onKeyDown={() => {
+                    // Unlock audio on every keystroke — the keydown event
+                    // is a strong user activation signal for browsers
+                    preUnlockAudio();
+                    activateElement();
+                  }}
+                  onChange={(e) => {
+                    if (e.target.value.trim().toLowerCase() === 'go') {
+                      handleReadyTap();
+                    }
+                  }}
+                />
               </div>
             </motion.div>
           </motion.div>
