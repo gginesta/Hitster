@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Disc, Coins, Check, X, SkipForward, AlertTriangle, ShoppingCart, Star, Play, Pause, Volume2, Volume1, VolumeX, Clock } from 'lucide-react';
+import { Disc, Check, X, SkipForward, AlertTriangle, ShoppingCart, Star, Play, Pause, Volume2, Volume1, VolumeX, Clock } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { getSocket } from '../services/socket';
 import { useGameStore } from '../store';
@@ -85,6 +85,7 @@ export function Game() {
   const sharedTimeline = useGameStore((s) => s.sharedTimeline);
   const isPlayingMusic = useGameStore((s) => s.isPlaying);
   const spotifyError = useGameStore((s) => s.spotifyError);
+  const pendingPlacement = useGameStore((s) => s.pendingPlacement);
 
   const disconnectedPlayers = useGameStore((s) => s.disconnectedPlayers);
 
@@ -160,7 +161,7 @@ export function Game() {
   // --- Volume & sound effects ---
   const volume = useGameStore((s) => s.volume);
   const setVolume = useGameStore((s) => s.setVolume);
-  const [soundMuted, setSoundMuted] = useState(isMuted);
+  const [soundMuted, setSoundMuted] = useState(() => isMuted());
   const prevVolumeRef = useRef(volume || 0.8);
 
   const handleToggleMute = useCallback(() => {
@@ -263,8 +264,6 @@ export function Game() {
   const isCoop = mode === 'coop';
 
   if (!me || !activePlayer) return null;
-
-  const pendingPlacement = useGameStore((s) => s.pendingPlacement);
 
   // Timeline to display:
   // - Co-op: shared timeline always

@@ -630,6 +630,7 @@ export function Lobby() {
               playerList.length < MIN_PLAYERS
               || (needsDecadeSelection && (!settings.decades || settings.decades.length === 0))
               || (needsGenreSelection && (!settings.genres || settings.genres.length === 0))
+              || (settings.songPack === 'playlist' && !settings.playlistUrl)
             }
             className="w-full bg-[#1DB954] hover:bg-[#1ed760] disabled:opacity-50 disabled:hover:bg-[#1DB954] text-black font-black text-xl py-5 rounded-2xl flex items-center justify-center gap-2 shadow-[0_0_30px_rgba(29,185,84,0.4)] transition-all transform active:scale-95"
           >

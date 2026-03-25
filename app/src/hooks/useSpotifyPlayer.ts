@@ -15,7 +15,6 @@ import {
   initFallbackAudio,
   playPreviewUrl,
   pauseFallback,
-  destroyFallback,
   setFallbackVolume,
 } from '../services/audioFallback';
 

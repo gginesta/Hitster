@@ -253,7 +253,7 @@ export function Home() {
               className="w-full bg-black/20 border border-white/5 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:ring-1 focus:ring-[#1DB954]/50 transition-all"
             />
             <input
-              type="text"
+              type="password"
               value={authPassword}
               onChange={(e) => setAuthPassword(e.target.value)}
               placeholder="Password"

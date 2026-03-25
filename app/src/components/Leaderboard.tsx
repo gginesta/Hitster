@@ -66,7 +66,7 @@ export function Leaderboard() {
 
             {leaderboard.map((entry, index) => {
               const rank = index + 1;
-              const isCurrentUser = signedInAs && entry.username === signedInAs.toLowerCase();
+              const isCurrentUser = signedInAs && entry.username.toLowerCase() === signedInAs.toLowerCase();
               const medalColor =
                 rank === 1
                   ? 'text-yellow-400'

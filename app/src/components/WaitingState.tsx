@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Zap } from 'lucide-react';
 import { useGameStore } from '../store';
@@ -43,11 +43,21 @@ export function WaitingState() {
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
   const [hasBuzzed, setHasBuzzed] = useState(false);
+  const triviaTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Reset buzz state when turn changes
   useEffect(() => {
     setHasBuzzed(false);
   }, [currentTurnPlayerId]);
+
+  // Clean up trivia timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (triviaTimeoutRef.current !== null) {
+        clearTimeout(triviaTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const loadNextQuestion = useCallback(() => {
     setQuestion((prev) => getRandomQuestion(prev));
@@ -59,7 +69,7 @@ export function WaitingState() {
     if (showResult) return;
     setSelectedAnswer(index);
     setShowResult(true);
-    setTimeout(loadNextQuestion, 2000);
+    triviaTimeoutRef.current = setTimeout(loadNextQuestion, 2000);
   };
 
   const handleBuzz = () => {

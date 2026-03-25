@@ -22,6 +22,7 @@ import {
 } from '@hitster/shared';
 import { logger } from './logger';
 import { fuzzyMatch } from './fuzzy';
+import { fisherYatesShuffle } from './shuffle';
 
 type HitsterServer = Server<ClientToServerEvents, ServerToClientEvents>;
 
@@ -190,7 +191,7 @@ export class GameEngine {
     }
 
     // Shuffle turn order
-    const turnOrder = [...playerIds].sort(() => Math.random() - 0.5);
+    const turnOrder = fisherYatesShuffle([...playerIds]);
     this.room.gameState = {
       ...this.room.gameState,
       phase: 'playing',
@@ -292,6 +293,10 @@ export class GameEngine {
   placeCard(playerId: string, position: number) {
     const gs = this.room.gameState;
     if (gs.phase !== 'playing' || gs.currentTurnPlayerId !== playerId) return;
+
+    // Bounds-check position
+    const timeline = this.isCoop ? gs.sharedTimeline : this.room.players[playerId]?.timeline;
+    if (!timeline || position < 0 || position > timeline.length) return;
 
     // Clear turn timer since player acted
     if (this.turnTimer) {
@@ -414,6 +419,9 @@ export class GameEngine {
   }
 
   buyCard(playerId: string) {
+    const gs = this.room.gameState;
+    if (gs.phase === 'lobby' || gs.phase === 'game_over') return;
+
     const player = this.room.players[playerId];
     if (!player || player.tokens < BUY_CARD_COST) return;
 
@@ -446,8 +454,8 @@ export class GameEngine {
     }
   }
 
-  confirmReveal() {
-    if (this.room.gameState.phase === 'reveal') {
+  confirmReveal(playerId: string) {
+    if (this.room.gameState.phase === 'reveal' && playerId === this.room.hostId) {
       this.advanceTurn();
     }
   }
@@ -580,7 +588,9 @@ export class GameEngine {
     });
     this.io.to(this.room.code).emit('song-history', { history: this.songHistory });
 
-    if (winnerId) {
+    // Only emit timeline-updated for winnerId if the card wasn't stolen
+    // (stolen cards already had their timeline-updated emitted above)
+    if (winnerId && !stolenBy) {
       this.io.to(this.room.code).emit('timeline-updated', {
         playerId: winnerId,
         timeline: this.room.players[winnerId].timeline,
@@ -756,7 +766,8 @@ export class GameEngine {
   }
 
   /**
-   * Called when a player reconnects. Clears any pending disconnect timer.
+   * Called when a player reconnects. Clears any pending disconnect timer
+   * and restarts phase-appropriate timers if it was their turn.
    */
   handlePlayerReconnect(playerId: string): void {
     const timer = this.disconnectTimers.get(playerId);
@@ -771,6 +782,57 @@ export class GameEngine {
       });
 
       this.io.to(this.room.code).emit('player-reconnected', { playerId });
+
+      // Restart phase-appropriate timers if it was the reconnecting player's turn
+      const gs = this.room.gameState;
+      if (gs.currentTurnPlayerId === playerId) {
+        if (gs.phase === 'challenge') {
+          this.challengeTimer = setTimeout(() => {
+            this.resolveRound();
+          }, CHALLENGE_WINDOW_MS);
+        } else if (gs.phase === 'playing') {
+          const turnPlayerId = playerId;
+          this.turnTimer = setTimeout(() => {
+            this.turnTimer = null;
+            if (this.room.gameState.phase === 'playing' && this.room.gameState.currentTurnPlayerId === turnPlayerId) {
+              this.advanceTurn();
+            }
+          }, TURN_TIME_MS);
+        }
+      }
+    }
+  }
+
+  /**
+   * Called when a player voluntarily leaves. Skips grace period and
+   * immediately advances the turn if it was their turn.
+   */
+  handlePlayerVoluntaryLeave(playerId: string): void {
+    const gs = this.room.gameState;
+    if (gs.phase === 'lobby' || gs.phase === 'game_over') return;
+
+    // Clear any existing disconnect timer for this player
+    const existingTimer = this.disconnectTimers.get(playerId);
+    if (existingTimer) {
+      clearTimeout(existingTimer);
+      this.disconnectTimers.delete(playerId);
+    }
+
+    // Emit disconnected event (no reconnect expected)
+    this.io.to(this.room.code).emit('player-disconnected', { playerId, reconnectDeadline: Date.now() });
+    this.io.to(this.room.code).emit('player-timed-out', { playerId });
+
+    // If it's their turn, immediately advance
+    if (gs.currentTurnPlayerId === playerId && (gs.phase === 'playing' || gs.phase === 'challenge')) {
+      if (this.turnTimer) {
+        clearTimeout(this.turnTimer);
+        this.turnTimer = null;
+      }
+      if (this.challengeTimer) {
+        clearTimeout(this.challengeTimer);
+        this.challengeTimer = null;
+      }
+      this.advanceTurn();
     }
   }
 
@@ -785,6 +847,14 @@ export class GameEngine {
       if (this.room.players[pid]?.connected) break;
       gs.turnIndex = (gs.turnIndex + 1) % gs.turnOrder.length;
       attempts++;
+    }
+
+    // If no connected player was found, end the game
+    const nextPid = gs.turnOrder[gs.turnIndex];
+    if (!this.room.players[nextPid]?.connected) {
+      logger.warn('No connected players remaining, ending game', { roomCode: this.room.code });
+      this.endGame();
+      return;
     }
 
     gs.currentTurnPlayerId = gs.turnOrder[gs.turnIndex];
@@ -848,8 +918,4 @@ export class GameEngine {
       this.onGameEndCallback();
     }
   }
-}
-
-function normalize(s: string): string {
-  return s.toLowerCase().replace(/[^a-z0-9]/g, '');
 }
