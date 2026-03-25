@@ -374,9 +374,19 @@ export function registerRoomHandlers(io: HitsterServer, socket: HitsterSocket) {
   socket.on('start-game', async () => {
     try {
       const mapping = socketToRoom.get(socket.id);
-      if (!mapping) return;
+      if (!mapping) {
+        socket.emit('error', { message: 'Connection lost. Please refresh and rejoin the room.' });
+        return;
+      }
       const room = rooms.get(mapping.code);
-      if (!room || room.hostId !== mapping.playerId) return;
+      if (!room) {
+        socket.emit('error', { message: 'Room no longer exists.' });
+        return;
+      }
+      if (room.hostId !== mapping.playerId) {
+        socket.emit('error', { message: 'Only the host can start the game.' });
+        return;
+      }
 
       // Guard against double start
       if (room.gameState.phase !== 'lobby') {
@@ -446,20 +456,14 @@ export function registerRoomHandlers(io: HitsterServer, socket: HitsterSocket) {
           }
           deck = playable;
         } else {
-          // Preview mode: only keep songs that have a pre-baked previewUrl
-          deck = deck.filter((s) => !!s.previewUrl);
-          if (deck.length === 0) {
-            socket.emit('error', {
-              message: 'No songs have preview audio yet. Run the prebake script (scripts/prebake-previews.ts) with a Spotify token first, or host with Spotify.',
-            });
-            return;
+          // No Spotify token: prefer songs with pre-baked previewUrl for audio,
+          // but keep the full deck so the game can still start.
+          const withPreview = deck.filter((s) => !!s.previewUrl);
+          if (withPreview.length >= 10) {
+            deck = withPreview;
           }
-          if (deck.length < 10) {
-            socket.emit('error', {
-              message: `Only ${deck.length} songs have preview audio for your filters. Try broadening your selection or host with Spotify.`,
-            });
-            return;
-          }
+          // Songs without previewUrl will still work — they just won't have audio.
+          // game.ts already handles this by skipping the play-song emit.
         }
       }
 
