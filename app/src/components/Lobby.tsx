@@ -3,7 +3,7 @@ import { Users, Crown, Settings, LogOut, Play, Music, ListMusic, Link, Share2, C
 import { motion } from 'motion/react';
 import { getSocket, clearSession } from '../services/socket';
 import { useGameStore } from '../store';
-import { requestActivation, preUnlockAudio } from '../services/spotifyPlayer';
+import { requestActivation, preUnlockAudio, activateElement } from '../services/spotifyPlayer';
 import { refreshAccessToken } from '../services/spotify';
 import type { GameMode, SongPack, SongGenre, SongRegion } from '@hitster/shared';
 import { MIN_CARDS_TO_WIN, MAX_CARDS_TO_WIN, MIN_PLAYERS } from '@hitster/shared';
@@ -59,6 +59,8 @@ export function Lobby() {
   const reset = useGameStore((s) => s.reset);
   const spotifyToken = useGameStore((s) => s.spotifyToken);
 
+  const spotifyReady = useGameStore((s) => s.spotifyReady);
+
   const isHost = hostId === myId;
   const hasSpotify = !!spotifyToken;
   const playerList = Object.values(players);
@@ -68,6 +70,7 @@ export function Lobby() {
   const [playlistImported, setPlaylistImported] = useState(!!settings.playlistUrl);
   const [copied, setCopied] = useState(false);
   const [starting, setStarting] = useState(false);
+  const [audioActivated, setAudioActivated] = useState(false);
 
   // Reset starting state when an error arrives from the server
   useEffect(() => {
@@ -819,11 +822,62 @@ export function Lobby() {
               {error}
             </p>
           )}
+
+          {/* Audio activation — host must type to unlock audio before starting */}
+          {hasSpotify && !audioActivated && (
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-4 text-center space-y-3">
+              {spotifyReady ? (
+                <>
+                  <p className="text-sm text-gray-300">
+                    Type anything below to activate music
+                  </p>
+                  <input
+                    autoFocus
+                    type="text"
+                    inputMode="search"
+                    autoComplete="off"
+                    autoCorrect="off"
+                    autoCapitalize="off"
+                    spellCheck={false}
+                    placeholder="Type here..."
+                    className="w-48 text-center text-lg font-bold bg-white/10 border-2 border-[#1DB954]/50 rounded-xl px-4 py-3 text-white placeholder-white/20 focus:outline-none focus:border-[#1DB954] focus:shadow-[0_0_20px_rgba(29,185,84,0.3)] caret-[#1DB954]"
+                    style={{ WebkitTextSecurity: 'disc' } as React.CSSProperties}
+                    onKeyDown={() => {
+                      preUnlockAudio();
+                      activateElement();
+                    }}
+                    onChange={(e) => {
+                      if (e.target.value.length >= 2) {
+                        preUnlockAudio();
+                        activateElement();
+                        requestActivation();
+                        setAudioActivated(true);
+                      }
+                    }}
+                  />
+                </>
+              ) : (
+                <div className="flex items-center justify-center gap-2 text-gray-400">
+                  <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
+                  <span className="text-sm">Connecting to Spotify...</span>
+                </div>
+              )}
+            </div>
+          )}
+
+          {hasSpotify && audioActivated && (
+            <div className="flex items-center justify-center gap-2 text-[#1DB954] text-sm font-semibold">
+              <CheckCircle className="w-4 h-4" />
+              <span>Music activated</span>
+            </div>
+          )}
+
           <button
             onClick={handleStart}
             disabled={
               starting
               || playerList.length < MIN_PLAYERS
+              || (hasSpotify && !audioActivated)
               || (needsDecadeSelection && (!settings.decades || settings.decades.length === 0))
               || (needsGenreSelection && (!settings.genres || settings.genres.length === 0))
               || (settings.songPack === 'playlist' && !settings.playlistUrl)
