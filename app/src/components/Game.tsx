@@ -418,6 +418,39 @@ export function Game() {
         </div>
       )}
 
+      {/* Disconnected player banner(s) */}
+      <AnimatePresence>
+        {Object.entries(disconnectCountdowns).map(([pid, secs]) => {
+          const dcPlayer = players[pid];
+          if (!dcPlayer) return null;
+          const isTheirTurn = currentTurnPlayerId === pid;
+          return (
+            <motion.div
+              key={`dc-${pid}`}
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className={`border-b px-4 py-2.5 text-center text-sm font-semibold ${
+                isTheirTurn
+                  ? 'bg-amber-500/20 border-amber-500/30 text-amber-300'
+                  : 'bg-yellow-500/10 border-yellow-500/20 text-yellow-400'
+              }`}
+            >
+              <motion.div
+                animate={{ opacity: [1, 0.6, 1] }}
+                transition={{ duration: 2, repeat: Infinity }}
+                className="flex items-center justify-center gap-2"
+              >
+                <AlertTriangle className="w-4 h-4 flex-shrink-0" />
+                <span>
+                  {dcPlayer.name} disconnected{isTheirTurn ? ' (their turn)' : ''} &mdash; waiting {secs}s...
+                </span>
+              </motion.div>
+            </motion.div>
+          );
+        })}
+      </AnimatePresence>
+
       {/* Center Area */}
       <div className="flex-1 flex flex-col items-center justify-center p-6 relative overflow-y-auto">
         <AnimatePresence mode="wait">
