@@ -1,5 +1,7 @@
 import type {
   GameSettings,
+  GameStats,
+  PlayedSong,
   Player,
   Room,
   SongCard,
@@ -22,6 +24,7 @@ export interface ClientToServerEvents {
   'restart-game': () => void;
   'register': (data: { username: string; password: string; displayName: string }) => void;
   'login': (data: { username: string; password: string }) => void;
+  'buzz': () => void;
 }
 
 export interface ServerToClientEvents {
@@ -58,4 +61,10 @@ export interface ServerToClientEvents {
   'error': (data: { message: string }) => void;
   'state-sync': (room: Room) => void;
   'auth-result': (data: { success: boolean; error?: string; displayName?: string }) => void;
+  'song-history': (data: { history: PlayedSong[] }) => void;
+  'game-stats': (data: GameStats) => void;
+  'player-disconnected': (data: { playerId: string; reconnectDeadline: number }) => void;
+  'player-reconnected': (data: { playerId: string }) => void;
+  'player-timed-out': (data: { playerId: string }) => void;
+  'player-buzzed': (data: { playerId: string }) => void;
 }
