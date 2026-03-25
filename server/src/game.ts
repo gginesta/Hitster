@@ -5,6 +5,8 @@ import type {
   Room,
   SongCard,
   SongGuess,
+  PlayerStats,
+  GameStats,
 } from '@hitster/shared';
 import {
   STARTING_TOKENS,
@@ -36,6 +38,12 @@ export class GameEngine {
   private yearGuess: number | null = null;
   /** Grace period timers for disconnected players */
   private disconnectTimers: Map<string, ReturnType<typeof setTimeout>> = new Map();
+  /** Per-player stats tracked throughout the game */
+  private playerStats: Map<string, PlayerStats> = new Map();
+  /** Timestamp when the current turn started (for fastest placement tracking) */
+  private turnStartTime: number = 0;
+  /** Total rounds played */
+  private totalRounds: number = 0;
 
   constructor(room: Room, io: HitsterServer) {
     this.room = room;
@@ -76,6 +84,9 @@ export class GameEngine {
     this.songNamed.clear();
     this.songNameCorrect.clear();
     this.yearGuess = null;
+    this.playerStats.clear();
+    this.totalRounds = 0;
+    this.turnStartTime = 0;
 
     // Reset all players: clear timelines, restore starting tokens
     for (const player of Object.values(this.room.players)) {
@@ -99,7 +110,24 @@ export class GameEngine {
 
   startGame(deck: SongCard[]) {
     this.deck = [...deck];
+    this.totalRounds = 0;
     const playerIds = Object.keys(this.room.players);
+
+    // Initialize player stats
+    this.playerStats.clear();
+    for (const id of playerIds) {
+      this.playerStats.set(id, {
+        correctPlacements: 0,
+        totalPlacements: 0,
+        challengesWon: 0,
+        challengesLost: 0,
+        longestStreak: 0,
+        currentStreak: 0,
+        fastestPlacementMs: null,
+        decadeAccuracy: {},
+        songsNamed: 0,
+      });
+    }
 
     // Give each player a starting card (or shared timeline for co-op)
     if (this.isCoop) {
@@ -177,6 +205,7 @@ export class GameEngine {
     this.songNamed.clear();
     this.songNameCorrect.clear();
     this.yearGuess = null;
+    this.turnStartTime = Date.now();
 
     const turnPlayerId = this.room.gameState.currentTurnPlayerId!;
     const turnPlayer = this.room.players[turnPlayerId];
@@ -227,6 +256,13 @@ export class GameEngine {
     if (this.turnTimer) {
       clearTimeout(this.turnTimer);
       this.turnTimer = null;
+    }
+
+    // Track placement speed for stats
+    const placementMs = Date.now() - this.turnStartTime;
+    const stats = this.playerStats.get(playerId);
+    if (stats && (stats.fastestPlacementMs === null || placementMs < stats.fastestPlacementMs)) {
+      stats.fastestPlacementMs = placementMs;
     }
 
     gs.pendingPlacement = position;
@@ -295,6 +331,12 @@ export class GameEngine {
     }
 
     if (correct) {
+      // Track songsNamed stat
+      const stats = this.playerStats.get(playerId);
+      if (stats) {
+        stats.songsNamed++;
+      }
+
       const player = this.room.players[playerId];
       if (player && player.tokens < MAX_TOKENS) {
         player.tokens += 1;
@@ -402,6 +444,45 @@ export class GameEngine {
       correct = placementCorrect && activePlayerNamedSong && (yearCorrect === true);
     }
 
+    // Update active player stats
+    this.totalRounds++;
+    const activeStats = this.playerStats.get(activePlayerId);
+    if (activeStats) {
+      activeStats.totalPlacements++;
+      if (correct) {
+        activeStats.correctPlacements++;
+        activeStats.currentStreak++;
+        if (activeStats.currentStreak > activeStats.longestStreak) {
+          activeStats.longestStreak = activeStats.currentStreak;
+        }
+      } else {
+        activeStats.currentStreak = 0;
+      }
+      // Update decade accuracy
+      const decade = Math.floor(song.year / 10) * 10;
+      if (!activeStats.decadeAccuracy[decade]) {
+        activeStats.decadeAccuracy[decade] = { correct: 0, total: 0 };
+      }
+      activeStats.decadeAccuracy[decade].total++;
+      if (placementCorrect) {
+        activeStats.decadeAccuracy[decade].correct++;
+      }
+    }
+
+    // Update challenger stats
+    for (const challengerId of gs.challengers) {
+      const challengerStats = this.playerStats.get(challengerId);
+      if (challengerStats) {
+        if (!correct) {
+          // Challenger was right (placement was wrong)
+          challengerStats.challengesWon++;
+        } else {
+          // Challenger was wrong (placement was correct)
+          challengerStats.challengesLost++;
+        }
+      }
+    }
+
     let stolenBy: string | null = null;
     let winnerId: string | null = null;
 
@@ -471,6 +552,30 @@ export class GameEngine {
     const gs = this.room.gameState;
     const sharedTimeline = gs.sharedTimeline;
     const placementCorrect = this.isPlacementCorrect(sharedTimeline, song, position);
+
+    // Update active player stats for co-op
+    this.totalRounds++;
+    const activeStats = this.playerStats.get(activePlayerId);
+    if (activeStats) {
+      activeStats.totalPlacements++;
+      if (placementCorrect) {
+        activeStats.correctPlacements++;
+        activeStats.currentStreak++;
+        if (activeStats.currentStreak > activeStats.longestStreak) {
+          activeStats.longestStreak = activeStats.currentStreak;
+        }
+      } else {
+        activeStats.currentStreak = 0;
+      }
+      const decade = Math.floor(song.year / 10) * 10;
+      if (!activeStats.decadeAccuracy[decade]) {
+        activeStats.decadeAccuracy[decade] = { correct: 0, total: 0 };
+      }
+      activeStats.decadeAccuracy[decade].total++;
+      if (placementCorrect) {
+        activeStats.decadeAccuracy[decade].correct++;
+      }
+    }
 
     if (placementCorrect) {
       // Card goes into shared timeline
