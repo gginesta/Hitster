@@ -59,6 +59,9 @@ The game is fully playable as a real-time multiplayer experience with Spotify in
 - [x] Player statistics profile (accuracy, streaks, challenges, songs named)
 - [x] Preview Mode — host without Spotify using 30-second preview clips (no account needed, unlimited players)
 - [x] Preview URL pre-baking script (`scripts/prebake-previews.ts`)
+- [x] Auto-caching of preview URLs from Spotify games (background-resolves 100 uncached songs per game)
+- [x] Autoplay fix for iOS Safari (capture phase + touchend, keydown unlock, fallback audio init for preview mode)
+- [x] Turn timer moved to top bar (compact ring next to score chips)
 
 ---
 
@@ -139,3 +142,4 @@ A full-stack audit was performed covering 30 server issues and 20 client issues.
 - Password hashing uses SHA-256 without salt (acceptable for a game, not for sensitive data)
 - No rate limiting on auth endpoints
 - CORS origin is wildcard (should be restricted in production)
+- Spotify preview URLs are no longer available via Client Credentials API (removed by Spotify late 2024); preview URLs accumulate via the background-resolve mechanism as Premium-hosted games are played
