@@ -1,6 +1,6 @@
 # Implementation Plan — Feature Sprint
 
-## Status: COMPLETE (14 features + audit)
+## Status: COMPLETE (14 features + audit + preview mode + bug fixes)
 
 ---
 
