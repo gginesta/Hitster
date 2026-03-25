@@ -1,8 +1,9 @@
-import { Trophy, Home, RotateCcw, Medal, Coins } from 'lucide-react';
+import { Trophy, Home, RotateCcw, Medal, Coins, Zap, Target, Flame, Swords, Music } from 'lucide-react';
 import { motion } from 'motion/react';
 import { getSocket } from '../services/socket';
 import { clearSession } from '../services/socket';
 import { useGameStore } from '../store';
+import type { GameStats, PlayerStats } from '@hitster/shared';
 
 const ORDINALS = ['1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th'];
 
@@ -42,6 +43,7 @@ export function Results() {
   const myId = useGameStore((s) => s.myId);
   const hostId = useGameStore((s) => s.hostId);
   const reset = useGameStore((s) => s.reset);
+  const gameStats = useGameStore((s) => s.gameStats);
 
   const isCoop = settings.mode === 'coop';
   const isHost = myId === hostId;
@@ -177,6 +179,9 @@ export function Results() {
         )}
       </div>
 
+      {/* Awards */}
+      {gameStats && <Awards gameStats={gameStats} players={finalPlayers} />}
+
       {/* Action buttons */}
       <div className="mt-8 w-full max-w-md mx-auto space-y-3 pb-4">
         {isHost ? (
@@ -200,6 +205,161 @@ export function Results() {
           <Home className="w-5 h-5" />
           Leave Game
         </button>
+      </div>
+    </div>
+  );
+}
+
+interface AwardDef {
+  id: string;
+  label: string;
+  icon: React.ReactNode;
+  gradient: string;
+  playerId: string | null;
+  detail: string;
+}
+
+function Awards({ gameStats, players }: { gameStats: GameStats; players: Record<string, { name: string }> }) {
+  const stats = gameStats.playerStats;
+  const playerIds = Object.keys(stats);
+
+  const getName = (id: string) => players[id]?.name ?? 'Unknown';
+
+  // Fastest Fingers — lowest fastestPlacementMs
+  let fastestId: string | null = null;
+  let fastestMs = Infinity;
+  for (const id of playerIds) {
+    const ms = stats[id].fastestPlacementMs;
+    if (ms !== null && ms < fastestMs) {
+      fastestMs = ms;
+      fastestId = id;
+    }
+  }
+
+  // Sharpshooter — highest correct/total ratio (min 1 placement)
+  let sharpshooterId: string | null = null;
+  let bestRatio = -1;
+  for (const id of playerIds) {
+    const s = stats[id];
+    if (s.totalPlacements > 0) {
+      const ratio = s.correctPlacements / s.totalPlacements;
+      if (ratio > bestRatio) {
+        bestRatio = ratio;
+        sharpshooterId = id;
+      }
+    }
+  }
+
+  // Hot Streak — longest streak
+  let streakId: string | null = null;
+  let bestStreak = 0;
+  for (const id of playerIds) {
+    if (stats[id].longestStreak > bestStreak) {
+      bestStreak = stats[id].longestStreak;
+      streakId = id;
+    }
+  }
+
+  // Challenge King — most challengesWon
+  let challengeId: string | null = null;
+  let mostWon = 0;
+  for (const id of playerIds) {
+    if (stats[id].challengesWon > mostWon) {
+      mostWon = stats[id].challengesWon;
+      challengeId = id;
+    }
+  }
+
+  // Name That Tune — most songsNamed
+  let tuneId: string | null = null;
+  let mostNamed = 0;
+  for (const id of playerIds) {
+    if (stats[id].songsNamed > mostNamed) {
+      mostNamed = stats[id].songsNamed;
+      tuneId = id;
+    }
+  }
+
+  const awards: AwardDef[] = [
+    {
+      id: 'fastest',
+      label: 'Fastest Fingers',
+      icon: <Zap className="w-5 h-5" />,
+      gradient: 'from-yellow-500/20 to-amber-500/5',
+      playerId: fastestId,
+      detail: fastestId ? `${(fastestMs / 1000).toFixed(1)}s` : '',
+    },
+    {
+      id: 'sharpshooter',
+      label: 'Sharpshooter',
+      icon: <Target className="w-5 h-5" />,
+      gradient: 'from-emerald-500/20 to-green-500/5',
+      playerId: sharpshooterId,
+      detail: sharpshooterId ? `${Math.round(bestRatio * 100)}% accuracy` : '',
+    },
+    {
+      id: 'streak',
+      label: 'Hot Streak',
+      icon: <Flame className="w-5 h-5" />,
+      gradient: 'from-orange-500/20 to-red-500/5',
+      playerId: streakId && bestStreak > 0 ? streakId : null,
+      detail: streakId && bestStreak > 0 ? `${bestStreak} in a row` : '',
+    },
+    {
+      id: 'challenge',
+      label: 'Challenge King',
+      icon: <Swords className="w-5 h-5" />,
+      gradient: 'from-purple-500/20 to-violet-500/5',
+      playerId: mostWon > 0 ? challengeId : null,
+      detail: mostWon > 0 ? `${mostWon} won` : '',
+    },
+    {
+      id: 'tune',
+      label: 'Name That Tune',
+      icon: <Music className="w-5 h-5" />,
+      gradient: 'from-cyan-500/20 to-blue-500/5',
+      playerId: mostNamed > 0 ? tuneId : null,
+      detail: mostNamed > 0 ? `${mostNamed} songs` : '',
+    },
+  ].filter((a) => a.playerId !== null);
+
+  if (awards.length === 0) return null;
+
+  return (
+    <div className="w-full max-w-md mx-auto mt-8">
+      <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3">
+        Awards
+      </h3>
+      <div className="space-y-2.5">
+        {awards.map((award, index) => (
+          <motion.div
+            key={award.id}
+            initial={{ x: -20, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{
+              delay: 0.4 + index * 0.1,
+              type: 'spring',
+              stiffness: 200,
+              damping: 22,
+            }}
+            className={`flex items-center gap-3 p-4 rounded-2xl border border-white/[0.08] bg-gradient-to-r ${award.gradient} backdrop-blur-sm`}
+          >
+            <div className="w-10 h-10 rounded-full bg-white/[0.08] flex items-center justify-center shrink-0">
+              {award.icon}
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="text-xs text-gray-400 font-semibold uppercase tracking-wide">
+                {award.label}
+              </div>
+              <div className="font-bold text-sm truncate">
+                {getName(award.playerId!)}
+              </div>
+            </div>
+            <div className="text-xs text-gray-400 font-bold whitespace-nowrap">
+              {award.detail}
+            </div>
+          </motion.div>
+        ))}
       </div>
     </div>
   );

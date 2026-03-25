@@ -140,6 +140,13 @@ export function playTickSound(): void {
   ]);
 }
 
+/** Buzz — quick short blip (E5), triangle wave, 80ms */
+export function playBuzzSound(): void {
+  playTones([
+    { frequency: NOTE.E5, type: 'triangle', duration: 0.08, startTime: 0, volume: 0.5 },
+  ]);
+}
+
 /** Game start — ascending arpeggio (C4 → E4 → G4 → C5), sine wave, 100ms each */
 export function playStartSound(): void {
   playTones([

@@ -2,6 +2,8 @@ import { create } from 'zustand';
 import type {
   GamePhase,
   GameSettings,
+  GameStats,
+  PlayedSong,
   Player,
   SongCard,
   Room,
@@ -73,12 +75,21 @@ interface GameStore {
   currentTrackId: string | null;
   currentPreviewUrl: string | null;
 
+
+  // Buzz
+  buzzedPlayers: string[];
   // Disconnect grace period
   disconnectedPlayers: Record<string, number>; // playerId → reconnectDeadline timestamp
 
   // Winner
   winnerId: string | null;
   finalPlayers: Record<string, Player>;
+
+  // End-of-game stats
+  gameStats: GameStats | null;
+
+  // Song history
+  songHistory: PlayedSong[];
 
   // Actions
   setScreen: (screen: Screen) => void;
@@ -115,6 +126,10 @@ interface GameStore {
   setPlayerDisconnected: (playerId: string, deadline: number) => void;
   setPlayerReconnected: (playerId: string) => void;
   setPlayerTimedOut: (playerId: string) => void;
+  setGameStats: (stats: GameStats) => void;
+  setSongHistory: (history: PlayedSong[]) => void;
+  addBuzzedPlayer: (id: string) => void;
+  clearBuzzedPlayers: () => void;
   syncRoom: (room: Room) => void;
   reset: () => void;
 }
@@ -155,11 +170,14 @@ const initialState = {
   autoplayBlocked: false,
   currentTrackId: null as string | null,
   currentPreviewUrl: null as string | null,
+  buzzedPlayers: [] as string[],
   disconnectedPlayers: {} as Record<string, number>,
   lastReveal: null,
   songNameResult: null,
   winnerId: null,
   finalPlayers: {} as Record<string, Player>,
+  gameStats: null as GameStats | null,
+  songHistory: [] as PlayedSong[],
 };
 
 export const useGameStore = create<GameStore>((set) => ({
@@ -233,6 +251,13 @@ export const useGameStore = create<GameStore>((set) => ({
       const { [playerId]: _, ...rest } = s.disconnectedPlayers;
       return { disconnectedPlayers: rest };
     }),
+  setGameStats: (gameStats) => set({ gameStats }),
+  setSongHistory: (songHistory) => set({ songHistory }),
+  addBuzzedPlayer: (id) =>
+    set((s) => ({
+      buzzedPlayers: s.buzzedPlayers.includes(id) ? s.buzzedPlayers : [...s.buzzedPlayers, id],
+    })),
+  clearBuzzedPlayers: () => set({ buzzedPlayers: [] }),
   syncRoom: (room) =>
     set({
       players: room.players,

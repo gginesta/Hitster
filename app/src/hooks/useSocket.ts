@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { getSocket, saveSession, getSession, clearSession } from '../services/socket';
 import { useGameStore } from '../store';
+import { playBuzzSound } from '../services/sounds';
 
 export function useSocket() {
   const store = useGameStore();
@@ -78,6 +79,7 @@ export function useSocket() {
       store.setPendingPlacement(null);
       store.setLastReveal(null);
       useGameStore.setState({ songNameResult: null, turnDeadline: null });
+      store.clearBuzzedPlayers();
     });
 
     socket.on('turn-started', ({ turnDeadline }) => {
@@ -126,6 +128,14 @@ export function useSocket() {
       store.setSongNameResult(playerId, correct);
     });
 
+    socket.on('game-stats', (data) => {
+      store.setGameStats(data);
+    });
+
+    socket.on('song-history', ({ history }) => {
+      store.setSongHistory(history);
+    });
+
     socket.on('game-over', ({ winnerId, players }) => {
       store.setWinner(winnerId, players);
       store.setPhase('game_over');
@@ -142,6 +152,8 @@ export function useSocket() {
       useGameStore.setState({
         winnerId: null,
         finalPlayers: {},
+        gameStats: null,
+        songHistory: [],
         songNameResult: null,
         challengeDeadline: null,
       });
@@ -169,6 +181,11 @@ export function useSocket() {
 
     socket.on('player-timed-out', ({ playerId }) => {
       store.setPlayerTimedOut(playerId);
+    });
+
+    socket.on('player-buzzed', ({ playerId }) => {
+      store.addBuzzedPlayer(playerId);
+      playBuzzSound();
     });
 
     return () => {

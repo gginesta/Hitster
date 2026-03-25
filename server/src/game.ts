@@ -5,6 +5,7 @@ import type {
   Room,
   SongCard,
   SongGuess,
+  PlayedSong,
   PlayerStats,
   GameStats,
 } from '@hitster/shared';
@@ -44,6 +45,10 @@ export class GameEngine {
   private turnStartTime: number = 0;
   /** Total rounds played */
   private totalRounds: number = 0;
+  /** History of all played songs */
+  private songHistory: PlayedSong[] = [];
+  /** Current round number */
+  private roundNumber: number = 0;
 
   constructor(room: Room, io: HitsterServer) {
     this.room = room;
@@ -60,6 +65,10 @@ export class GameEngine {
 
   setSpotifyToken(token: string) {
     this.spotifyAccessToken = token;
+  }
+
+  getSongHistory(): PlayedSong[] {
+    return this.songHistory;
   }
 
   resetGame() {
@@ -84,6 +93,8 @@ export class GameEngine {
     this.songNamed.clear();
     this.songNameCorrect.clear();
     this.yearGuess = null;
+    this.songHistory = [];
+    this.roundNumber = 0;
     this.playerStats.clear();
     this.totalRounds = 0;
     this.turnStartTime = 0;
@@ -206,6 +217,7 @@ export class GameEngine {
     this.songNameCorrect.clear();
     this.yearGuess = null;
     this.turnStartTime = Date.now();
+    this.roundNumber++;
 
     const turnPlayerId = this.room.gameState.currentTurnPlayerId!;
     const turnPlayer = this.room.players[turnPlayerId];
@@ -529,6 +541,16 @@ export class GameEngine {
       },
     });
 
+    // Record song history entry
+    this.songHistory.push({
+      song,
+      turnPlayerId: activePlayerId,
+      correct,
+      stolenBy,
+      roundNumber: this.roundNumber,
+    });
+    this.io.to(this.room.code).emit('song-history', { history: this.songHistory });
+
     if (winnerId) {
       this.io.to(this.room.code).emit('timeline-updated', {
         playerId: winnerId,
@@ -608,6 +630,16 @@ export class GameEngine {
     this.io.to(this.room.code).emit('shared-timeline-updated', {
       timeline: sharedTimeline,
     });
+
+    // Record song history entry
+    this.songHistory.push({
+      song,
+      turnPlayerId: activePlayerId,
+      correct: placementCorrect,
+      stolenBy: null,
+      roundNumber: this.roundNumber,
+    });
+    this.io.to(this.room.code).emit('song-history', { history: this.songHistory });
 
     // Check co-op win condition
     if (sharedTimeline.length >= this.room.settings.cardsToWin) {
@@ -763,6 +795,20 @@ export class GameEngine {
       mode: this.mode,
       finalScores,
     });
+
+    // Build and emit game stats
+    const playerStatsObj: Record<string, PlayerStats> = {};
+    for (const [id, stats] of this.playerStats.entries()) {
+      playerStatsObj[id] = { ...stats };
+    }
+    const gameStats: GameStats = {
+      playerStats: playerStatsObj,
+      totalRounds: this.totalRounds,
+    };
+    this.io.to(this.room.code).emit('game-stats', gameStats);
+
+    // Emit final song history
+    this.io.to(this.room.code).emit('song-history', { history: this.songHistory });
 
     this.io.to(this.room.code).emit('game-over', {
       winnerId,

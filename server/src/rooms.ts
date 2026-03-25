@@ -221,6 +221,15 @@ export function registerRoomHandlers(io: HitsterServer, socket: HitsterSocket) {
       }
     }
 
+    // Re-send song history if available
+    const engineForHistory = games.get(upperCode);
+    if (engineForHistory) {
+      const history = engineForHistory.getSongHistory();
+      if (history.length > 0) {
+        socket.emit('song-history', { history });
+      }
+    }
+
     persistRoom(upperCode);
   });
 
@@ -371,6 +380,15 @@ export function registerRoomHandlers(io: HitsterServer, socket: HitsterSocket) {
     persistRoom(mapping.code);
 
     io.to(mapping.code).emit('game-restarted', { room });
+  });
+
+  socket.on('buzz', () => {
+    const mapping = socketToRoom.get(socket.id);
+    if (!mapping) return;
+    const room = rooms.get(mapping.code);
+    if (!room || room.gameState.phase !== 'playing') return;
+    if (mapping.playerId === room.gameState.currentTurnPlayerId) return;
+    io.to(mapping.code).emit('player-buzzed', { playerId: mapping.playerId });
   });
 
   socket.on('disconnect', () => {
