@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Disc, Coins, Check, X, SkipForward, AlertTriangle, ShoppingCart, Star, Play, Pause, Volume2, Volume1, VolumeX } from 'lucide-react';
+import { Disc, Coins, Check, X, SkipForward, AlertTriangle, ShoppingCart, Star, Play, Pause, Volume2, Volume1, VolumeX, Clock } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { getSocket } from '../services/socket';
 import { useGameStore } from '../store';
@@ -16,6 +16,7 @@ import {
   toggleMute,
 } from '../services/sounds';
 import type { SongCard, GameMode } from '@hitster/shared';
+import { SongHistory } from './SongHistory';
 
 const DECADE_COLORS: Record<number, string> = {
   1930: 'from-amber-900 to-yellow-900',
@@ -89,6 +90,7 @@ export function Game() {
   const challengeDeadline = useGameStore((s) => s.challengeDeadline);
   const turnDeadline = useGameStore((s) => s.turnDeadline);
   const [noChallengeClicked, setNoChallengeClicked] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
 
   const [guessTitle, setGuessTitle] = useState('');
   const [guessArtist, setGuessArtist] = useState('');
@@ -377,6 +379,13 @@ export function Game() {
             )}
           </div>
           <div className="flex items-center gap-1 flex-shrink-0">
+            <button
+              onClick={() => setShowHistory(true)}
+              className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
+              title="Song History"
+            >
+              <Clock className="w-4 h-4" />
+            </button>
             <button
               onClick={handleToggleMute}
               className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
