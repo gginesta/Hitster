@@ -44,20 +44,37 @@ export function loadSongs() {
 /**
  * Select a game deck from the built-in song database.
  * @param decades - Optional array of decade start years to filter by (e.g. [1980, 1990])
+ * @param genres - Optional array of genres to filter by (e.g. ['rock', 'pop'])
+ * @param regions - Optional array of regions to filter by (e.g. ['global', 'uk'])
  */
-export function selectGameDeck(count: number = DECK_SIZE, decades?: number[]): SongCard[] {
+export function selectGameDeck(
+  count: number = DECK_SIZE,
+  decades?: number[],
+  genres?: string[],
+  regions?: string[],
+): SongCard[] {
   if (allSongs.length === 0) {
     logger.warn('No songs loaded, returning empty deck');
     return [];
   }
 
-  // Filter by selected decades if provided
-  const pool = decades && decades.length > 0
-    ? allSongs.filter((song) => {
-        const decade = Math.floor(song.year / 10) * 10;
-        return decades.includes(decade);
-      })
-    : allSongs;
+  // Filter by selected decades, genres, and regions
+  let pool = allSongs;
+
+  if (decades && decades.length > 0) {
+    pool = pool.filter((song) => {
+      const decade = Math.floor(song.year / 10) * 10;
+      return decades.includes(decade);
+    });
+  }
+
+  if (genres && genres.length > 0) {
+    pool = pool.filter((song) => song.genre && genres.includes(song.genre));
+  }
+
+  if (regions && regions.length > 0) {
+    pool = pool.filter((song) => song.region && regions.includes(song.region));
+  }
 
   if (pool.length === 0) {
     logger.warn('No songs match the selected decades', { decades });

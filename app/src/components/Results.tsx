@@ -1,9 +1,11 @@
-import { Trophy, Home, RotateCcw, Medal, Coins, Zap, Target, Flame, Swords, Music } from 'lucide-react';
+import { useState } from 'react';
+import { Trophy, Home, RotateCcw, Medal, Coins, Zap, Target, Flame, Swords, Music, Clock } from 'lucide-react';
 import { motion } from 'motion/react';
 import { getSocket } from '../services/socket';
 import { clearSession } from '../services/socket';
 import { useGameStore } from '../store';
 import type { GameStats, PlayerStats } from '@hitster/shared';
+import { SongHistory } from './SongHistory';
 
 const ORDINALS = ['1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th'];
 
@@ -44,6 +46,8 @@ export function Results() {
   const hostId = useGameStore((s) => s.hostId);
   const reset = useGameStore((s) => s.reset);
   const gameStats = useGameStore((s) => s.gameStats);
+
+  const [showHistory, setShowHistory] = useState(false);
 
   const isCoop = settings.mode === 'coop';
   const isHost = myId === hostId;
@@ -199,6 +203,13 @@ export function Results() {
           </div>
         )}
         <button
+          onClick={() => setShowHistory(true)}
+          className="w-full bg-white/[0.06] hover:bg-white/[0.1] text-gray-400 hover:text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-3 transition-all transform active:scale-[0.97] border border-white/[0.06]"
+        >
+          <Clock className="w-5 h-5" />
+          Song History
+        </button>
+        <button
           onClick={handleHome}
           className="w-full bg-white/[0.06] hover:bg-white/[0.1] text-gray-400 hover:text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-3 transition-all transform active:scale-[0.97] border border-white/[0.06]"
         >
@@ -206,6 +217,8 @@ export function Results() {
           Leave Game
         </button>
       </div>
+
+      <SongHistory isOpen={showHistory} onClose={() => setShowHistory(false)} />
     </div>
   );
 }

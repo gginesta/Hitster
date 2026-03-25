@@ -17,6 +17,7 @@ import {
 } from '../services/sounds';
 import type { SongCard, GameMode } from '@hitster/shared';
 import { SongHistory } from './SongHistory';
+import { WaitingState } from './WaitingState';
 
 const DECADE_COLORS: Record<number, string> = {
   1930: 'from-amber-900 to-yellow-900',
@@ -791,11 +792,7 @@ export function Game() {
         )}
 
         {!isMyTurn && phase === 'playing' && (
-          <p className="mt-8 text-gray-400">
-            {isCoop
-              ? `${activePlayer.name} is placing a card for the team...`
-              : `Waiting for ${activePlayer.name} to place the card...`}
-          </p>
+          <WaitingState />
         )}
 
         {/* Challengers display */}
@@ -886,6 +883,8 @@ export function Game() {
           </div>
         )}
       </div>
+
+      <SongHistory isOpen={showHistory} onClose={() => setShowHistory(false)} />
     </div>
   );
 }
