@@ -7,6 +7,8 @@ import { logger } from './logger';
 import { fisherYatesShuffle } from './shuffle';
 
 let allSongs: SongData[] = [];
+/** The resolved path to songs.json (set during loadSongs) */
+let songsFilePath: string | null = null;
 
 // In-memory cache: "title::artist" → { trackId, previewUrl }
 const trackCache = new Map<string, { trackId: string; previewUrl?: string }>();
@@ -29,11 +31,11 @@ export function loadSongs() {
     candidates: candidates.map(c => ({ path: c, exists: fs.existsSync(c) })),
   });
 
-  const songsPath = candidates.find(p => fs.existsSync(p)) || candidates[0];
-  logger.info('Loading songs', { path: songsPath });
+  songsFilePath = candidates.find(p => fs.existsSync(p)) || candidates[0];
+  logger.info('Loading songs', { path: songsFilePath });
 
   try {
-    const raw = fs.readFileSync(songsPath, 'utf-8');
+    const raw = fs.readFileSync(songsFilePath, 'utf-8');
     allSongs = JSON.parse(raw);
     logger.info('Songs loaded successfully', { count: allSongs.length });
   } catch (err) {
@@ -315,5 +317,38 @@ export async function resolveTrackIds(
     playable: playable.length,
   });
 
+  // Persist newly resolved preview URLs back to songs.json for preview mode
+  persistPreviewUrls();
+
   return playable;
+}
+
+/**
+ * Write resolved preview URLs and track IDs from the in-memory cache
+ * back to songs.json. This gradually populates preview data so that
+ * "Host without Spotify" mode gains audio over time as Spotify games
+ * are played.
+ */
+function persistPreviewUrls(): void {
+  if (!songsFilePath || allSongs.length === 0) return;
+
+  let updated = 0;
+  for (const song of allSongs) {
+    const key = cacheKey(song);
+    const cached = trackCache.get(key);
+    if (cached && !song.spotifyTrackId) {
+      song.spotifyTrackId = cached.trackId;
+      song.previewUrl = cached.previewUrl ?? null;
+      updated++;
+    }
+  }
+
+  if (updated === 0) return;
+
+  try {
+    fs.writeFileSync(songsFilePath, JSON.stringify(allSongs, null, 2) + '\n', 'utf-8');
+    logger.info('Persisted preview URLs to songs.json', { updated, total: allSongs.length });
+  } catch (err) {
+    logger.error('Failed to persist preview URLs', { error: String(err) });
+  }
 }
