@@ -219,6 +219,20 @@ export const useGameStore = create<GameStore>((set) => ({
   setSpotifyError: (spotifyError) => set({ spotifyError }),
   setIsPlaying: (isPlaying) => set({ isPlaying }),
   setCurrentTrackId: (currentTrackId, previewUrl) => set({ currentTrackId, currentPreviewUrl: previewUrl ?? null }),
+  setPlayerDisconnected: (playerId, deadline) =>
+    set((s) => ({
+      disconnectedPlayers: { ...s.disconnectedPlayers, [playerId]: deadline },
+    })),
+  setPlayerReconnected: (playerId) =>
+    set((s) => {
+      const { [playerId]: _, ...rest } = s.disconnectedPlayers;
+      return { disconnectedPlayers: rest };
+    }),
+  setPlayerTimedOut: (playerId) =>
+    set((s) => {
+      const { [playerId]: _, ...rest } = s.disconnectedPlayers;
+      return { disconnectedPlayers: rest };
+    }),
   syncRoom: (room) =>
     set({
       players: room.players,

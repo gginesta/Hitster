@@ -15,10 +15,13 @@ export function Home() {
   const [authPassword, setAuthPassword] = useState('');
   const [authLoading, setAuthLoading] = useState(false);
   const [signedInAs, setSignedInAs] = useState<string | null>(() => localStorage.getItem('hitster_username'));
+  const [inviteMessage, setInviteMessage] = useState<string | null>(null);
   const error = useGameStore((s) => s.error);
   const connected = useGameStore((s) => s.connected);
   const setScreen = useGameStore((s) => s.setScreen);
   const setError = useGameStore((s) => s.setError);
+  const pendingJoinCode = useGameStore((s) => s.pendingJoinCode);
+  const setPendingJoinCode = useGameStore((s) => s.setPendingJoinCode);
 
   const handleAuthResult = useCallback((data: { success: boolean; error?: string; displayName?: string }) => {
     setAuthLoading(false);
@@ -44,6 +47,15 @@ export function Home() {
       socket.off('auth-result', handleAuthResult);
     };
   }, [handleAuthResult]);
+
+  useEffect(() => {
+    if (pendingJoinCode) {
+      setMode('join');
+      setCode(pendingJoinCode.split('') as [string, string, string, string]);
+      setInviteMessage(`You've been invited to room ${pendingJoinCode}!`);
+      setPendingJoinCode(null);
+    }
+  }, [pendingJoinCode, setPendingJoinCode]);
 
   const handleAuth = () => {
     if (!authUsername.trim() || !authPassword.trim()) return;
@@ -387,6 +399,15 @@ export function Home() {
               exit={{ opacity: 0, x: -20 }}
               className="space-y-5 pt-2"
             >
+              {inviteMessage && (
+                <motion.p
+                  initial={{ opacity: 0, y: -5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-[#1DB954] text-sm text-center bg-[#1DB954]/10 border border-[#1DB954]/20 rounded-xl px-4 py-2.5 font-medium"
+                >
+                  {inviteMessage}
+                </motion.p>
+              )}
               <div className="space-y-3">
                 <label className="text-xs font-bold text-gray-400 uppercase tracking-wider text-center block">
                   Enter Room Code

@@ -4,6 +4,7 @@
  */
 
 let audio: HTMLAudioElement | null = null;
+let currentVolume = 0.8;
 let onStateChange: ((paused: boolean) => void) | null = null;
 
 export function initFallbackAudio(callbacks: { onStateChange: (paused: boolean) => void }) {
@@ -25,13 +26,20 @@ export async function playPreviewUrl(url: string): Promise<boolean> {
 
     audio.src = url;
     audio.currentTime = 0;
-    audio.volume = 0.8;
+    audio.volume = currentVolume;
     await audio.play();
     console.log('[Hitster] Fallback audio playing preview URL');
     return true;
   } catch (err) {
     console.error('[Hitster] Fallback audio play failed:', err);
     return false;
+  }
+}
+
+export function setFallbackVolume(vol: number): void {
+  currentVolume = Math.max(0, Math.min(1, vol));
+  if (audio) {
+    audio.volume = currentVolume;
   }
 }
 
