@@ -5,7 +5,7 @@ import { getSocket } from '../services/socket';
 import { useGameStore } from '../store';
 import { useSpotifyPlayer } from '../hooks/useSpotifyPlayer';
 import { preUnlockAudio, activateElement, resume } from '../services/spotifyPlayer';
-import { SKIP_COST, CHALLENGE_COST, BUY_CARD_COST, TURN_TIME_MS } from '@hitster/shared';
+import { SKIP_COST, CHALLENGE_COST, BUY_CARD_COST } from '@hitster/shared';
 import {
   playCorrectSound,
   playWrongSound,
@@ -128,7 +128,6 @@ export function Game() {
   }, [phase, challengeDeadline]);
 
   // Countdown timer for turn (playing phase)
-  const TURN_TIME_SECONDS = TURN_TIME_MS / 1000;
   const [turnCountdown, setTurnCountdown] = useState<number | null>(null);
   useEffect(() => {
     if (phase !== 'playing' || !turnDeadline) {
@@ -411,26 +410,6 @@ export function Game() {
 
         {/* Turn timer + Player score chips + mute */}
         <div className="flex items-center gap-2 flex-shrink-0">
-          {phase === 'playing' && turnCountdown !== null && turnCountdown > 0 && (
-            <div className="relative w-9 h-9 flex-shrink-0">
-              <svg className="w-9 h-9 -rotate-90" viewBox="0 0 100 100">
-                <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="8" />
-                <circle
-                  cx="50" cy="50" r="42" fill="none"
-                  stroke={turnCountdown <= 5 ? '#ef4444' : turnCountdown <= 10 ? '#f97316' : '#3b82f6'}
-                  strokeWidth="8" strokeLinecap="round"
-                  strokeDasharray={`${2 * Math.PI * 42}`}
-                  strokeDashoffset={`${2 * Math.PI * 42 * (1 - turnCountdown / TURN_TIME_SECONDS)}`}
-                  className="transition-all duration-1000 ease-linear"
-                />
-              </svg>
-              <span className={`absolute inset-0 flex items-center justify-center text-[11px] font-black ${
-                turnCountdown <= 5 ? 'text-red-400' : turnCountdown <= 10 ? 'text-orange-400' : 'text-white'
-              }`}>
-                {turnCountdown}
-              </span>
-            </div>
-          )}
           <div className="flex gap-2 overflow-x-auto hide-scrollbar">
             {isCoop ? (
               <div className="flex flex-col items-center px-1">
@@ -677,42 +656,6 @@ export function Game() {
                 <h2 className="text-6xl font-black text-white/90 mt-4">?</h2>
               )}
 
-              {/* Countdown timer during challenge phase */}
-              {phase === 'challenge' && countdown !== null && countdown > 0 && (
-                <motion.div
-                  key="countdown"
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  className="absolute inset-0 flex items-center justify-center z-20"
-                >
-                  <div className="relative">
-                    <svg className="w-40 h-40 -rotate-90" viewBox="0 0 100 100">
-                      <circle
-                        cx="50" cy="50" r="42"
-                        fill="none"
-                        stroke="rgba(255,255,255,0.1)"
-                        strokeWidth="6"
-                      />
-                      <circle
-                        cx="50" cy="50" r="42"
-                        fill="none"
-                        stroke={countdown <= 5 ? '#ef4444' : '#f59e0b'}
-                        strokeWidth="6"
-                        strokeLinecap="round"
-                        strokeDasharray={`${2 * Math.PI * 42}`}
-                        strokeDashoffset={`${2 * Math.PI * 42 * (1 - countdown / 8)}`}
-                        className="transition-all duration-100"
-                      />
-                    </svg>
-                    <span className={`absolute inset-0 flex items-center justify-center text-6xl font-black drop-shadow-lg ${
-                      countdown <= 3 ? 'text-red-400' : 'text-amber-400'
-                    }`}>
-                      {countdown}
-                    </span>
-                  </div>
-                </motion.div>
-              )}
-
               <p className="text-white/50 font-medium mt-3 text-sm">
                 {phase === 'challenge'
                   ? (isCoop ? 'Checking placement...' : 'Waiting for challenges...')
@@ -729,6 +672,20 @@ export function Game() {
             </motion.div>
           )}
         </AnimatePresence>
+
+        {/* Challenge countdown timer — shown below the card */}
+        {phase === 'challenge' && countdown !== null && countdown > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className={`mt-4 flex items-center justify-center gap-3 px-6 py-3 rounded-2xl font-bold text-lg ${
+              countdown <= 3 ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+            }`}
+          >
+            <Clock className="w-5 h-5" />
+            <span>{countdown}s to challenge</span>
+          </motion.div>
+        )}
 
         {/* Reveal: Continue button */}
         {phase === 'reveal' && (
@@ -765,10 +722,11 @@ export function Game() {
               placeholder={songNamingRequired ? 'Song Title (Required)' : 'Guess Title (Optional, +1 token)'}
               value={guessTitle}
               onChange={(e) => setGuessTitle(e.target.value)}
-              autoComplete="off"
-              autoCorrect="off"
-              autoCapitalize="off"
-              spellCheck={false}
+              autoComplete="on"
+              autoCorrect="on"
+              autoCapitalize="sentences"
+              spellCheck={true}
+              inputMode="text"
               className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#1DB954]"
             />
             <input
@@ -776,10 +734,11 @@ export function Game() {
               placeholder={songNamingRequired ? 'Artist (Required)' : 'Guess Artist (Optional)'}
               value={guessArtist}
               onChange={(e) => setGuessArtist(e.target.value)}
-              autoComplete="off"
-              autoCorrect="off"
-              autoCapitalize="off"
-              spellCheck={false}
+              autoComplete="on"
+              autoCorrect="on"
+              autoCapitalize="sentences"
+              spellCheck={true}
+              inputMode="text"
               className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#1DB954]"
             />
             {mode === 'expert' && (
