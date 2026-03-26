@@ -239,38 +239,30 @@ export function Game() {
     prevCountdownRef.current = countdown;
   }, [countdown]);
 
-  const autoplayBlocked = useGameStore((s) => s.autoplayBlocked);
   const { isHost: isSpotifyHost, spotifyReady, togglePlayback } = useSpotifyPlayer();
 
-  // Unlock audio on any user interaction (tap/click/keydown).
-  // iOS Safari requires audio to be triggered from a direct user gesture.
-  // We use capture phase to catch the event before anything else can swallow it.
-  const togglePlaybackRef = useRef(togglePlayback);
-  togglePlaybackRef.current = togglePlayback;
-
+  // Track whether music has actually started playing for the host.
+  // Show a big play button until it does.
+  const [musicStarted, setMusicStarted] = useState(false);
   useEffect(() => {
-    if (!autoplayBlocked) return;
+    if (isPlayingMusic) setMusicStarted(true);
+  }, [isPlayingMusic]);
+  // Reset when track changes (new turn)
+  const prevTrackRef = useRef(currentTurnPlayerId);
+  useEffect(() => {
+    if (currentTurnPlayerId !== prevTrackRef.current) {
+      prevTrackRef.current = currentTurnPlayerId;
+      setMusicStarted(false);
+    }
+  }, [currentTurnPlayerId]);
 
-    const unlockAudio = () => {
-      preUnlockAudio();
-      activateElement();
-      togglePlaybackRef.current();
-      document.removeEventListener('click', unlockAudio, true);
-      document.removeEventListener('touchend', unlockAudio, true);
-      document.removeEventListener('keydown', unlockAudio, true);
-    };
+  const needsPlayButton = isHost && phase === 'playing' && !musicStarted && !isPlayingMusic;
 
-    // Use capture phase + touchend (not touchstart) for iOS compatibility
-    document.addEventListener('click', unlockAudio, true);
-    document.addEventListener('touchend', unlockAudio, true);
-    document.addEventListener('keydown', unlockAudio, true);
-
-    return () => {
-      document.removeEventListener('click', unlockAudio, true);
-      document.removeEventListener('touchend', unlockAudio, true);
-      document.removeEventListener('keydown', unlockAudio, true);
-    };
-  }, [autoplayBlocked]);
+  const handlePlayTap = () => {
+    preUnlockAudio();
+    activateElement();
+    togglePlayback();
+  };
 
   const socket = getSocket();
   const isMyTurn = currentTurnPlayerId === myId;
@@ -460,15 +452,6 @@ export function Game() {
             )}
           </div>
           <div className="flex items-center gap-1 flex-shrink-0">
-            {isHost && (
-              <button
-                onClick={() => setShowStopConfirm(true)}
-                className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-red-400 hover:text-red-300 transition-colors"
-                title="Stop Game"
-              >
-                <Square className="w-4 h-4" fill="currentColor" />
-              </button>
-            )}
             <button
               onClick={() => setShowHistory(true)}
               className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
@@ -491,27 +474,50 @@ export function Game() {
               onChange={handleVolumeChange}
               className="w-16 h-1 accent-[#1DB954] bg-white/10 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[#1DB954]"
             />
+            {isHost && (
+              <button
+                onClick={() => setShowStopConfirm(true)}
+                className="p-2 rounded-xl bg-red-500/20 hover:bg-red-500/30 text-red-400 hover:text-red-300 transition-colors border border-red-500/30"
+                title="Stop Game"
+              >
+                <Square className="w-4 h-4" fill="currentColor" />
+              </button>
+            )}
           </div>
         </div>
       </div>
 
-      {/* Autoplay blocked banner */}
-      {autoplayBlocked && (
+      {/* Big play button + timer bar — shown when music hasn't started yet */}
+      {needsPlayButton && (
         <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-[#1DB954]/20 border-b border-[#1DB954]/30 px-4 py-3 text-center cursor-pointer"
-          onClick={togglePlayback}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="bg-black/60 border-b border-[#1DB954]/30 px-4 py-4"
         >
-          <div className="flex items-center justify-center gap-2 text-[#1DB954] font-bold">
-            <Play className="w-5 h-5" fill="currentColor" />
-            <span>Tap anywhere to start the music</span>
-          </div>
+          <button
+            onClick={handlePlayTap}
+            className="w-full flex items-center justify-center gap-3 bg-[#1DB954] hover:bg-[#1ed760] text-black font-black text-lg py-4 rounded-2xl shadow-[0_0_30px_rgba(29,185,84,0.4)] transition-all active:scale-95"
+          >
+            <Play className="w-7 h-7" fill="currentColor" />
+            TAP TO PLAY MUSIC
+          </button>
         </motion.div>
       )}
 
+      {/* Turn timer bar — visible below top bar during playing phase */}
+      {phase === 'playing' && turnCountdown !== null && turnCountdown > 0 && (
+        <div className={`px-4 py-2 border-b flex items-center justify-center gap-2 text-sm font-bold ${
+          turnCountdown <= 5 ? 'bg-red-500/20 border-red-500/30 text-red-400' :
+          turnCountdown <= 10 ? 'bg-orange-500/20 border-orange-500/30 text-orange-400' :
+          'bg-white/5 border-white/10 text-gray-300'
+        }`}>
+          <Clock className="w-4 h-4" />
+          <span>{turnCountdown}s remaining</span>
+        </div>
+      )}
+
       {/* Spotify error banner */}
-      {spotifyError && !autoplayBlocked && (
+      {spotifyError && (
         <div className="bg-red-500/10 border-b border-red-500/20 px-4 py-2 text-center text-xs text-red-400 font-medium">
           {spotifyError}
         </div>
