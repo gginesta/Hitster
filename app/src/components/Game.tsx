@@ -717,6 +717,18 @@ export function Game() {
           </motion.div>
         )}
 
+        {/* Song named notification — visible to all players */}
+        {songNameResult && songNameResult.playerId !== myId && songNameResult.correct && phase === 'playing' && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9, y: 10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            className="mt-3 flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30"
+          >
+            <Star className="w-4 h-4" />
+            {players[songNameResult.playerId]?.name || 'Someone'} named the song! +1 Token
+          </motion.div>
+        )}
+
         {/* Challenge result feedback */}
         {phase === 'reveal' && lastReveal?.challengeResults && myId in lastReveal.challengeResults && (
           <motion.div
