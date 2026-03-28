@@ -5,7 +5,7 @@ import { getSocket } from '../services/socket';
 import { useGameStore } from '../store';
 import { useSpotifyPlayer } from '../hooks/useSpotifyPlayer';
 import { preUnlockAudio, activateElement, resume } from '../services/spotifyPlayer';
-import { SKIP_COST, CHALLENGE_COST, BUY_CARD_COST } from '@hitster/shared';
+import { SKIP_COST, CHALLENGE_COST, BUY_CARD_COST } from '@tunes/shared';
 import {
   playCorrectSound,
   playWrongSound,
@@ -16,7 +16,7 @@ import {
   isMuted,
   toggleMute,
 } from '../services/sounds';
-import type { SongCard, GameMode } from '@hitster/shared';
+import type { SongCard, GameMode } from '@tunes/shared';
 import { SongHistory } from './SongHistory';
 import { WaitingState } from './WaitingState';
 
@@ -714,6 +714,18 @@ export function Game() {
           >
             <Clock className="w-5 h-5" />
             <span>{countdown}s to challenge</span>
+          </motion.div>
+        )}
+
+        {/* Song named notification — visible to all players */}
+        {songNameResult && songNameResult.playerId !== myId && songNameResult.correct && phase === 'playing' && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9, y: 10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            className="mt-3 flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30"
+          >
+            <Star className="w-4 h-4" />
+            {players[songNameResult.playerId]?.name || 'Someone'} named the song! +1 Token
           </motion.div>
         )}
 
