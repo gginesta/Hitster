@@ -215,7 +215,24 @@ export class GameEngine {
       deckSize: this.deck.length,
     });
 
-    this.io.to(this.room.code).emit('game-started', { gameState: this.room.gameState });
+    // Collect anchor cards for the dealing animation
+    const anchorCards: Record<string, SongCard> = {};
+    if (this.isCoop) {
+      const sharedCard = this.room.gameState.sharedTimeline[0];
+      if (sharedCard) {
+        // Use a special key so the client knows it's the shared timeline card
+        anchorCards['__shared__'] = sharedCard;
+      }
+    } else {
+      for (const id of playerIds) {
+        const card = this.room.players[id].timeline[0];
+        if (card) {
+          anchorCards[id] = card;
+        }
+      }
+    }
+
+    this.io.to(this.room.code).emit('game-started', { gameState: this.room.gameState, anchorCards });
 
     // Sync each player's starting timeline
     if (this.isCoop) {
@@ -231,7 +248,10 @@ export class GameEngine {
       }
     }
 
-    this.startTurn();
+    // Delay first turn to let clients show the anchor card animation
+    setTimeout(() => {
+      this.startTurn();
+    }, 3500);
   }
 
   private startTurn() {
