@@ -14,7 +14,7 @@ export function useSocket() {
       // Auto-rejoin room after reconnect
       const session = getSession();
       if (session) {
-        console.log('[Tunes] Reconnected — attempting rejoin', session.roomCode);
+        console.log('[Tunes] Reconnected \u2014 attempting rejoin', session.roomCode);
         socket.emit('rejoin-room', {
           code: session.roomCode,
           playerId: session.playerId,
@@ -63,12 +63,13 @@ export function useSocket() {
       useGameStore.getState().setSettings(settings);
     });
 
-    socket.on('game-started', ({ gameState }) => {
+    socket.on('game-started', ({ gameState, anchorCards }) => {
       const store = useGameStore.getState();
       store.setPhase(gameState.phase);
       store.setCurrentTurnPlayerId(gameState.currentTurnPlayerId);
       store.setDeckSize(gameState.deckSize);
       store.setLastReveal(null);
+      store.setAnchorCards(anchorCards ?? null);
       useGameStore.setState({ triviaScore: { correct: 0, total: 0 } });
       store.setScreen('game');
 
@@ -106,7 +107,7 @@ export function useSocket() {
     });
 
     socket.on('resolving-tracks', () => {
-      // Could show a loading state — for now just log
+      // Could show a loading state \u2014 for now just log
       console.log('Resolving Spotify track IDs...');
     });
 

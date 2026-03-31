@@ -38,7 +38,7 @@ export interface ServerToClientEvents {
   'player-joined': (player: Player) => void;
   'player-left': (playerId: string) => void;
   'settings-updated': (settings: GameSettings) => void;
-  'game-started': (data: { gameState: Room['gameState'] }) => void;
+  'game-started': (data: { gameState: Room['gameState']; anchorCards?: Record<string, SongCard> }) => void;
   'new-turn': (data: { turnPlayerId: string; songCard: Partial<SongCard> }) => void;
   'turn-started': (data: { turnPlayerId: string; turnDeadline: number }) => void;
   'play-song': (data: { spotifyTrackId: string; previewUrl?: string }) => void;
