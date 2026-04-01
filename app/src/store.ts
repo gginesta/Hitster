@@ -85,7 +85,7 @@ interface GameStore {
   // Buzz
   buzzedPlayers: string[];
   // Disconnect grace period
-  disconnectedPlayers: Record<string, number>; // playerId → reconnectDeadline timestamp
+  disconnectedPlayers: Record<string, number>; // playerId \u2192 reconnectDeadline timestamp
 
   // Winner
   winnerId: string | null;
@@ -93,6 +93,9 @@ interface GameStore {
 
   // End-of-game stats
   gameStats: GameStats | null;
+
+  // Anchor card dealing animation
+  anchorCards: Record<string, SongCard> | null;
 
   // Song history
   songHistory: PlayedSong[];
@@ -137,6 +140,7 @@ interface GameStore {
   setPlayerDisconnected: (playerId: string, deadline: number) => void;
   setPlayerReconnected: (playerId: string) => void;
   setPlayerTimedOut: (playerId: string) => void;
+  setAnchorCards: (cards: Record<string, SongCard> | null) => void;
   setGameStats: (stats: GameStats) => void;
   setSongHistory: (history: PlayedSong[]) => void;
   addBuzzedPlayer: (id: string) => void;
@@ -193,6 +197,7 @@ const initialState = {
   winnerId: null,
   finalPlayers: {} as Record<string, Player>,
   gameStats: null as GameStats | null,
+  anchorCards: null as Record<string, SongCard> | null,
   songHistory: [] as PlayedSong[],
   leaderboard: [] as LeaderboardEntry[],
   myStats: null as LeaderboardEntry | null,
@@ -270,6 +275,7 @@ export const useGameStore = create<GameStore>((set) => ({
       const { [playerId]: _, ...rest } = s.disconnectedPlayers;
       return { disconnectedPlayers: rest };
     }),
+  setAnchorCards: (anchorCards) => set({ anchorCards }),
   setGameStats: (gameStats) => set({ gameStats }),
   setSongHistory: (songHistory) => set({ songHistory }),
   addBuzzedPlayer: (id) =>

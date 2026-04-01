@@ -105,8 +105,17 @@ export function selectGameDeck(
     selected.push(...shuffled.slice(0, perDecade));
   }
 
+  // Deduplicate by title+artist (case-insensitive) before building the deck
+  const seen = new Set<string>();
+  const deduped = selected.filter((song) => {
+    const key = `${song.title.toLowerCase()}::${song.artist.toLowerCase()}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+
   // Shuffle and trim to count
-  const deck: SongCard[] = fisherYatesShuffle(selected)
+  const deck: SongCard[] = fisherYatesShuffle(deduped)
     .slice(0, count)
     .map((song) => ({
       ...song,
