@@ -489,6 +489,19 @@ export class GameEngine {
       ? titleMatch
       : titleMatch && artistMatch;
 
+    logger.info('Song name attempt', {
+      roomCode: this.room.code,
+      playerName: this.room.players[playerId]?.name,
+      guessTitle: guess.title,
+      guessArtist: guess.artist || '(empty)',
+      actualTitle: gs.currentSong.title,
+      actualArtist: gs.currentSong.artist,
+      titleMatch,
+      artistMatch,
+      correct,
+      mode: this.mode,
+    });
+
     this.songNameCorrect.set(playerId, correct);
 
     // Track year guess for Expert mode (only for active player)
@@ -513,7 +526,7 @@ export class GameEngine {
       }
     }
 
-    this.io.to(this.room.code).emit('song-named', { playerId, correct });
+    this.io.to(this.room.code).emit('song-named', { playerId, correct, titleMatch, artistMatch });
   }
 
   skipSong(playerId: string) {
