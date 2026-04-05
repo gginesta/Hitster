@@ -57,7 +57,7 @@ interface GameStore {
 
   // Reveal
   lastReveal: RevealData | null;
-  songNameResult: { playerId: string; correct: boolean } | null;
+  songNameResult: { playerId: string; correct: boolean; titleMatch?: boolean; artistMatch?: boolean } | null;
 
   // Challenge
   challengeDeadline: number | null;
@@ -125,7 +125,7 @@ interface GameStore {
   setDeckSize: (size: number) => void;
   setSharedTimeline: (timeline: SongCard[]) => void;
   setLastReveal: (reveal: RevealData | null) => void;
-  setSongNameResult: (playerId: string, correct: boolean) => void;
+  setSongNameResult: (playerId: string, correct: boolean, titleMatch?: boolean, artistMatch?: boolean) => void;
   setWinner: (winnerId: string, players: Record<string, Player>) => void;
   updatePlayerTokens: (playerId: string, tokens: number) => void;
   updatePlayerTimeline: (playerId: string, timeline: SongCard[]) => void;
@@ -228,7 +228,7 @@ export const useGameStore = create<GameStore>((set) => ({
   setDeckSize: (deckSize) => set({ deckSize }),
   setSharedTimeline: (sharedTimeline) => set({ sharedTimeline }),
   setLastReveal: (lastReveal) => set({ lastReveal }),
-  setSongNameResult: (playerId, correct) => set({ songNameResult: { playerId, correct } }),
+  setSongNameResult: (playerId, correct, titleMatch, artistMatch) => set({ songNameResult: { playerId, correct, titleMatch, artistMatch } }),
   setWinner: (winnerId, players) => set({ winnerId, finalPlayers: players }),
   updatePlayerTokens: (playerId, tokens) =>
     set((s) => ({

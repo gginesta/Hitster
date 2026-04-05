@@ -144,8 +144,8 @@ export function useSocket() {
       useGameStore.getState().setSharedTimeline(timeline);
     });
 
-    socket.on('song-named', ({ playerId, correct }) => {
-      useGameStore.getState().setSongNameResult(playerId, correct);
+    socket.on('song-named', ({ playerId, correct, titleMatch, artistMatch }) => {
+      useGameStore.getState().setSongNameResult(playerId, correct, titleMatch, artistMatch);
     });
 
     socket.on('game-stats', (data) => {
