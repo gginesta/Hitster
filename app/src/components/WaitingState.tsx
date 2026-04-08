@@ -3,7 +3,17 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Zap } from 'lucide-react';
 import { useGameStore } from '../store';
 import { getSocket } from '../services/socket';
-import { triviaQuestions, type TriviaQuestion } from '../data/trivia';
+import { triviaQuestions, type TriviaQuestion, type TriviaCategory } from '../data/trivia';
+
+const CATEGORY_LABELS: Record<TriviaCategory, string> = {
+  general: 'Music Trivia',
+  lyrics: 'Finish the Lyric',
+  first: 'Which Came First?',
+  true_false: 'True or False',
+  decades: 'Name the Decade',
+  instruments: 'Instruments',
+  origins: 'Music Origins',
+};
 
 function getRandomQuestion(exclude?: TriviaQuestion): TriviaQuestion {
   const pool = exclude ? triviaQuestions.filter((q) => q !== exclude) : triviaQuestions;
@@ -78,7 +88,7 @@ export function WaitingState() {
         <div className="flex items-center justify-between mb-3">
           <div>
             <p className="text-xs uppercase tracking-widest text-purple-400 font-semibold">
-              Music Trivia
+              {CATEGORY_LABELS[question.category || 'general']}
             </p>
             <p className="text-[10px] text-purple-400/60 mt-0.5">Compete for bragging rights</p>
           </div>

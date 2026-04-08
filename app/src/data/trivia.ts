@@ -1,7 +1,10 @@
+export type TriviaCategory = 'general' | 'lyrics' | 'first' | 'true_false' | 'decades' | 'instruments' | 'origins';
+
 export interface TriviaQuestion {
   question: string;
   options: [string, string, string, string];
   correctIndex: number;
+  category?: TriviaCategory;
 }
 
 export const triviaQuestions: TriviaQuestion[] = [
@@ -772,5 +775,341 @@ export const triviaQuestions: TriviaQuestion[] = [
     question: 'What was the best-selling album of the 2000s decade?',
     options: ['Back to Black', 'The Eminem Show', '21', 'Hybrid Theory'],
     correctIndex: 2,
+  },
+
+  // --- LYRICS: "Finish the lyric" / "Which song?" ---
+  {
+    question: 'Finish the lyric: "Is this the real life? Is this just..."',
+    options: ['a dream?', 'fantasy?', 'an illusion?', 'insanity?'],
+    correctIndex: 1,
+    category: 'lyrics',
+  },
+  {
+    question: 'Which song starts with: "Hello, it\'s me"?',
+    options: ['"Hello" - Lionel Richie', '"Hello" - Adele', '"Hey Jude" - The Beatles', '"Hey Ya!" - OutKast'],
+    correctIndex: 1,
+    category: 'lyrics',
+  },
+  {
+    question: 'Finish the lyric: "Just a small town girl, livin\' in a..."',
+    options: ['big city world', 'lonely world', 'crazy world', 'material world'],
+    correctIndex: 1,
+    category: 'lyrics',
+  },
+  {
+    question: '"We will, we will..." what comes next?',
+    options: ['Win!', 'Rock you!', 'Fight!', 'Shine!'],
+    correctIndex: 1,
+    category: 'lyrics',
+  },
+  {
+    question: 'Which song contains: "Ground control to Major Tom"?',
+    options: ['"Rocket Man"', '"Starman"', '"Space Oddity"', '"Life on Mars?"'],
+    correctIndex: 2,
+    category: 'lyrics',
+  },
+  {
+    question: 'Finish the lyric: "I got my mind set on you, I got my mind..."',
+    options: ['set on you', 'made up too', 'open wide', 'blown away'],
+    correctIndex: 0,
+    category: 'lyrics',
+  },
+  {
+    question: '"Tonight we are young, so let\'s set the world on..." what?',
+    options: ['Ice', 'Fire', 'Edge', 'Repeat'],
+    correctIndex: 1,
+    category: 'lyrics',
+  },
+  {
+    question: 'Which song has the lyric: "I\'m a creep, I\'m a weirdo"?',
+    options: ['"Loser" - Beck', '"Creep" - Radiohead', '"Freak on a Leash" - Korn', '"Paranoid Android" - Radiohead'],
+    correctIndex: 1,
+    category: 'lyrics',
+  },
+  {
+    question: 'Finish the lyric: "I will always..."',
+    options: ['be there', 'remember you', 'love you', 'need you'],
+    correctIndex: 2,
+    category: 'lyrics',
+  },
+  {
+    question: '"Mama, just killed a man..." is from which song?',
+    options: ['"Stairway to Heaven"', '"Hotel California"', '"Bohemian Rhapsody"', '"Free Bird"'],
+    correctIndex: 2,
+    category: 'lyrics',
+  },
+  {
+    question: 'Which song starts with: "I see a red door and I want it painted..."?',
+    options: ['"Black" - Pearl Jam', '"Back in Black" - AC/DC', '"Paint It Black" - Rolling Stones', '"Blackbird" - Beatles'],
+    correctIndex: 2,
+    category: 'lyrics',
+  },
+  {
+    question: 'Finish the lyric: "Every breath you take, every move you..."',
+    options: ['break', 'fake', 'make', 'shake'],
+    correctIndex: 2,
+    category: 'lyrics',
+  },
+  {
+    question: '"I\'m walking on sunshine" — who sang it?',
+    options: ['Cyndi Lauper', 'Katrina and the Waves', 'Belinda Carlisle', 'The Bangles'],
+    correctIndex: 1,
+    category: 'lyrics',
+  },
+  {
+    question: 'Finish the lyric: "Don\'t stop believin\', hold on to that..."',
+    options: ['dream', 'feeling', 'moment', 'love'],
+    correctIndex: 1,
+    category: 'lyrics',
+  },
+
+  // --- WHICH CAME FIRST? ---
+  {
+    question: 'Which was released first?',
+    options: ['"Thriller" (1982)', '"Purple Rain" (1984)', '"Born in the U.S.A." (1984)', '"Like a Virgin" (1984)'],
+    correctIndex: 0,
+    category: 'first',
+  },
+  {
+    question: 'Which band formed first?',
+    options: ['Nirvana (1987)', 'Pearl Jam (1990)', 'Radiohead (1985)', 'Green Day (1987)'],
+    correctIndex: 2,
+    category: 'first',
+  },
+  {
+    question: 'Which technology came first?',
+    options: ['Compact Disc (1982)', 'MP3 format (1993)', 'Napster (1999)', 'iTunes Store (2003)'],
+    correctIndex: 0,
+    category: 'first',
+  },
+  {
+    question: 'Which of these songs was released first?',
+    options: ['"Smells Like Teen Spirit" (1991)', '"Wonderwall" (1995)', '"Losing My Religion" (1991)', '"Creep" (1992)'],
+    correctIndex: 0,
+    category: 'first',
+  },
+  {
+    question: 'Which festival started first?',
+    options: ['Glastonbury (1970)', 'Coachella (1999)', 'Lollapalooza (1991)', 'Bonnaroo (2002)'],
+    correctIndex: 0,
+    category: 'first',
+  },
+  {
+    question: 'Which debut album came first?',
+    options: ['The College Dropout (2004)', 'Back to Black (2006)', 'Born This Way (2011)', 'Channel Orange (2012)'],
+    correctIndex: 0,
+    category: 'first',
+  },
+  {
+    question: 'Which music event happened first?',
+    options: ['Woodstock (1969)', 'Live Aid (1985)', 'MTV launch (1981)', 'First Grammy Awards (1959)'],
+    correctIndex: 3,
+    category: 'first',
+  },
+  {
+    question: 'Which streaming service launched first?',
+    options: ['Spotify (2008)', 'Apple Music (2015)', 'Tidal (2014)', 'Pandora (2005)'],
+    correctIndex: 3,
+    category: 'first',
+  },
+
+  // --- TRUE OR FALSE (as 4-option) ---
+  {
+    question: '"Stairway to Heaven" was never released as a single. True or false?',
+    options: ['True — it was never a single', 'False — it was a huge single', 'True — but only in the UK', 'False — it was a B-side'],
+    correctIndex: 0,
+    category: 'true_false',
+  },
+  {
+    question: 'Mozart was buried in a mass grave. True or false?',
+    options: ['True', 'False — he had a grand funeral', 'False — he was cremated', 'True — but only temporarily'],
+    correctIndex: 0,
+    category: 'true_false',
+  },
+  {
+    question: 'The longest song to reach #1 on Billboard was over 8 minutes. True or false?',
+    options: ['True — "American Pie"', 'True — "Bohemian Rhapsody"', 'False — no #1 was over 6 min', 'True — "Hey Jude"'],
+    correctIndex: 0,
+    category: 'true_false',
+  },
+  {
+    question: 'Jimi Hendrix, Janis Joplin, and Jim Morrison all died at age 27. True or false?',
+    options: ['True', 'False — only Hendrix was 27', 'False — Morrison was 28', 'True — but only two of them'],
+    correctIndex: 0,
+    category: 'true_false',
+  },
+  {
+    question: 'Beethoven dedicated his 3rd Symphony to Napoleon. True or false?',
+    options: ['True — and later removed the dedication', 'False — it was for a king', 'False — it had no dedication', 'True — it was never changed'],
+    correctIndex: 0,
+    category: 'true_false',
+  },
+  {
+    question: 'The saxophone is classified as a brass instrument. True or false?',
+    options: ['True — it\'s made of brass', 'False — it\'s a woodwind', 'True — brass family', 'False — it\'s a hybrid'],
+    correctIndex: 1,
+    category: 'true_false',
+  },
+  {
+    question: '"Happy Birthday" was under copyright until 2015. True or false?',
+    options: ['True', 'False — it was always public domain', 'False — copyright ended in 1990', 'True — but only in Europe'],
+    correctIndex: 0,
+    category: 'true_false',
+  },
+  {
+    question: 'Vinyl records spin at 33 or 45 RPM. True or false?',
+    options: ['True — those are the standard speeds', 'False — they spin at 78 RPM only', 'False — all records are 33 RPM', 'True — but also 78 RPM for early records'],
+    correctIndex: 3,
+    category: 'true_false',
+  },
+
+  // --- NAME THE DECADE ---
+  {
+    question: 'In which decade did disco music peak?',
+    options: ['1960s', '1970s', '1980s', '1990s'],
+    correctIndex: 1,
+    category: 'decades',
+  },
+  {
+    question: 'When did electronic dance music (EDM) go mainstream?',
+    options: ['1990s', '2000s', '2010s', '1980s'],
+    correctIndex: 2,
+    category: 'decades',
+  },
+  {
+    question: 'In which decade was Auto-Tune first used in a hit song?',
+    options: ['1980s', '1990s', '2000s', '2010s'],
+    correctIndex: 1,
+    category: 'decades',
+  },
+  {
+    question: 'When did the "British Invasion" of American pop charts happen?',
+    options: ['1950s', '1960s', '1970s', '1980s'],
+    correctIndex: 1,
+    category: 'decades',
+  },
+  {
+    question: 'In which decade did MTV launch?',
+    options: ['1970s', '1980s', '1990s', '2000s'],
+    correctIndex: 1,
+    category: 'decades',
+  },
+  {
+    question: 'When did grunge music dominate the charts?',
+    options: ['1980s', 'Early 1990s', 'Late 1990s', '2000s'],
+    correctIndex: 1,
+    category: 'decades',
+  },
+  {
+    question: 'In which decade did Motown Records have its greatest success?',
+    options: ['1950s', '1960s', '1970s', '1980s'],
+    correctIndex: 1,
+    category: 'decades',
+  },
+  {
+    question: 'When was the golden age of jazz?',
+    options: ['1900s-1910s', '1920s-1930s', '1940s-1960s', '1970s-1980s'],
+    correctIndex: 2,
+    category: 'decades',
+  },
+
+  // --- INSTRUMENTS ---
+  {
+    question: 'How many strings does a standard bass guitar have?',
+    options: ['3', '4', '5', '6'],
+    correctIndex: 1,
+    category: 'instruments',
+  },
+  {
+    question: 'Which of these is NOT a percussion instrument?',
+    options: ['Marimba', 'Timpani', 'Oboe', 'Triangle'],
+    correctIndex: 2,
+    category: 'instruments',
+  },
+  {
+    question: 'What is the smallest instrument in the string family?',
+    options: ['Viola', 'Violin', 'Cello', 'Ukulele'],
+    correctIndex: 1,
+    category: 'instruments',
+  },
+  {
+    question: 'A Hammond B3 is a type of what instrument?',
+    options: ['Guitar', 'Organ', 'Synthesizer', 'Piano'],
+    correctIndex: 1,
+    category: 'instruments',
+  },
+  {
+    question: 'How many valves does a standard trumpet have?',
+    options: ['2', '3', '4', '5'],
+    correctIndex: 1,
+    category: 'instruments',
+  },
+  {
+    question: 'What instrument is a "Rhodes"?',
+    options: ['Electric piano', 'Electric guitar', 'Drum machine', 'Synthesizer'],
+    correctIndex: 0,
+    category: 'instruments',
+  },
+  {
+    question: 'Which of these is a double-reed instrument?',
+    options: ['Clarinet', 'Flute', 'Oboe', 'Saxophone'],
+    correctIndex: 2,
+    category: 'instruments',
+  },
+  {
+    question: 'A "hi-hat" is part of what instrument?',
+    options: ['Guitar', 'Piano', 'Drum kit', 'Organ'],
+    correctIndex: 2,
+    category: 'instruments',
+  },
+
+  // --- ORIGINS & GEOGRAPHY ---
+  {
+    question: 'Where did bossa nova music originate?',
+    options: ['Cuba', 'Argentina', 'Brazil', 'Portugal'],
+    correctIndex: 2,
+    category: 'origins',
+  },
+  {
+    question: 'Which city is considered the birthplace of jazz?',
+    options: ['Chicago', 'Memphis', 'New York', 'New Orleans'],
+    correctIndex: 3,
+    category: 'origins',
+  },
+  {
+    question: 'Tango music originated in which country?',
+    options: ['Spain', 'Brazil', 'Argentina', 'Mexico'],
+    correctIndex: 2,
+    category: 'origins',
+  },
+  {
+    question: 'Where did techno music originate?',
+    options: ['Berlin, Germany', 'Detroit, USA', 'London, UK', 'Ibiza, Spain'],
+    correctIndex: 1,
+    category: 'origins',
+  },
+  {
+    question: 'Which country is the didgeridoo from?',
+    options: ['New Zealand', 'South Africa', 'Australia', 'Papua New Guinea'],
+    correctIndex: 2,
+    category: 'origins',
+  },
+  {
+    question: 'Where did the blues originate?',
+    options: ['Chicago', 'Mississippi Delta', 'Memphis', 'Nashville'],
+    correctIndex: 1,
+    category: 'origins',
+  },
+  {
+    question: 'Afrobeats music is primarily from which region?',
+    options: ['South Africa', 'West Africa (Nigeria/Ghana)', 'East Africa', 'Caribbean'],
+    correctIndex: 1,
+    category: 'origins',
+  },
+  {
+    question: 'Where was the accordion invented?',
+    options: ['Italy', 'France', 'Austria', 'Germany'],
+    correctIndex: 2,
+    category: 'origins',
   },
 ];
