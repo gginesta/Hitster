@@ -1,0 +1,412 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Tunes — Vinyl &amp; Neon mockup</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bowlby+One&family=Space+Grotesk:wght@400;500;600;700&family=Unbounded:wght@500;700;900&display=swap" rel="stylesheet">
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      fontFamily: {
+        body: ['"Space Grotesk"', 'ui-sans-serif', 'system-ui'],
+        display: ['"Unbounded"', 'ui-sans-serif', 'system-ui'],
+        chunky: ['"Bowlby One"', 'ui-sans-serif', 'system-ui'],
+      },
+      colors: {
+        plum: { 950: '#0a0318', 900: '#120528', 800: '#1a0839', 700: '#260d4f' },
+        neon: { pink: '#ff2e9a', cyan: '#22e6ff', amber: '#ffbe3d', violet: '#a855f7' },
+      },
+    },
+  },
+};
+</script>
+<style>
+  body {
+    font-family: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+    background:
+      radial-gradient(900px 600px at 10% 0%, rgba(168,85,247,0.25), transparent 60%),
+      radial-gradient(800px 600px at 90% 100%, rgba(255,46,154,0.18), transparent 60%),
+      radial-gradient(600px 500px at 50% 50%, rgba(34,230,255,0.10), transparent 65%),
+      #0a0318;
+    color: white;
+    min-height: 100vh;
+  }
+  .display { font-family: "Unbounded", ui-sans-serif, system-ui; letter-spacing: -0.02em; }
+  .chunky  { font-family: "Bowlby One", ui-sans-serif, system-ui; letter-spacing: 0.02em; }
+  /* Neon glows */
+  .glow-pink  { box-shadow: 0 0 40px rgba(255,46,154,0.55), 0 0 100px rgba(255,46,154,0.25); }
+  .glow-cyan  { box-shadow: 0 0 40px rgba(34,230,255,0.55),  0 0 100px rgba(34,230,255,0.25); }
+  .glow-amber { box-shadow: 0 0 30px rgba(255,190,61,0.45),  0 0 80px rgba(255,190,61,0.2); }
+  .text-glow-pink { text-shadow: 0 0 24px rgba(255,46,154,0.75), 0 0 60px rgba(255,46,154,0.4); }
+  .text-glow-cyan { text-shadow: 0 0 24px rgba(34,230,255,0.75), 0 0 60px rgba(34,230,255,0.4); }
+
+  /* Phone frame */
+  .phone {
+    width: 390px;
+    min-height: 820px;
+    border-radius: 44px;
+    padding: 10px;
+    background: linear-gradient(180deg, #2a1050, #0a0318);
+    box-shadow: 0 40px 120px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.06) inset, 0 0 0 12px rgba(0,0,0,0.35);
+    position: relative;
+  }
+  .phone-screen {
+    position: relative;
+    border-radius: 34px;
+    overflow: hidden;
+    background: #0a0318;
+    height: 800px;
+  }
+  .phone-notch {
+    position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
+    width: 120px; height: 28px; border-radius: 18px;
+    background: #000; z-index: 50;
+  }
+
+  /* Vinyl record */
+  .vinyl {
+    position: relative; width: 100%; aspect-ratio: 1;
+    border-radius: 50%;
+    background:
+      radial-gradient(circle at 50% 50%, #1a0839 0 18%, transparent 18.5%),
+      repeating-radial-gradient(circle at 50% 50%, rgba(255,255,255,0.03) 0 1px, transparent 1px 4px),
+      radial-gradient(circle at 50% 50%, #120414 0 35%, #0a0206 55%, #000 100%);
+    box-shadow:
+      0 30px 60px rgba(0,0,0,0.55),
+      0 0 0 1px rgba(255,255,255,0.04),
+      inset 0 0 40px rgba(0,0,0,0.8);
+  }
+  .vinyl::before {
+    content: ""; position: absolute; inset: 0;
+    border-radius: 50%;
+    background: conic-gradient(from 0deg, transparent 0deg, rgba(255,46,154,0.14) 80deg, transparent 160deg, rgba(34,230,255,0.14) 260deg, transparent 340deg);
+    mix-blend-mode: screen; opacity: .6;
+  }
+  .vinyl-label {
+    position: absolute; inset: 25%;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; text-align: center;
+    background: radial-gradient(circle at 50% 30%, #ff2e9a 0, #a21561 55%, #4a0b2c 100%);
+    box-shadow: inset 0 0 18px rgba(0,0,0,0.45), 0 8px 30px rgba(255,46,154,0.3);
+    color: #fff;
+  }
+  .vinyl-label-cyan {
+    background: radial-gradient(circle at 50% 30%, #22e6ff 0, #0eaac4 55%, #0b4a57 100%);
+    box-shadow: inset 0 0 18px rgba(0,0,0,0.45), 0 8px 30px rgba(34,230,255,0.3);
+  }
+  .vinyl-hole {
+    position: absolute; top: 50%; left: 50%; width: 14px; height: 14px; border-radius: 50%;
+    background: #0a0318;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 0 2px rgba(255,255,255,0.08);
+  }
+  .spin { animation: spin 14s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Needle / tonearm */
+  .tonearm {
+    position: absolute;
+    top: 8%; right: -6%;
+    width: 150px; height: 10px;
+    background: linear-gradient(90deg, #eee, #888);
+    border-radius: 6px;
+    transform-origin: right center;
+    transform: rotate(-22deg);
+    box-shadow: 0 8px 18px rgba(0,0,0,0.5);
+  }
+  .tonearm::after {
+    content: ""; position: absolute; left: -8px; top: -4px;
+    width: 18px; height: 18px; border-radius: 50%;
+    background: radial-gradient(circle, #fff, #aaa);
+  }
+
+  /* Timeline sleeve card */
+  .sleeve {
+    position: relative;
+    width: 96px; height: 132px;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 18px 30px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.06);
+    flex: none;
+  }
+  .sleeve::after {
+    content: ""; position: absolute;
+    right: -34px; top: 12px; bottom: 12px; width: 56px;
+    background:
+      radial-gradient(circle at 50% 50%, #1a0839 0 16%, transparent 16.5%),
+      repeating-radial-gradient(circle at 50% 50%, rgba(255,255,255,0.06) 0 1px, transparent 1px 3px),
+      radial-gradient(circle at 50% 50%, #120414 0 35%, #0a0206 55%, #000 100%);
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
+  }
+  .sleeve .inner { position: absolute; inset: 0; padding: 10px 10px 10px 10px; display: flex; flex-direction: column; justify-content: space-between; }
+
+  /* Scanlines / grain */
+  .scanlines::after {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background-image: repeating-linear-gradient(0deg, rgba(255,255,255,0.02) 0 1px, transparent 1px 3px);
+    mix-blend-mode: overlay; opacity: .6;
+  }
+
+  /* Neon button */
+  .btn-neon-pink {
+    background: linear-gradient(135deg, #ff2e9a, #ff6bd1);
+    color: #0a0318; border-radius: 18px; padding: 14px 20px; font-weight: 800;
+    box-shadow: 0 0 30px rgba(255,46,154,0.45), inset 0 -3px 0 rgba(0,0,0,0.2);
+  }
+  .btn-neon-outline-cyan {
+    color: #22e6ff; border: 1.5px solid rgba(34,230,255,0.45); border-radius: 18px; padding: 14px 20px; font-weight: 800;
+    background: linear-gradient(135deg, rgba(34,230,255,0.1), rgba(34,230,255,0.04));
+    box-shadow: 0 0 30px rgba(34,230,255,0.25);
+  }
+  .btn-ghost {
+    color: rgba(255,255,255,0.65); background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08); border-radius: 14px;
+  }
+
+  /* Equalizer bars */
+  .eq { display: inline-flex; gap: 3px; align-items: flex-end; height: 18px; }
+  .eq i { width: 3px; background: linear-gradient(0deg, #ff2e9a, #22e6ff); border-radius: 2px; animation: bars 0.9s infinite ease-in-out alternate; }
+  .eq i:nth-child(2){animation-delay:.15s;} .eq i:nth-child(3){animation-delay:.25s;} .eq i:nth-child(4){animation-delay:.35s;} .eq i:nth-child(5){animation-delay:.45s;}
+  @keyframes bars { from{height:4px} to{height:18px} }
+</style>
+</head>
+<body class="min-h-screen">
+
+<header class="max-w-6xl mx-auto px-6 pt-10 pb-4">
+  <a href="./index.html" class="text-neon-cyan/80 hover:text-neon-cyan text-sm">&larr; Back to gallery</a>
+  <h1 class="display text-4xl font-bold mt-4">Direction A — <span class="text-glow-pink text-neon-pink">Vinyl</span> &amp; <span class="text-glow-cyan text-neon-cyan">Neon</span></h1>
+  <p class="text-white/60 max-w-2xl mt-2">Deep purple with tri-color neon (magenta · cyan · amber). Vinyl-disc centerpieces, record-sleeve timeline cards, chunky display type. A disco / record-shop feel — loud, musical, unmistakably a party game.</p>
+</header>
+
+<main class="max-w-6xl mx-auto px-6 pb-20">
+
+  <!-- Phones row -->
+  <div class="flex flex-wrap justify-center gap-8 mt-8">
+
+    <!-- ============================================================= HOME -->
+    <figure class="flex flex-col items-center">
+      <div class="phone">
+        <div class="phone-notch"></div>
+        <div class="phone-screen scanlines">
+          <!-- ambient blobs -->
+          <div class="absolute -top-24 -left-24 w-72 h-72 rounded-full bg-neon-pink/30 blur-3xl"></div>
+          <div class="absolute -bottom-24 -right-20 w-80 h-80 rounded-full bg-neon-cyan/20 blur-3xl"></div>
+
+          <!-- status / wifi indicator -->
+          <div class="absolute top-3 right-4 flex items-center gap-1.5 text-[10px] font-bold text-neon-cyan/80 z-20">
+            <span class="w-1.5 h-1.5 rounded-full bg-neon-cyan glow-cyan"></span> CONNECTED
+          </div>
+
+          <div class="relative px-6 pt-16 pb-6 h-full flex flex-col">
+            <!-- Vinyl hero -->
+            <div class="relative mx-auto" style="width: 240px;">
+              <div class="vinyl spin">
+                <div class="vinyl-label">
+                  <div>
+                    <div class="chunky text-xl leading-none">TUNES</div>
+                    <div class="text-[8px] tracking-[0.3em] mt-1 opacity-80">A MUSIC PARTY</div>
+                  </div>
+                </div>
+                <div class="vinyl-hole"></div>
+              </div>
+              <div class="tonearm"></div>
+            </div>
+
+            <div class="text-center mt-6">
+              <h1 class="display text-5xl font-black tracking-tight">
+                <span class="text-glow-pink text-neon-pink">Drop</span> the needle.
+              </h1>
+              <p class="text-white/60 text-sm mt-2">Host a room. Share the code. Guess the year.</p>
+            </div>
+
+            <!-- Name input -->
+            <div class="mt-8 space-y-3">
+              <label class="text-[10px] tracking-[0.3em] text-neon-cyan font-bold">YOUR STAGE NAME</label>
+              <div class="relative">
+                <input value="Alex" class="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-lg font-medium focus:outline-none focus:border-neon-pink focus:bg-neon-pink/5" />
+                <span class="absolute right-4 top-1/2 -translate-y-1/2 eq"><i></i><i></i><i></i><i></i><i></i></span>
+              </div>
+            </div>
+
+            <!-- CTAs -->
+            <div class="mt-6 space-y-3">
+              <button class="btn-neon-pink w-full text-center chunky text-lg">HOST A ROOM</button>
+              <button class="btn-neon-outline-cyan w-full text-center chunky text-lg">JOIN WITH CODE</button>
+            </div>
+
+            <!-- Footer chips -->
+            <div class="mt-auto pt-6 flex items-center justify-center gap-2 text-[11px]">
+              <button class="btn-ghost px-3 py-2">📖 Rules</button>
+              <button class="btn-ghost px-3 py-2">🏆 Leaderboard</button>
+              <button class="btn-ghost px-3 py-2">📊 My Stats</button>
+            </div>
+            <p class="text-center text-[10px] text-white/30 mt-3">TUNES v2.3.0 · 33⅓ rpm</p>
+          </div>
+        </div>
+      </div>
+      <figcaption class="mt-4 text-sm text-white/50 uppercase tracking-[0.2em]">Home</figcaption>
+    </figure>
+
+    <!-- ============================================================= GAME -->
+    <figure class="flex flex-col items-center">
+      <div class="phone">
+        <div class="phone-notch"></div>
+        <div class="phone-screen scanlines">
+          <div class="absolute -top-32 left-1/2 -translate-x-1/2 w-96 h-96 rounded-full bg-neon-pink/20 blur-3xl"></div>
+          <div class="absolute bottom-0 right-0 w-96 h-96 rounded-full bg-neon-cyan/15 blur-3xl"></div>
+
+          <div class="relative h-full flex flex-col">
+            <!-- Top bar -->
+            <div class="pt-10 px-4 pb-2 border-b border-white/5 bg-black/40">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2 min-w-0">
+                  <span class="eq"><i></i><i></i><i></i><i></i><i></i></span>
+                  <p class="chunky text-neon-pink text-sm text-glow-pink">JORDAN'S TURN</p>
+                  <span class="text-[9px] px-2 py-0.5 rounded-full border border-neon-violet/40 text-neon-violet bg-neon-violet/10 font-bold">PRO</span>
+                </div>
+                <div class="flex items-center gap-1.5 text-white/60">
+                  <button class="w-7 h-7 rounded-full bg-white/5 flex items-center justify-center text-xs">🕘</button>
+                  <button class="w-7 h-7 rounded-full bg-white/5 flex items-center justify-center text-xs">🔊</button>
+                </div>
+              </div>
+              <!-- Player chips -->
+              <div class="mt-2 flex gap-1.5 overflow-x-auto">
+                <div class="flex-none flex flex-col items-center px-2.5 py-1 rounded-xl bg-neon-pink/10 border border-neon-pink/30">
+                  <span class="text-[9px] font-bold text-neon-pink">JORDAN</span>
+                  <span class="font-black text-sm">4<span class="text-white/40 text-[10px]">/10</span></span>
+                  <span class="text-[9px] text-neon-amber">★ 2</span>
+                </div>
+                <div class="flex-none flex flex-col items-center px-2.5 py-1 rounded-xl bg-white/5">
+                  <span class="text-[9px] font-bold text-white/60">MAYA</span>
+                  <span class="font-black text-sm">3<span class="text-white/40 text-[10px]">/10</span></span>
+                  <span class="text-[9px] text-neon-amber">★ 3</span>
+                </div>
+                <div class="flex-none flex flex-col items-center px-2.5 py-1 rounded-xl bg-white/5">
+                  <span class="text-[9px] font-bold text-white/60">YOU</span>
+                  <span class="font-black text-sm">3<span class="text-white/40 text-[10px]">/10</span></span>
+                  <span class="text-[9px] text-neon-amber">★ 1</span>
+                </div>
+                <div class="flex-none flex flex-col items-center px-2.5 py-1 rounded-xl bg-white/5">
+                  <span class="text-[9px] font-bold text-white/60">SAM</span>
+                  <span class="font-black text-sm">2<span class="text-white/40 text-[10px]">/10</span></span>
+                  <span class="text-[9px] text-neon-amber">★ 2</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Center stage: rotating vinyl mystery -->
+            <div class="flex-1 flex flex-col items-center justify-center px-6 relative">
+              <div class="text-[10px] tracking-[0.3em] text-white/40 mb-3">NOW SPINNING · ???</div>
+              <div class="relative" style="width: 220px;">
+                <div class="vinyl spin">
+                  <div class="vinyl-label vinyl-label-cyan">
+                    <div class="chunky text-4xl leading-none">?</div>
+                  </div>
+                  <div class="vinyl-hole"></div>
+                </div>
+                <div class="tonearm"></div>
+              </div>
+              <!-- Turn timer pill -->
+              <div class="mt-6 px-5 py-2 rounded-full border border-neon-amber/40 bg-neon-amber/10 text-neon-amber font-bold text-sm flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-neon-amber animate-pulse"></span>
+                38 seconds
+              </div>
+            </div>
+
+            <!-- Timeline dock -->
+            <div class="bg-black/50 border-t border-white/5 px-4 pt-3 pb-4">
+              <div class="flex items-center justify-between mb-2">
+                <p class="text-[10px] tracking-[0.3em] text-white/40 font-bold">JORDAN'S CRATE</p>
+                <button class="text-[10px] text-neon-cyan font-bold">SHOW MINE ⇄</button>
+              </div>
+              <div class="flex gap-2 overflow-x-auto pb-2">
+                <div class="sleeve" style="background: linear-gradient(135deg, #4a148c, #7b1fa2);">
+                  <div class="inner">
+                    <div class="flex items-start justify-between">
+                      <span class="chunky text-2xl text-neon-amber">'87</span>
+                    </div>
+                    <div class="text-white">
+                      <div class="text-[10px] font-bold leading-tight truncate">Sweet Child O'</div>
+                      <div class="text-[9px] text-white/60 truncate">Guns N' Roses</div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Drop zone -->
+                <button class="flex-none w-10 h-[132px] rounded-lg border-2 border-dashed border-neon-cyan/40 hover:border-neon-cyan flex items-center justify-center text-neon-cyan font-bold">+</button>
+
+                <div class="sleeve" style="background: linear-gradient(135deg, #1b5e20, #00695c);">
+                  <div class="inner">
+                    <span class="chunky text-2xl text-neon-amber">'91</span>
+                    <div>
+                      <div class="text-[10px] font-bold leading-tight truncate text-white">Teen Spirit</div>
+                      <div class="text-[9px] text-white/60 truncate">Nirvana</div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Selected drop zone -->
+                <button class="flex-none w-10 h-[132px] rounded-lg border-2 border-neon-pink bg-neon-pink/20 glow-pink flex items-center justify-center text-neon-pink font-bold">+</button>
+
+                <div class="sleeve" style="background: linear-gradient(135deg, #e65100, #bf360c);">
+                  <div class="inner">
+                    <span class="chunky text-2xl text-neon-amber">'03</span>
+                    <div>
+                      <div class="text-[10px] font-bold leading-tight truncate text-white">Hey Ya!</div>
+                      <div class="text-[9px] text-white/60 truncate">OutKast</div>
+                    </div>
+                  </div>
+                </div>
+
+                <button class="flex-none w-10 h-[132px] rounded-lg border-2 border-dashed border-neon-cyan/40 hover:border-neon-cyan flex items-center justify-center text-neon-cyan font-bold">+</button>
+
+                <div class="sleeve" style="background: linear-gradient(135deg, #0277bd, #01579b);">
+                  <div class="inner">
+                    <span class="chunky text-2xl text-neon-amber">'10</span>
+                    <div>
+                      <div class="text-[10px] font-bold leading-tight truncate text-white">Rolling Deep</div>
+                      <div class="text-[9px] text-white/60 truncate">Adele</div>
+                    </div>
+                  </div>
+                </div>
+
+                <button class="flex-none w-10 h-[132px] rounded-lg border-2 border-dashed border-neon-cyan/40 hover:border-neon-cyan flex items-center justify-center text-neon-cyan font-bold">+</button>
+              </div>
+
+              <!-- Actions -->
+              <div class="mt-2 flex gap-2">
+                <button class="flex-1 btn-ghost py-3 text-xs font-bold">⏭ Skip · 1★</button>
+                <button class="flex-[2] chunky btn-neon-pink py-3 text-base">PLACE CARD</button>
+                <button class="flex-1 btn-ghost py-3 text-xs font-bold">🛒 Buy · 3★</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <figcaption class="mt-4 text-sm text-white/50 uppercase tracking-[0.2em]">In-Game</figcaption>
+    </figure>
+
+  </div>
+
+  <!-- Design notes -->
+  <section class="max-w-3xl mx-auto mt-20 space-y-5">
+    <h2 class="display text-2xl font-bold">Design notes</h2>
+    <ul class="space-y-3 text-white/70 text-sm leading-relaxed">
+      <li><span class="text-neon-pink font-bold">Hero is a vinyl record.</span> Home, lobby, and the in-game mystery card all use the same rotating record motif, reinforcing the brand every time you look at the screen.</li>
+      <li><span class="text-neon-cyan font-bold">Tri-color neon</span> (pink · cyan · amber) replaces the mono-green palette. Pink = primary action, cyan = secondary / info, amber = tokens and warnings — no more color confusion.</li>
+      <li><span class="text-neon-amber font-bold">Sleeve cards</span> give the timeline physical presence: each card is an album sleeve with a peeking record, decade year in chunky "Bowlby One", and color per era.</li>
+      <li><span class="text-neon-violet font-bold">Unbounded</span> for headlines, <span class="text-neon-violet font-bold">Space Grotesk</span> for body. Less "black-weight everything", more rhythm.</li>
+      <li><span class="text-neon-pink font-bold">Ambient glow + scanlines</span> add atmosphere — the app feels like a dim club, not a dashboard.</li>
+    </ul>
+  </section>
+
+</main>
+
+</body>
+</html>

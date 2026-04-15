@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Tunes — Redesign Mockup Gallery</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,700&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  body {
+    font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
+    color: #e8ebf4;
+    background:
+      radial-gradient(800px 600px at 10% 0%, rgba(180,123,255,0.20), transparent 60%),
+      radial-gradient(800px 600px at 90% 100%, rgba(252,105,118,0.15), transparent 60%),
+      #0a0b14;
+    min-height: 100vh;
+  }
+  .serif { font-family: "Fraunces", ui-serif, Georgia; }
+
+  .card {
+    display: block;
+    position: relative;
+    border-radius: 28px;
+    overflow: hidden;
+    padding: 28px;
+    transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s;
+    min-height: 340px;
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+  .card:hover { transform: translateY(-6px); box-shadow: 0 30px 80px rgba(0,0,0,0.5); }
+
+  /* A: vinyl & neon preview */
+  .card-a {
+    background:
+      radial-gradient(600px 400px at 20% 0%, rgba(168,85,247,0.45), transparent 55%),
+      radial-gradient(500px 400px at 100% 100%, rgba(255,46,154,0.35), transparent 55%),
+      #0a0318;
+  }
+  /* B: modern glass preview */
+  .card-b {
+    background:
+      radial-gradient(500px 400px at 80% 10%, rgba(180,123,255,0.55), transparent 55%),
+      radial-gradient(600px 500px at 0% 100%, rgba(127,255,180,0.35), transparent 55%),
+      #0b0d16;
+  }
+  /* C: festival preview */
+  .card-c {
+    background:
+      radial-gradient(500px 400px at 10% 10%, rgba(252,105,118,0.45), transparent 55%),
+      radial-gradient(500px 500px at 100% 100%, rgba(139,123,255,0.45), transparent 55%),
+      #1a0e2b;
+  }
+
+  /* Vinyl for A thumbnail */
+  .mini-vinyl {
+    width: 100%; aspect-ratio: 1; border-radius: 50%;
+    background:
+      repeating-radial-gradient(circle at 50% 50%, rgba(255,255,255,0.04) 0 1px, transparent 1px 4px),
+      radial-gradient(circle at 50% 50%, #120414 0 35%, #0a0206 60%, #000 100%);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.5), inset 0 0 30px rgba(0,0,0,0.6);
+    position: relative;
+  }
+  .mini-vinyl::before {
+    content:""; position:absolute; inset:28%; border-radius:50%;
+    background: radial-gradient(circle at 50% 30%, #ff2e9a 0, #a21561 60%, #4a0b2c 100%);
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.45);
+  }
+  .mini-vinyl::after {
+    content:""; position:absolute; inset:46%; border-radius:50%; background:#0a0318;
+  }
+
+  /* Glass thumbnail for B */
+  .mini-glass {
+    border-radius: 20px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.03));
+    border: 1px solid rgba(255,255,255,0.1);
+    backdrop-filter: blur(18px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.1);
+  }
+
+  /* Polaroid thumbnail for C */
+  .mini-polaroid {
+    background: #fafaf4;
+    border-radius: 4px;
+    padding: 6px 6px 18px 6px;
+    box-shadow: 0 14px 30px rgba(0,0,0,0.45);
+    color: #181020;
+    transform: rotate(-4deg);
+    position: relative;
+  }
+  .mini-polaroid::before {
+    content:""; position:absolute; top:-6px; left:50%; transform:translateX(-50%);
+    width:10px; height:10px; border-radius:50%;
+    background: radial-gradient(circle at 30% 30%, #ff9db3, #c72346);
+  }
+</style>
+</head>
+<body>
+
+<main class="max-w-6xl mx-auto px-6 py-16">
+  <div class="mb-12">
+    <div class="text-xs uppercase tracking-[0.3em] text-white/40 font-bold">Tunes · Redesign</div>
+    <h1 class="serif text-6xl font-light tracking-tight mt-2">Pick a <em class="serif italic">vibe</em>.</h1>
+    <p class="text-white/60 mt-4 max-w-2xl text-lg leading-relaxed">
+      Three distinct visual directions for the Tunes party game — each showing the Home screen and the in-game experience. Open them, compare, tell me which feels right. We'll roll the winning direction across the whole app.
+    </p>
+  </div>
+
+  <div class="grid md:grid-cols-3 gap-6">
+
+    <!-- A: Vinyl & Neon -->
+    <a href="./vinyl-neon.html" class="card card-a">
+      <div class="flex flex-col h-full">
+        <div class="text-xs uppercase tracking-[0.3em] text-pink-300/80 font-bold">Direction A</div>
+        <h2 class="text-3xl font-black mt-1" style="text-shadow: 0 0 20px rgba(255,46,154,0.6);">Vinyl &amp; Neon</h2>
+        <p class="text-white/70 text-sm mt-2 flex-1">Deep purple, tri-color neon, rotating records as the hero. Disco/record-shop energy — loud, musical, unmistakably a music game.</p>
+        <div class="flex items-center justify-between gap-4 mt-6">
+          <div class="w-28">
+            <div class="mini-vinyl"></div>
+          </div>
+          <div class="flex items-end gap-0.5 h-12 text-pink-400" style="color: #ff2e9a;">
+            <span class="w-1.5 h-2 bg-current rounded-full"></span>
+            <span class="w-1.5 h-6 bg-current rounded-full"></span>
+            <span class="w-1.5 h-8 bg-current rounded-full"></span>
+            <span class="w-1.5 h-4 bg-current rounded-full"></span>
+            <span class="w-1.5 h-10 bg-current rounded-full"></span>
+            <span class="w-1.5 h-3 bg-current rounded-full"></span>
+            <span class="w-1.5 h-7 bg-current rounded-full"></span>
+          </div>
+        </div>
+        <div class="mt-5 text-sm font-bold text-pink-300">View mockup →</div>
+      </div>
+    </a>
+
+    <!-- B: Modern Glass -->
+    <a href="./modern-glass.html" class="card card-b">
+      <div class="flex flex-col h-full">
+        <div class="text-xs uppercase tracking-[0.3em] text-green-300/80 font-bold">Direction B</div>
+        <h2 class="serif text-3xl font-light mt-1">Modern <em class="italic">Glass</em></h2>
+        <p class="text-white/70 text-sm mt-2 flex-1">Aurora gradients, frosted glass panels, serif+sans typography. Premium, refined — Apple Music meets Arc browser.</p>
+        <div class="flex items-end gap-3 mt-6">
+          <div class="mini-glass w-28 h-28 flex items-center justify-center">
+            <div class="w-16 h-16 rounded-full" style="background: conic-gradient(from 45deg, #b47bff, #7fffb4, #ffc7b0, #b47bff);"></div>
+          </div>
+          <div class="mini-glass flex-1 h-28 p-3 flex flex-col justify-end">
+            <div class="text-[9px] uppercase tracking-widest text-white/50">1991</div>
+            <div class="serif text-2xl font-light">'91</div>
+          </div>
+        </div>
+        <div class="mt-5 text-sm font-bold text-green-300">View mockup →</div>
+      </div>
+    </a>
+
+    <!-- C: Festival -->
+    <a href="./festival.html" class="card card-c">
+      <div class="flex flex-col h-full">
+        <div class="text-xs uppercase tracking-[0.3em] text-rose-300/80 font-bold">Direction C</div>
+        <h2 class="text-3xl font-black mt-1 tracking-tight">
+          <span class="text-white">F</span><span class="text-rose-400">e</span><span class="text-yellow-300">s</span><span class="text-sky-300">t</span><span class="text-emerald-300">i</span><span class="text-violet-300">v</span><span class="text-white">al</span>
+        </h2>
+        <p class="text-white/70 text-sm mt-2 flex-1">Bold, playful, unapologetically a party. Per-player colors, polaroid timeline, sticker halos, chunky 3D buttons.</p>
+        <div class="flex items-end gap-2 mt-6">
+          <div class="mini-polaroid w-20" style="transform: rotate(-6deg);">
+            <div class="w-full aspect-square rounded-sm flex items-center justify-center text-white font-black" style="background: linear-gradient(135deg,#fc6976,#b3274f);">'87</div>
+          </div>
+          <div class="mini-polaroid w-20" style="transform: rotate(3deg);">
+            <div class="w-full aspect-square rounded-sm flex items-center justify-center text-white font-black" style="background: linear-gradient(135deg,#7fffb4,#187a4d);">'91</div>
+          </div>
+          <div class="mini-polaroid w-20" style="transform: rotate(-2deg);">
+            <div class="w-full aspect-square rounded-sm flex items-center justify-center text-white font-black" style="background: linear-gradient(135deg,#8b7bff,#4a1b8c);">'10</div>
+          </div>
+        </div>
+        <div class="mt-5 text-sm font-bold text-rose-300">View mockup →</div>
+      </div>
+    </a>
+
+  </div>
+
+  <!-- What each mockup covers -->
+  <section class="mt-16 grid md:grid-cols-2 gap-8">
+    <div>
+      <h3 class="serif text-2xl font-light mb-3">What's in each mockup</h3>
+      <ul class="space-y-2 text-white/70 text-sm leading-relaxed">
+        <li class="flex gap-2"><span class="text-white/30">•</span><span><strong class="text-white">Home screen</strong> — wordmark, name input, host/join CTAs, footer links</span></li>
+        <li class="flex gap-2"><span class="text-white/30">•</span><span><strong class="text-white">In-game screen</strong> — top bar with turn info &amp; scores, mystery card, timeline, action row</span></li>
+        <li class="flex gap-2"><span class="text-white/30">•</span><span><strong class="text-white">Design notes</strong> — what's new and why, per direction</span></li>
+      </ul>
+      <p class="text-white/50 text-sm mt-6">
+        Each mockup uses the same sample game state (players: Jordan, Maya, You, Sam · Pro mode · turn timer at 0:38) so you can compare the visual language apples-to-apples.
+      </p>
+    </div>
+
+    <div>
+      <h3 class="serif text-2xl font-light mb-3">How to pick</h3>
+      <ol class="space-y-2 text-white/70 text-sm leading-relaxed list-decimal pl-5">
+        <li>Open all three in separate tabs and flip between them.</li>
+        <li>Imagine a noisy living-room with friends passing a phone around — which screen sets the right tone?</li>
+        <li>Reply with your pick (A / B / C), or a mix ("B's glass + A's vinyl cards"). Full concepts are combinable.</li>
+      </ol>
+      <p class="text-white/50 text-sm mt-6">
+        Once you pick, I'll build the <strong class="text-white">design system</strong> (tokens + components) and re-skin the whole app: Home, Lobby, Game, Results, Rules, Leaderboard, Profile, and the waiting-state trivia moment.
+      </p>
+    </div>
+  </section>
+
+  <footer class="mt-20 text-center text-xs text-white/30">
+    Mockups only — no game logic wired in. All rendered with Tailwind CDN + Google Fonts; open any file directly in a browser.
+  </footer>
+</main>
+
+</body>
+</html>
