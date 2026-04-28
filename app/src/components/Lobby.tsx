@@ -39,14 +39,14 @@ const AVAILABLE_REGIONS: { value: SongRegion; label: string }[] = [
 
 /** Curated Spotify playlists for genre packs */
 const GENRE_PACKS = [
-  { label: 'Summer Hits', icon: '\u2600', playlistId: '37i9dQZF1DXdwTUxmGKrdN', color: 'from-amber-500 to-orange-600' },
-  { label: 'Movie Soundtracks', icon: '\uD83C\uDFAC', playlistId: '37i9dQZF1DX4dyzvuaRJ0n', color: 'from-purple-600 to-indigo-700' },
-  { label: 'Rock Classics', icon: '\uD83E\uDD18', playlistId: '37i9dQZF1DWXRqgorJj26U', color: 'from-red-600 to-rose-800' },
-  { label: 'Hip-Hop', icon: '\uD83C\uDFA4', playlistId: '37i9dQZF1DX48TTZL62Yht', color: 'from-yellow-500 to-amber-700' },
-  { label: 'Latin Hits', icon: '\uD83D\uDD25', playlistId: '37i9dQZF1DX10zKzsJ2jva', color: 'from-pink-500 to-red-600' },
-  { label: '90s Throwback', icon: '\uD83D\uDCFC', playlistId: '37i9dQZF1DXbTxRt5MxAvz', color: 'from-cyan-500 to-blue-600' },
-  { label: 'Indie Hits', icon: '\uD83C\uDF3B', playlistId: '37i9dQZF1DX2Nc3B70tvx0', color: 'from-emerald-500 to-teal-700' },
-  { label: 'All-Time Greatest', icon: '\uD83C\uDFC6', playlistId: '37i9dQZF1DXcBWIGoYBM5M', color: 'from-yellow-400 to-yellow-600' },
+  { label: 'Summer Hits', icon: '\u2600', playlistId: '37i9dQZF1DXdwTUxmGKrdN', dec: 'dec-1970s' },
+  { label: 'Movie Soundtracks', icon: '\uD83C\uDFAC', playlistId: '37i9dQZF1DX4dyzvuaRJ0n', dec: 'dec-1960s' },
+  { label: 'Rock Classics', icon: '\uD83E\uDD18', playlistId: '37i9dQZF1DWXRqgorJj26U', dec: 'dec-1950s' },
+  { label: 'Hip-Hop', icon: '\uD83C\uDFA4', playlistId: '37i9dQZF1DX48TTZL62Yht', dec: 'dec-1940s' },
+  { label: 'Latin Hits', icon: '\uD83D\uDD25', playlistId: '37i9dQZF1DX10zKzsJ2jva', dec: 'dec-1980s' },
+  { label: '90s Throwback', icon: '\uD83D\uDCFC', playlistId: '37i9dQZF1DXbTxRt5MxAvz', dec: 'dec-2000s' },
+  { label: 'Indie Hits', icon: '\uD83C\uDF3B', playlistId: '37i9dQZF1DX2Nc3B70tvx0', dec: 'dec-2020s' },
+  { label: 'All-Time Greatest', icon: '\uD83C\uDFC6', playlistId: '37i9dQZF1DXcBWIGoYBM5M', dec: 'dec-1930s' },
 ];
 
 export function Lobby() {
@@ -305,7 +305,7 @@ export function Lobby() {
         {isHost ? (
           <div className="panel p-5 space-y-6">
             <h3 className="text-[10px] uppercase tracking-[0.3em] font-bold text-white/50 flex items-center gap-2">
-              <Settings className="w-5 h-5 text-gray-400" />
+              <Settings className="w-5 h-5 text-white/55" />
               Game Settings
             </h3>
 
@@ -322,12 +322,12 @@ export function Lobby() {
                       className={`py-3 px-3 rounded-xl text-left transition-all ${
                         settings.mode === value
                           ? 'bg-neon-pink text-[#0a0318] glow-pink'
-                          : 'bg-black/30 text-gray-300 hover:bg-black/50'
+                          : 'bg-black/30 text-white/75 hover:bg-black/50 border border-white/[0.06]'
                       }`}
                     >
                       <span className="text-sm font-bold block">{label}</span>
                       <span className={`text-[10px] block mt-0.5 ${
-                        settings.mode === value ? 'text-black/60' : 'text-gray-500'
+                        settings.mode === value ? 'text-black/60' : 'text-white/40'
                       }`}>{desc}</span>
                     </button>
                   ))}
@@ -356,13 +356,13 @@ export function Lobby() {
           </div>
         ) : (
           <div className="panel p-5">
-            <div className="text-center space-y-2 text-gray-400 mb-4">
+            <div className="text-center space-y-2 text-white/55 mb-4">
               <p className="text-sm">
                 Mode: <span className="text-white font-medium">{modes.find(m => m.value === settings.mode)?.label ?? settings.mode}</span>
                 {' · '}
                 Cards to win: <span className="text-white font-medium">{settings.cardsToWin}</span>
               </p>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-white/40">
                 {modes.find(m => m.value === settings.mode)?.desc}
               </p>
             </div>
@@ -384,10 +384,10 @@ export function Lobby() {
                 className={`py-3 px-2 rounded-xl text-center transition-all ${
                   settings.songPack === 'standard'
                     ? 'bg-neon-pink text-[#0a0318] glow-pink'
-                    : 'bg-black/30 text-gray-300 hover:bg-black/50'
+                    : 'bg-black/30 text-white/75 hover:bg-black/50 border border-white/[0.06]'
                 }`}
               >
-                <ListMusic className={`w-5 h-5 mx-auto mb-1 ${settings.songPack === 'standard' ? 'text-black' : ''}`} />
+                <ListMusic className={`w-5 h-5 mx-auto mb-1 ${settings.songPack === 'standard' ? 'text-[#0a0318]' : 'text-white/70'}`} />
                 <span className="text-xs font-bold block">Standard</span>
               </button>
               <button
@@ -395,10 +395,10 @@ export function Lobby() {
                 className={`py-3 px-2 rounded-xl text-center transition-all ${
                   settings.songPack === 'decades'
                     ? 'bg-neon-pink text-[#0a0318] glow-pink'
-                    : 'bg-black/30 text-gray-300 hover:bg-black/50'
+                    : 'bg-black/30 text-white/75 hover:bg-black/50 border border-white/[0.06]'
                 }`}
               >
-                <span className={`text-lg block ${settings.songPack === 'decades' ? 'text-black' : ''}`}>#</span>
+                <span className={`text-lg block ${settings.songPack === 'decades' ? 'text-[#0a0318]' : 'text-white/70'}`}>#</span>
                 <span className="text-xs font-bold block">Decades</span>
               </button>
               <button
@@ -406,10 +406,10 @@ export function Lobby() {
                 className={`py-3 px-2 rounded-xl text-center transition-all ${
                   settings.songPack === 'genre'
                     ? 'bg-neon-pink text-[#0a0318] glow-pink'
-                    : 'bg-black/30 text-gray-300 hover:bg-black/50'
+                    : 'bg-black/30 text-white/75 hover:bg-black/50 border border-white/[0.06]'
                 }`}
               >
-                <Music className={`w-5 h-5 mx-auto mb-1 ${settings.songPack === 'genre' ? 'text-black' : ''}`} />
+                <Music className={`w-5 h-5 mx-auto mb-1 ${settings.songPack === 'genre' ? 'text-[#0a0318]' : 'text-white/70'}`} />
                 <span className="text-xs font-bold block">By Genre</span>
               </button>
             </div>
@@ -419,20 +419,20 @@ export function Lobby() {
                 className={`py-3 px-2 rounded-xl text-center transition-all ${
                   settings.songPack === 'genre-decade'
                     ? 'bg-neon-pink text-[#0a0318] glow-pink'
-                    : 'bg-black/30 text-gray-300 hover:bg-black/50'
+                    : 'bg-black/30 text-white/75 hover:bg-black/50 border border-white/[0.06]'
                 }`}
               >
-                <span className={`text-xs font-bold block ${settings.songPack === 'genre-decade' ? 'text-black' : ''}`}>Genre + Decade</span>
+                <span className={`text-xs font-bold block ${settings.songPack === 'genre-decade' ? 'text-[#0a0318]' : 'text-white/70'}`}>Genre + Decade</span>
               </button>
               <button
                 onClick={() => handleSetSongPack('playlist')}
                 className={`py-3 px-2 rounded-xl text-center transition-all ${
                   settings.songPack === 'playlist'
                     ? 'bg-neon-pink text-[#0a0318] glow-pink'
-                    : 'bg-black/30 text-gray-300 hover:bg-black/50'
+                    : 'bg-black/30 text-white/75 hover:bg-black/50 border border-white/[0.06]'
                 }`}
               >
-                <Link className={`w-5 h-5 mx-auto mb-1 ${settings.songPack === 'playlist' ? 'text-black' : ''}`} />
+                <Link className={`w-5 h-5 mx-auto mb-1 ${settings.songPack === 'playlist' ? 'text-[#0a0318]' : 'text-white/70'}`} />
                 <span className="text-xs font-bold block">Playlist</span>
               </button>
             </div>
@@ -457,7 +457,7 @@ export function Lobby() {
                         className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${
                           selected
                             ? 'bg-neon-pink text-[#0a0318] glow-pink'
-                            : 'bg-black/30 text-gray-300 hover:bg-black/50'
+                            : 'bg-black/30 text-white/75 hover:bg-black/50 border border-white/[0.06]'
                         }`}
                       >
                         {label}
@@ -488,7 +488,7 @@ export function Lobby() {
                         className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${
                           selected
                             ? 'bg-neon-pink text-[#0a0318] glow-pink'
-                            : 'bg-black/30 text-gray-300 hover:bg-black/50'
+                            : 'bg-black/30 text-white/75 hover:bg-black/50 border border-white/[0.06]'
                         }`}
                       >
                         {label}
@@ -511,22 +511,22 @@ export function Lobby() {
                   Quick Pick a Playlist
                 </label>
                 <div className="grid grid-cols-2 gap-3">
-                  {GENRE_PACKS.map(({ label, icon, playlistId, color }) => {
+                  {GENRE_PACKS.map(({ label, icon, playlistId, dec }) => {
                     const isActive = playlistInput.includes(playlistId);
                     return (
                       <button
                         key={playlistId}
                         onClick={() => handleSelectGenrePack(playlistId)}
-                        className={`relative overflow-hidden rounded-2xl p-4 text-left transition-all transform hover:scale-[1.02] active:scale-95 ${
+                        className={`relative overflow-hidden rounded-2xl p-4 text-left transition-all transform hover:scale-[1.02] active:scale-95 ${dec} ${
                           isActive
-                            ? 'ring-2 ring-neon-pink ring-offset-2 ring-offset-bg-base'
+                            ? 'ring-2 ring-neon-pink ring-offset-2 ring-offset-[#0a0318] glow-pink'
                             : ''
                         }`}
                       >
-                        <div className={`absolute inset-0 bg-gradient-to-br ${color} opacity-${isActive ? '100' : '80'}`} />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent" />
                         <div className="relative z-10">
                           <span className="text-2xl block mb-1">{icon}</span>
-                          <span className="text-sm font-bold text-white block leading-tight">{label}</span>
+                          <span className="text-sm font-bold text-white block leading-tight drop-shadow">{label}</span>
                         </div>
                         {isActive && (
                           <div className="absolute top-2 right-2 z-10">
@@ -555,7 +555,7 @@ export function Lobby() {
                         autoCorrect="off"
                         autoCapitalize="off"
                         spellCheck={false}
-                        className={`w-full bg-black/30 border rounded-xl px-4 py-3 pr-10 text-sm text-white placeholder-gray-500 focus:outline-none transition-all ${
+                        className={`w-full bg-black/30 border rounded-xl px-4 py-3 pr-10 text-sm text-white placeholder-white/30 focus:outline-none transition-all ${
                           playlistInput.trim() === ''
                             ? 'border-white/10'
                             : isValidPlaylistUrl(playlistInput)
@@ -576,7 +576,7 @@ export function Lobby() {
                     <button
                       onClick={handleImportPlaylist}
                       disabled={!isValidPlaylistUrl(playlistInput)}
-                      className="px-4 py-3 rounded-xl bg-neon-pink hover:bg-[#ff6bd1] disabled:opacity-40 disabled:hover:bg-neon-pink text-black font-bold text-sm transition-all flex items-center gap-1.5 whitespace-nowrap"
+                      className="btn btn-primary whitespace-nowrap"
                     >
                       <ArrowDownToLine className="w-4 h-4" />
                       Import
@@ -602,7 +602,7 @@ export function Lobby() {
             )}
 
             {settings.songPack === 'standard' && (
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-white/40">
                 500+ songs spanning 1950s-2020s, balanced across decades
               </p>
             )}
@@ -623,7 +623,7 @@ export function Lobby() {
                       className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${
                         selected
                           ? 'bg-neon-pink text-[#0a0318] glow-pink'
-                          : 'bg-black/30 text-gray-300 hover:bg-black/50'
+                          : 'bg-black/30 text-white/75 hover:bg-black/50 border border-white/[0.06]'
                       }`}
                     >
                       {label}
@@ -631,7 +631,7 @@ export function Lobby() {
                   );
                 })}
               </div>
-              <p className="text-[10px] text-gray-500">
+              <p className="text-[10px] text-white/40">
                 Select regions to include songs from those regions. Leave empty to include all.
               </p>
             </div>
@@ -643,7 +643,7 @@ export function Lobby() {
               Song Source
             </h3>
 
-            <p className="text-xs text-amber-400/80 bg-amber-500/10 border border-amber-500/20 rounded-xl px-3 py-2">
+            <p className="text-xs text-neon-amber bg-neon-amber/10 border border-neon-amber/30 rounded-xl px-3 py-2">
               Preview mode: 30-second clips from the built-in song library
             </p>
 
@@ -654,10 +654,10 @@ export function Lobby() {
                 className={`py-3 px-2 rounded-xl text-center transition-all ${
                   settings.songPack === 'standard'
                     ? 'bg-neon-pink text-[#0a0318] glow-pink'
-                    : 'bg-black/30 text-gray-300 hover:bg-black/50'
+                    : 'bg-black/30 text-white/75 hover:bg-black/50 border border-white/[0.06]'
                 }`}
               >
-                <ListMusic className={`w-5 h-5 mx-auto mb-1 ${settings.songPack === 'standard' ? 'text-black' : ''}`} />
+                <ListMusic className={`w-5 h-5 mx-auto mb-1 ${settings.songPack === 'standard' ? 'text-[#0a0318]' : 'text-white/70'}`} />
                 <span className="text-xs font-bold block">Standard</span>
               </button>
               <button
@@ -665,10 +665,10 @@ export function Lobby() {
                 className={`py-3 px-2 rounded-xl text-center transition-all ${
                   settings.songPack === 'decades'
                     ? 'bg-neon-pink text-[#0a0318] glow-pink'
-                    : 'bg-black/30 text-gray-300 hover:bg-black/50'
+                    : 'bg-black/30 text-white/75 hover:bg-black/50 border border-white/[0.06]'
                 }`}
               >
-                <span className={`text-lg block ${settings.songPack === 'decades' ? 'text-black' : ''}`}>#</span>
+                <span className={`text-lg block ${settings.songPack === 'decades' ? 'text-[#0a0318]' : 'text-white/70'}`}>#</span>
                 <span className="text-xs font-bold block">Decades</span>
               </button>
               <button
@@ -676,10 +676,10 @@ export function Lobby() {
                 className={`py-3 px-2 rounded-xl text-center transition-all ${
                   settings.songPack === 'genre'
                     ? 'bg-neon-pink text-[#0a0318] glow-pink'
-                    : 'bg-black/30 text-gray-300 hover:bg-black/50'
+                    : 'bg-black/30 text-white/75 hover:bg-black/50 border border-white/[0.06]'
                 }`}
               >
-                <Music className={`w-5 h-5 mx-auto mb-1 ${settings.songPack === 'genre' ? 'text-black' : ''}`} />
+                <Music className={`w-5 h-5 mx-auto mb-1 ${settings.songPack === 'genre' ? 'text-[#0a0318]' : 'text-white/70'}`} />
                 <span className="text-xs font-bold block">By Genre</span>
               </button>
             </div>
@@ -689,10 +689,10 @@ export function Lobby() {
                 className={`py-3 px-2 rounded-xl text-center transition-all ${
                   settings.songPack === 'genre-decade'
                     ? 'bg-neon-pink text-[#0a0318] glow-pink'
-                    : 'bg-black/30 text-gray-300 hover:bg-black/50'
+                    : 'bg-black/30 text-white/75 hover:bg-black/50 border border-white/[0.06]'
                 }`}
               >
-                <span className={`text-xs font-bold block ${settings.songPack === 'genre-decade' ? 'text-black' : ''}`}>Genre + Decade</span>
+                <span className={`text-xs font-bold block ${settings.songPack === 'genre-decade' ? 'text-[#0a0318]' : 'text-white/70'}`}>Genre + Decade</span>
               </button>
             </div>
 
@@ -716,7 +716,7 @@ export function Lobby() {
                         className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${
                           selected
                             ? 'bg-neon-pink text-[#0a0318] glow-pink'
-                            : 'bg-black/30 text-gray-300 hover:bg-black/50'
+                            : 'bg-black/30 text-white/75 hover:bg-black/50 border border-white/[0.06]'
                         }`}
                       >
                         {label}
@@ -747,7 +747,7 @@ export function Lobby() {
                         className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${
                           selected
                             ? 'bg-neon-pink text-[#0a0318] glow-pink'
-                            : 'bg-black/30 text-gray-300 hover:bg-black/50'
+                            : 'bg-black/30 text-white/75 hover:bg-black/50 border border-white/[0.06]'
                         }`}
                       >
                         {label}
@@ -759,7 +759,7 @@ export function Lobby() {
             )}
 
             {settings.songPack === 'standard' && (
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-white/40">
                 500+ songs spanning 1950s-2020s, balanced across decades
               </p>
             )}
@@ -780,7 +780,7 @@ export function Lobby() {
                       className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${
                         selected
                           ? 'bg-neon-pink text-[#0a0318] glow-pink'
-                          : 'bg-black/30 text-gray-300 hover:bg-black/50'
+                          : 'bg-black/30 text-white/75 hover:bg-black/50 border border-white/[0.06]'
                       }`}
                     >
                       {label}
@@ -788,7 +788,7 @@ export function Lobby() {
                   );
                 })}
               </div>
-              <p className="text-[10px] text-gray-500">
+              <p className="text-[10px] text-white/40">
                 Select regions to include songs from those regions. Leave empty to include all.
               </p>
             </div>
@@ -797,7 +797,7 @@ export function Lobby() {
           /* Non-host: show what the host picked */
           settings.songPack !== 'standard' && (
             <div className="panel p-4">
-              <p className="text-sm text-gray-400 text-center">
+              <p className="text-sm text-white/55 text-center">
                 <Music className="w-4 h-4 inline-block mr-1 -mt-0.5" />
                 {songPackLabel}
               </p>
@@ -808,7 +808,7 @@ export function Lobby() {
         {/* Non-host waiting message */}
         {!isHost && (
           <div className="panel p-5">
-            <div className="flex flex-col items-center justify-center py-6 text-gray-400">
+            <div className="flex flex-col items-center justify-center py-6 text-white/55">
               <div className="animate-pulse flex space-x-2 mb-4">
                 <div className="w-3 h-3 bg-neon-pink rounded-full" />
                 <div className="w-3 h-3 bg-neon-pink rounded-full" style={{ animationDelay: '200ms' }} />
@@ -837,13 +837,13 @@ export function Lobby() {
               || (needsGenreSelection && (!settings.genres || settings.genres.length === 0))
               || (settings.songPack === 'playlist' && !settings.playlistUrl)
             }
-            className="w-full bg-neon-pink hover:bg-[#ff6bd1] disabled:opacity-50 disabled:hover:bg-neon-pink text-black font-black text-xl py-5 rounded-2xl flex items-center justify-center gap-2 glow-pink transition-all transform active:scale-95"
+            className="btn btn-primary btn-lg w-full"
           >
             <Play className="w-6 h-6 fill-current" />
-            {starting ? 'STARTING...' : 'START GAME'}
+            {starting ? 'STARTING…' : 'START GAME'}
           </button>
           {playerList.length < MIN_PLAYERS && (
-            <p className="text-gray-500 text-xs text-center">
+            <p className="text-white/40 text-xs text-center">
               Need at least {MIN_PLAYERS} players to start
             </p>
           )}

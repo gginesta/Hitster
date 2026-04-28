@@ -49,19 +49,19 @@ const MEDAL_STYLES: Record<number, { bg: string; border: string; badge: string; 
   0: {
     bg: 'bg-gradient-to-r from-[#FFD700]/15 via-[#FFD700]/5 to-transparent',
     border: 'border-[#FFD700]/40',
-    badge: 'bg-gradient-to-br from-[#FFD700] to-[#FFA000] text-black',
+    badge: 'bg-gradient-to-br from-[#FFD700] to-[#FFA000] text-[#0a0318]',
     text: 'text-[#FFD700]',
   },
   1: {
     bg: 'bg-gradient-to-r from-[#C0C0C0]/10 to-transparent',
     border: 'border-[#C0C0C0]/30',
-    badge: 'bg-gradient-to-br from-[#D0D0D0] to-[#A0A0A0] text-black',
+    badge: 'bg-gradient-to-br from-[#D0D0D0] to-[#A0A0A0] text-[#0a0318]',
     text: 'text-[#C0C0C0]',
   },
   2: {
     bg: 'bg-gradient-to-r from-[#CD7F32]/10 to-transparent',
     border: 'border-[#CD7F32]/30',
-    badge: 'bg-gradient-to-br from-[#CD7F32] to-[#A0622A] text-black',
+    badge: 'bg-gradient-to-br from-[#CD7F32] to-[#A0622A] text-[#0a0318]',
     text: 'text-[#CD7F32]',
   },
 };
@@ -69,8 +69,8 @@ const MEDAL_STYLES: Record<number, { bg: string; border: string; badge: string; 
 const DEFAULT_STYLE = {
   bg: 'bg-white/[0.03]',
   border: 'border-white/[0.06]',
-  badge: 'bg-white/10 text-gray-500',
-  text: 'text-gray-500',
+  badge: 'bg-white/10 text-white/40',
+  text: 'text-white/40',
 };
 
 export function Results() {
@@ -134,7 +134,7 @@ export function Results() {
 
       {/* Rankings */}
       <div className="flex-1 w-full max-w-md mx-auto space-y-3">
-        <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3">
+        <h3 className="text-xs font-bold text-white/40 uppercase tracking-widest mb-3">
           {isCoop ? 'Team Result' : 'Final Rankings'}
         </h3>
 
@@ -149,7 +149,7 @@ export function Results() {
               <span className="text-base font-bold text-neon-pink">Team Score</span>
               <div className="flex items-baseline gap-1.5">
                 <span className="font-black text-2xl">{sharedTimeline.length}</span>
-                <span className="text-xs text-gray-500 uppercase">Cards</span>
+                <span className="text-xs text-white/40 uppercase">Cards</span>
               </div>
             </div>
             <div className="space-y-2">
@@ -201,14 +201,14 @@ export function Results() {
                   <div>
                     <span className="font-bold text-base block">{player.name}</span>
                     {player.id === myId && (
-                      <span className="text-[10px] text-gray-500 font-medium">You</span>
+                      <span className="text-[10px] text-white/40 font-medium">You</span>
                     )}
                   </div>
                 </div>
                 <div className="flex flex-col items-end">
                   <div className="flex items-baseline gap-1">
                     <span className="font-black text-xl tabular-nums">{player.timeline.length}</span>
-                    <span className="text-[10px] text-gray-500 uppercase font-bold">Cards</span>
+                    <span className="text-[10px] text-white/40 uppercase font-bold">Cards</span>
                   </div>
                   <div className="flex items-center gap-1 text-xs text-[#FFD700]/70 font-bold">
                     <Coins className="w-3 h-3" />
@@ -449,7 +449,7 @@ function Awards({ gameStats, players }: { gameStats: GameStats; players: Record<
 
   return (
     <div className="w-full max-w-md mx-auto mt-8">
-      <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3">
+      <h3 className="text-xs font-bold text-white/40 uppercase tracking-widest mb-3">
         Awards
       </h3>
       <div className="space-y-2.5">
@@ -470,14 +470,14 @@ function Awards({ gameStats, players }: { gameStats: GameStats; players: Record<
               {award.icon}
             </div>
             <div className="flex-1 min-w-0">
-              <div className="text-xs text-gray-400 font-semibold uppercase tracking-wide">
+              <div className="text-xs text-white/55 font-semibold uppercase tracking-wide">
                 {award.label}
               </div>
               <div className="font-bold text-sm truncate">
                 {getName(award.playerId!)}
               </div>
             </div>
-            <div className="text-xs text-gray-400 font-bold whitespace-nowrap">
+            <div className="text-xs text-white/55 font-bold whitespace-nowrap">
               {award.detail}
             </div>
           </motion.div>

@@ -20,24 +20,6 @@ import type { SongCard, GameMode } from '@tunes/shared';
 import { SongHistory } from './SongHistory';
 import { WaitingState } from './WaitingState';
 
-const DECADE_COLORS: Record<number, string> = {
-  1930: 'from-amber-900 to-yellow-900',
-  1940: 'from-amber-800 to-orange-900',
-  1950: 'from-rose-800 to-pink-900',
-  1960: 'from-purple-700 to-violet-900',
-  1970: 'from-orange-600 to-red-800',
-  1980: 'from-pink-500 to-purple-700',
-  1990: 'from-green-600 to-teal-800',
-  2000: 'from-blue-500 to-indigo-700',
-  2010: 'from-indigo-500 to-purple-700',
-  2020: 'from-emerald-500 to-cyan-700',
-};
-
-function getCardColor(year: number): string {
-  const decade = Math.floor(year / 10) * 10;
-  return DECADE_COLORS[decade] || 'from-gray-600 to-gray-800';
-}
-
 const MODE_LABELS: Record<GameMode, string> = {
   original: 'Original',
   pro: 'Pro',
@@ -68,23 +50,6 @@ const DECADE_CLASS: Record<number, string> = {
 function getDecadeClass(year: number): string {
   const decade = Math.floor(year / 10) * 10;
   return DECADE_CLASS[decade] || 'dec-1980s';
-}
-
-function Equalizer({ animate }: { animate: boolean }) {
-  return (
-    <div className="flex items-end gap-[3px] h-6">
-      {[0, 1, 2, 3, 4].map((i) => (
-        <div
-          key={i}
-          className={`w-[3px] bg-neon-pink rounded-full ${animate ? 'animate-equalizer' : ''}`}
-          style={{
-            height: animate ? undefined : 6,
-            animationDelay: animate ? `${i * 0.12}s` : undefined,
-          }}
-        />
-      ))}
-    </div>
-  );
 }
 
 export function Game() {
@@ -407,9 +372,7 @@ export function Game() {
   const songNamingRequired = mode === 'pro' || mode === 'expert';
 
   return (
-    <div
-      className="flex flex-col h-screen text-white  overflow-hidden"
-    >
+    <div className="flex flex-col h-screen text-white overflow-hidden">
       {/* Stop game confirmation dialog */}
       <AnimatePresence>
         {showStopConfirm && (
@@ -425,21 +388,21 @@ export function Game() {
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className=" border border-white/10 rounded-2xl p-6 mx-4 max-w-sm w-full shadow-2xl"
+              className="panel-raised p-6 mx-4 max-w-sm w-full"
               onClick={(e) => e.stopPropagation()}
             >
-              <h3 className="text-lg font-bold text-white mb-2">Stop Game?</h3>
-              <p className="text-sm text-gray-400 mb-6">This will end the current game and return everyone to the lobby.</p>
+              <h3 className="font-heading text-lg font-bold text-white mb-2">Stop Game?</h3>
+              <p className="text-sm text-white/60 mb-6">This will end the current game and return everyone to the lobby.</p>
               <div className="flex gap-3">
                 <button
                   onClick={() => setShowStopConfirm(false)}
-                  className="flex-1 py-2.5 rounded-xl bg-white/10 text-white font-bold text-sm hover:bg-white/15 transition-colors"
+                  className="btn btn-ghost flex-1"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleStopGame}
-                  className="flex-1 py-2.5 rounded-xl bg-red-500 text-white font-bold text-sm hover:bg-red-600 transition-colors"
+                  className="btn btn-danger flex-1"
                 >
                   Stop Game
                 </button>
@@ -481,7 +444,7 @@ export function Game() {
             <motion.h2
               initial={{ y: -20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              className="text-xl font-bold text-white mb-2"
+              className="font-heading text-xl font-bold text-white mb-2"
             >
               Starting Cards
             </motion.h2>
@@ -492,18 +455,25 @@ export function Game() {
                   : players[key]?.id === myId
                     ? 'You'
                     : players[key]?.name || 'Player';
+                const decade = getDecadeClass(card.year);
+                const yearShort = `'${String(card.year).slice(-2)}`;
                 return (
                   <motion.div
                     key={key}
                     initial={{ scale: 0, rotateY: 180, opacity: 0 }}
                     animate={{ scale: 1, rotateY: 0, opacity: 1 }}
                     transition={{ delay: 0.3 + i * 0.3, type: 'spring', stiffness: 200, damping: 20 }}
-                    className={`flex flex-col items-center gap-1.5 rounded-xl p-3 bg-gradient-to-b ${getCardColor(card.year)} border border-white/20 shadow-lg min-w-[100px]`}
+                    className={`sleeve ${decade}`}
                   >
-                    <span className="text-[10px] font-bold text-white/70 uppercase tracking-wider">{label}</span>
-                    <span className="text-sm font-bold text-white text-center leading-tight">{card.title}</span>
-                    <span className="text-xs text-white/60">{card.artist}</span>
-                    <span className="text-lg font-black text-white/90">{card.year}</span>
+                    <div className="sleeve-shade" />
+                    <div className="sleeve-inner">
+                      <span className="font-chunky text-2xl text-neon-amber leading-none drop-shadow-md">{yearShort}</span>
+                      <div className="text-white">
+                        <p className="text-[9px] uppercase tracking-[0.2em] font-bold text-white/70 mb-0.5">{label}</p>
+                        <p className="text-[11px] font-bold leading-snug line-clamp-2 drop-shadow-sm">{card.title}</p>
+                        <p className="text-[10px] text-white/60 truncate mt-0.5">{card.artist}</p>
+                      </div>
+                    </div>
                   </motion.div>
                 );
               })}
@@ -514,7 +484,7 @@ export function Game() {
                 animate={{ opacity: 1 }}
                 transition={{ delay: 1.5 }}
                 onClick={() => getSocket().emit('skip-anchors')}
-                className="mt-4 px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white/70 text-sm font-medium transition-colors"
+                className="btn btn-ghost mt-4"
               >
                 Skip
               </motion.button>
@@ -524,37 +494,41 @@ export function Game() {
       </AnimatePresence>
 
       {/* Top Bar — Row 1: Turn info + controls */}
-      <div className="bg-black/60 border-b border-white/5 z-10">
+      <div className="bg-black/40 border-b border-white/[0.06] z-10 backdrop-blur-sm">
         <div className="flex justify-between items-center px-3 py-2">
           <div className="flex items-center gap-2 min-w-0">
-            <p className="font-bold text-neon-pink text-base truncate">
-              {isMyTurn ? 'Your Turn' : `${activePlayer.name}'s Turn`}
+            <span className="eq flex-shrink-0"><i /><i /><i /><i /><i /></span>
+            <p className="font-chunky text-neon-pink text-sm truncate text-glow-pink">
+              {isMyTurn ? 'YOUR TURN' : `${activePlayer.name.toUpperCase()}'S TURN`}
             </p>
             <span className={`${MODE_CHIP_CLASS[mode]} flex-shrink-0`}>
               {MODE_LABELS[mode]}
             </span>
-            <span className="text-xs text-gray-500 flex-shrink-0">{deckSize} left</span>
+            <span className="text-[10px] text-white/40 flex-shrink-0 tabular-nums uppercase tracking-wider">{deckSize} left</span>
           </div>
           <div className="flex items-center gap-1 flex-shrink-0">
             <button
               onClick={() => setShowHistory(true)}
-              className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
+              className="btn-icon"
               title="Song History"
+              aria-label="Song History"
             >
               <Clock className="w-4 h-4" />
             </button>
             <button
               onClick={handleToggleMute}
-              className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
+              className="btn-icon"
               title={volume > 0 ? 'Mute' : 'Unmute'}
+              aria-label="Toggle mute"
             >
               <VolumeIcon className="w-4 h-4" />
             </button>
             {isHost && (
               <button
                 onClick={() => setShowStopConfirm(true)}
-                className="p-1.5 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-400 hover:text-red-300 transition-colors border border-red-500/30"
+                className="btn-icon text-red-400 border-red-500/30 bg-red-500/10 hover:bg-red-500/20"
                 title="Stop Game"
+                aria-label="Stop Game"
               >
                 <Square className="w-3.5 h-3.5" fill="currentColor" />
               </button>
@@ -566,11 +540,11 @@ export function Game() {
         <div className="overflow-x-auto hide-scrollbar px-3 pb-1.5">
           <div className="flex gap-1.5 min-w-max mx-auto w-fit">
             {isCoop ? (
-              <div className="flex items-center gap-2 bg-white/5 rounded-xl px-4 py-1.5">
-                <span className="text-lg font-black text-green-400 tabular-nums">
-                  {sharedTimeline.length}/{settings.cardsToWin}
+              <div className="flex items-center gap-2 bg-neon-cyan/10 border border-neon-cyan/30 rounded-xl px-4 py-1.5">
+                <span className="font-display text-xl text-neon-cyan tabular-nums leading-none">
+                  {sharedTimeline.length}<span className="text-white/40 text-xs">/{settings.cardsToWin}</span>
                 </span>
-                <span className="text-sm text-gray-400">Team</span>
+                <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-white/55">Team</span>
               </div>
             ) : (
               playerList.map((p) => (
@@ -594,16 +568,16 @@ export function Game() {
         </div>
       </div>
 
-      {/* Big play button + timer bar — shown when music hasn't started yet */}
+      {/* Big play button — shown when music hasn't started yet */}
       {needsPlayButton && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="bg-black/60 border-b border-neon-pink/30 px-3 py-2"
+          className="bg-black/40 border-b border-neon-pink/30 px-3 py-2"
         >
           <button
             onClick={handlePlayTap}
-            className="w-full flex items-center justify-center gap-2 bg-neon-pink hover:bg-[#ff6bd1] text-black font-black text-base py-3 rounded-xl glow-pink transition-all active:scale-95"
+            className="btn btn-primary btn-lg w-full"
           >
             <Play className="w-5 h-5" fill="currentColor" />
             TAP TO PLAY MUSIC
@@ -611,21 +585,25 @@ export function Game() {
         </motion.div>
       )}
 
-      {/* Turn timer bar — visible below top bar during playing phase */}
-      {phase === 'playing' && turnCountdown !== null && turnCountdown > 0 && (
-        <div className={`px-4 py-2 border-b flex items-center justify-center gap-2 text-sm font-bold ${
-          turnCountdown <= 5 ? 'bg-red-500/20 border-red-500/30 text-red-400' :
-          turnCountdown <= 10 ? 'bg-orange-500/20 border-orange-500/30 text-orange-400' :
-          'bg-white/5 border-white/10 text-gray-300'
-        }`}>
-          <Clock className="w-4 h-4" />
-          <span>{turnCountdown}s remaining</span>
-        </div>
-      )}
+      {/* Turn timer bar — gradient stripe under top chrome */}
+      {phase === 'playing' && turnCountdown !== null && turnCountdown > 0 && (() => {
+        const total = 60;
+        const pct = Math.min(100, Math.max(0, (turnCountdown / total) * 100));
+        const tint = turnCountdown <= 5 ? '#f87171' : turnCountdown <= 10 ? 'var(--color-neon-amber)' : 'var(--color-neon-cyan)';
+        return (
+          <div className="relative h-[3px] bg-white/5 overflow-hidden">
+            <div
+              className="absolute inset-y-0 left-0 transition-all duration-1000 ease-linear"
+              style={{ width: `${pct}%`, background: `linear-gradient(90deg, ${tint}, ${tint})` }}
+            />
+          </div>
+        );
+      })()}
 
       {/* Spotify error banner */}
       {spotifyError && (
-        <div className="bg-red-500/10 border-b border-red-500/20 px-4 py-2 text-center text-xs text-red-400 font-medium">
+        <div className="bg-red-500/15 border-b border-red-500/30 px-4 py-2 text-center text-xs text-red-300 font-bold flex items-center justify-center gap-2">
+          <AlertTriangle className="w-3.5 h-3.5" />
           {spotifyError}
         </div>
       )}
@@ -642,16 +620,16 @@ export function Game() {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className={`border-b px-4 py-2.5 text-center text-sm font-semibold ${
+              className={`border-b px-4 py-2.5 text-center text-sm font-bold ${
                 isTheirTurn
-                  ? 'bg-amber-500/20 border-amber-500/30 text-amber-300'
-                  : 'bg-yellow-500/10 border-yellow-500/20 text-yellow-400'
+                  ? 'bg-neon-amber/20 border-neon-amber/40 text-neon-amber'
+                  : 'bg-neon-amber/10 border-neon-amber/25 text-neon-amber/85'
               }`}
             >
               <div className="flex items-center justify-center gap-2 animate-blink">
                 <AlertTriangle className="w-4 h-4 flex-shrink-0" />
                 <span>
-                  {dcPlayer.name} disconnected{isTheirTurn ? ' (their turn)' : ''} &mdash; waiting {secs}s...
+                  {dcPlayer.name} disconnected{isTheirTurn ? ' (their turn)' : ''} — waiting {secs}s…
                 </span>
               </div>
             </motion.div>
@@ -839,7 +817,7 @@ export function Game() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             onClick={handleConfirmReveal}
-            className="mt-6 bg-neon-pink hover:bg-[#ff6bd1] text-black font-bold py-3 px-8 rounded-2xl transition-all transform active:scale-95"
+            className="btn btn-primary btn-lg mt-6"
           >
             Continue
           </motion.button>
@@ -853,13 +831,13 @@ export function Game() {
             className="mt-5 w-full max-w-xs space-y-3"
           >
             {songNamingRequired && (
-              <div className={`text-center text-xs font-bold px-3 py-1.5 rounded-xl border ${
+              <div className={`text-center text-[11px] font-bold px-3 py-2 rounded-xl border uppercase tracking-[0.15em] ${
                 mode === 'expert'
-                  ? 'bg-red-500/10 text-red-400 border-red-500/20'
-                  : 'bg-purple-500/10 text-purple-400 border-purple-500/20'
+                  ? 'bg-red-500/10 text-red-300 border-red-500/30'
+                  : 'bg-neon-violet/10 text-neon-violet border-neon-violet/30'
               }`}>
                 {mode === 'expert'
-                  ? 'Required: Name the song + guess the exact year'
+                  ? 'Required: Name the song + exact year'
                   : 'Required: Name the song to keep the card'}
               </div>
             )}
@@ -872,7 +850,7 @@ export function Game() {
               autoComplete="off"
               autoCapitalize="sentences"
               enterKeyHint="next"
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-neon-pink"
+              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 focus:outline-none focus:border-neon-pink focus:bg-neon-pink/5 transition-all"
             />
             <input
               type="search"
@@ -883,7 +861,7 @@ export function Game() {
               autoComplete="off"
               autoCapitalize="sentences"
               enterKeyHint="done"
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-neon-pink"
+              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 focus:outline-none focus:border-neon-pink focus:bg-neon-pink/5 transition-all"
             />
             {mode === 'expert' && (
               <input
@@ -892,13 +870,14 @@ export function Game() {
                 value={guessYear}
                 onChange={(e) => setGuessYear(e.target.value)}
                 autoComplete="off"
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-neon-pink"
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 tabular-nums focus:outline-none focus:border-neon-pink focus:bg-neon-pink/5 transition-all"
               />
             )}
             {guessTitle ? (
               <button
                 onClick={handleNameSong}
-                className="w-full bg-purple-600 hover:bg-purple-500 text-white font-bold py-2 rounded-xl text-sm transition-all"
+                className="btn btn-primary w-full"
+                style={{ background: 'linear-gradient(135deg, var(--color-neon-violet), #c084fc)', boxShadow: '0 0 24px rgba(168,85,247,0.4)' }}
               >
                 Submit Song Guess
               </button>
@@ -925,24 +904,26 @@ export function Game() {
             animate={{ opacity: 1, y: 0 }}
             className="mt-5 text-center w-full max-w-sm"
           >
-            <p className="text-gray-400 mb-2">
-              {activePlayer.name} placed the card. Think it's wrong?
-            </p>
-            <p className="text-xs text-gray-500 mb-4">
-              Pick where YOU think it belongs in the timeline below, then challenge.
-            </p>
+            <div className="bg-red-500/10 border border-red-500/30 rounded-xl px-4 py-2.5 mb-3">
+              <p className="text-red-300 font-bold text-sm">
+                {activePlayer.name} placed the card. Think it's wrong?
+              </p>
+              <p className="text-[11px] text-red-200/70 mt-0.5">
+                Pick where YOU think it belongs, then challenge.
+              </p>
+            </div>
             <div className="flex gap-3 justify-center">
               <button
                 onClick={handleChallenge}
                 disabled={me.tokens < CHALLENGE_COST || challengePosition === null}
-                className="bg-red-500/15 hover:bg-red-500/25 text-red-400 border border-red-500/30 font-bold py-3.5 px-6 rounded-2xl flex items-center gap-2 transition-all disabled:opacity-40 active:scale-[0.97]"
+                className="btn btn-danger flex-1"
               >
                 <AlertTriangle className="w-5 h-5" />
-                {challengePosition !== null ? `Challenge! (${CHALLENGE_COST})` : 'Pick a position first'}
+                {challengePosition !== null ? `Challenge! (${CHALLENGE_COST}★)` : 'Pick a position'}
               </button>
               <button
                 onClick={() => setNoChallengeClicked(true)}
-                className="bg-white/[0.06] hover:bg-white/[0.1] text-gray-400 hover:text-white border border-white/[0.08] font-bold py-3.5 px-6 rounded-2xl flex items-center gap-2 transition-all active:scale-[0.97]"
+                className="btn btn-ghost flex-1"
               >
                 <Check className="w-5 h-5" />
                 Looks Good
@@ -952,23 +933,23 @@ export function Game() {
         )}
 
         {!isMyTurn && phase === 'challenge' && !isCoop && challengers.includes(myId) && (
-          <p className="mt-5 text-neon-pink font-medium">Challenge submitted!</p>
+          <p className="mt-5 text-neon-cyan font-bold flex items-center gap-2"><Check className="w-4 h-4" />Challenge submitted!</p>
         )}
 
         {!isMyTurn && phase === 'challenge' && !isCoop && noChallengeClicked && !challengers.includes(myId) && (
-          <p className="mt-5 text-gray-500 font-medium">No challenge — waiting for timer...</p>
+          <p className="mt-5 text-white/40 font-medium">No challenge — waiting for timer…</p>
         )}
 
         {/* Active player sees countdown too during challenge */}
         {isMyTurn && phase === 'challenge' && !isCoop && (
-          <p className="mt-5 text-gray-400 font-medium">
-            Waiting for challenges...
+          <p className="mt-5 text-white/55 font-medium">
+            Waiting for challenges…
           </p>
         )}
 
         {/* Challengers display */}
         {!isCoop && challengers.length > 0 && phase === 'challenge' && (
-          <div className="mt-4 text-sm text-gray-400">
+          <div className="mt-4 text-sm text-white/55">
             Challengers: {challengers.map((id) => players[id]?.name || 'Unknown').join(', ')}
           </div>
         )}
@@ -977,7 +958,7 @@ export function Game() {
       {/* Bottom: Timeline + Actions */}
       <div className="bg-black/60 border-t border-white/10 px-4 pt-3 pb-4">
         <div className="flex items-center justify-between mb-2">
-          <h3 className="font-bold text-gray-300 uppercase tracking-widest text-xs">
+          <h3 className="font-bold text-white/75 uppercase tracking-widest text-xs">
             {isCoop
               ? 'Team Timeline'
               : isMyTurn
@@ -989,7 +970,7 @@ export function Game() {
           {!isMyTurn && !isCoop && phase !== 'reveal' && (
             <button
               onClick={() => setViewingOwnTimeline((v) => !v)}
-              className="flex items-center gap-1.5 text-xs font-bold text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 px-2.5 py-1 rounded-lg transition-colors"
+              className="flex items-center gap-1.5 text-xs font-bold text-white/55 hover:text-white bg-white/5 hover:bg-white/10 px-2.5 py-1 rounded-lg transition-colors"
             >
               <ArrowLeftRight className="w-3.5 h-3.5" />
               {viewingOwnTimeline ? 'Show Theirs' : 'Show Mine'}
@@ -1045,7 +1026,7 @@ export function Game() {
               ))}
 
               {displayTimeline.length === 0 && !showDropZones && phase !== 'challenge' && (
-                <p className="text-gray-500 text-sm italic mx-auto">No cards yet</p>
+                <p className="text-white/40 text-sm italic mx-auto">No cards yet</p>
               )}
             </div>
           );
