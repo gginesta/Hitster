@@ -842,24 +842,28 @@ export function Game() {
               </div>
             )}
             <input
-              type="search"
+              type="text"
               name="song-title-guess"
               placeholder={songNamingRequired ? 'Song Title (Required)' : 'Guess Title (Optional, +1 token)'}
               value={guessTitle}
               onChange={(e) => setGuessTitle(e.target.value)}
               autoComplete="off"
+              autoCorrect="on"
               autoCapitalize="sentences"
+              spellCheck={true}
               enterKeyHint="next"
               className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 focus:outline-none focus:border-neon-pink focus:bg-neon-pink/5 transition-all"
             />
             <input
-              type="search"
+              type="text"
               name="song-artist-guess"
               placeholder={songNamingRequired ? 'Artist (Required)' : 'Guess Artist (Optional)'}
               value={guessArtist}
               onChange={(e) => setGuessArtist(e.target.value)}
               autoComplete="off"
-              autoCapitalize="sentences"
+              autoCorrect="on"
+              autoCapitalize="words"
+              spellCheck={true}
               enterKeyHint="done"
               className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 focus:outline-none focus:border-neon-pink focus:bg-neon-pink/5 transition-all"
             />

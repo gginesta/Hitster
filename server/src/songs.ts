@@ -14,8 +14,29 @@ let songsFilePath: string | null = null;
 // In-memory cache: "title::artist" → { trackId, previewUrl }
 const trackCache = new Map<string, { trackId: string; previewUrl?: string; albumArtUrl?: string }>();
 
+/**
+ * Recently selected song keys (across all decks, all rooms, this server lifetime).
+ * Used to bias future deck selections away from songs that just played, so the
+ * same handful of high-resolvability tracks don't dominate every game. Bounded
+ * by RECENT_SONGS_LIMIT — once full, oldest entries are dropped FIFO.
+ */
+const recentlySelected: string[] = [];
+const RECENT_SONGS_LIMIT = 250;
+
 function cacheKey(song: SongData): string {
   return `${song.title.toLowerCase()}::${song.artist.toLowerCase()}`;
+}
+
+function rememberRecent(songs: SongData[]): void {
+  for (const song of songs) {
+    const key = cacheKey(song);
+    const idx = recentlySelected.indexOf(key);
+    if (idx !== -1) recentlySelected.splice(idx, 1);
+    recentlySelected.push(key);
+  }
+  while (recentlySelected.length > RECENT_SONGS_LIMIT) {
+    recentlySelected.shift();
+  }
 }
 
 export function loadSongs() {
@@ -98,12 +119,19 @@ export function selectGameDeck(
   const selected: SongData[] = [];
   const decadeKeys = [...byDecade.keys()].sort();
   const perDecade = Math.max(1, Math.ceil(count / decadeKeys.length));
+  const recentSet = new Set(recentlySelected);
 
-  // Pick from each decade
+  // Pick from each decade, preferring songs not in the recent-set so the same
+  // handful of tracks don't reappear in every game. If a decade's pool is
+  // smaller than the per-decade quota, all of its songs are taken (so small
+  // decades are still represented), but recent ones go to the back of the line.
   for (const decade of decadeKeys) {
     const songs = byDecade.get(decade)!;
     const shuffled = fisherYatesShuffle([...songs]);
-    selected.push(...shuffled.slice(0, perDecade));
+    const fresh = shuffled.filter((s) => !recentSet.has(cacheKey(s)));
+    const stale = shuffled.filter((s) => recentSet.has(cacheKey(s)));
+    const ordered = [...fresh, ...stale];
+    selected.push(...ordered.slice(0, perDecade));
   }
 
   // Deduplicate by title+artist (case-insensitive) before building the deck
@@ -116,15 +144,16 @@ export function selectGameDeck(
   });
 
   // Shuffle and trim to count
-  const deck: SongCard[] = fisherYatesShuffle(deduped)
-    .slice(0, count)
-    .map((song) => ({
-      ...song,
-      id: uuidv4(),
-      // Preserve pre-baked Spotify data from songs.json if available
-      spotifyTrackId: song.spotifyTrackId || undefined,
-      previewUrl: song.previewUrl || undefined,
-    }));
+  const finalSongs = fisherYatesShuffle(deduped).slice(0, count);
+  rememberRecent(finalSongs);
+
+  const deck: SongCard[] = finalSongs.map((song) => ({
+    ...song,
+    id: uuidv4(),
+    // Preserve pre-baked Spotify data from songs.json if available
+    spotifyTrackId: song.spotifyTrackId || undefined,
+    previewUrl: song.previewUrl || undefined,
+  }));
 
   return deck;
 }

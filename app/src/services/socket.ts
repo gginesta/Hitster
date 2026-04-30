@@ -28,26 +28,45 @@ export function getSocket(): GameSocket {
   return socket;
 }
 
-/** Store session info so we can rejoin after disconnect */
+/**
+ * Store session info so we can rejoin after disconnect. Uses localStorage so
+ * that the session survives iOS Safari killing the tab when the phone locks
+ * or the app is backgrounded — sessionStorage gets wiped in those cases and
+ * the player would lose access to the running game.
+ *
+ * The session is stamped with a timestamp and only considered valid for a
+ * short window so a stale session from days ago doesn't try to rejoin a room
+ * that no longer exists.
+ */
+const SESSION_TTL_MS = 12 * 60 * 60 * 1000; // 12 hours
+
 export function saveSession(roomCode: string, playerId: string): void {
   try {
-    sessionStorage.setItem('tunes_room', roomCode);
-    sessionStorage.setItem('tunes_player', playerId);
-  } catch { /* sessionStorage unavailable */ }
+    localStorage.setItem('tunes_room', roomCode);
+    localStorage.setItem('tunes_player', playerId);
+    localStorage.setItem('tunes_session_ts', String(Date.now()));
+  } catch { /* localStorage unavailable */ }
 }
 
 export function getSession(): { roomCode: string; playerId: string } | null {
   try {
-    const roomCode = sessionStorage.getItem('tunes_room');
-    const playerId = sessionStorage.getItem('tunes_player');
-    if (roomCode && playerId) return { roomCode, playerId };
-  } catch { /* sessionStorage unavailable */ }
+    const roomCode = localStorage.getItem('tunes_room');
+    const playerId = localStorage.getItem('tunes_player');
+    const ts = parseInt(localStorage.getItem('tunes_session_ts') || '0', 10);
+    if (!roomCode || !playerId) return null;
+    if (ts && Date.now() - ts > SESSION_TTL_MS) {
+      clearSession();
+      return null;
+    }
+    return { roomCode, playerId };
+  } catch { /* localStorage unavailable */ }
   return null;
 }
 
 export function clearSession(): void {
   try {
-    sessionStorage.removeItem('tunes_room');
-    sessionStorage.removeItem('tunes_player');
-  } catch { /* sessionStorage unavailable */ }
+    localStorage.removeItem('tunes_room');
+    localStorage.removeItem('tunes_player');
+    localStorage.removeItem('tunes_session_ts');
+  } catch { /* localStorage unavailable */ }
 }
